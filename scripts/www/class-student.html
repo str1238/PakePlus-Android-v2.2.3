@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>班级 - 学生</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* =============================================
+     CSS VARIABLES
+     ============================================= */
+  :root {
+    --bg: #F2F2F7;
+    --surface: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #6E6E73;
+    --text-muted: #AEAEB2;
+    --border: #E5E5EA;
+    --border-dark: #D1D1D6;
+    --blue: #007AFF;
+    --blue-light: #E8F4FF;
+    --primary: #007AFF;
+    --brand: #2dc89c;
+    --brand-light: rgba(45,200,156,0.12);
+    --orange: #FF9500;
+    --orange-light: rgba(255,149,0,0.1);
+    --purple: #764ba2;
+    --purple-light: #F3EEFF;
+    --red: #FF3B30;
+
+    --sp-1: 4px;   --sp-2: 8px;   --sp-3: 12px;  --sp-4: 16px;
+    --sp-5: 20px;  --sp-6: 24px;  --sp-8: 32px;
+
+    --content-pad: var(--sp-4);
+
+    --text-xs: 11px;  --text-sm: 12px;  --text-base: 14px;
+    --text-md: 15px;  --text-lg: 16px;  --text-xl: 17px;
+    --text-2xl: 20px; --text-3xl: 24px;
+
+    --card-radius: 12px;
+    --btn-height: 50px;
+    --avatar-size: 40px;
+
+    --tab-bg: rgba(255,255,255,0.88);
+    --tab-radius: 28px;
+    --tab-height: 68px;
+    --tab-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+    --tab-inset-bottom: 20px;
+  }
+
+  /* =============================================
+     BASE RESET
+     ============================================= */
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html { font-size: 14px; scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans SC', 'Helvetica Neue', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    max-width: 100%;
+    margin: 0 auto;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  .page-wrapper { width: 100%; }
+  .content { padding: var(--sp-4); padding-top: 52px; padding-bottom: calc(100px + var(--tab-height)); }
+
+  /* =============================================
+     STATUS BAR
+     ============================================= */
+  .status-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    height: 44px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 0 24px 8px;
+	 z-index: 9999;
+  }
+  .status-time   { font-size: var(--text-md); font-weight: 600; color: var(--text-primary); }
+  .status-icons  { display: flex; align-items: center; gap: 5px; }
+  .status-icons svg { width: 17px; height: 17px; }
+
+  /* =============================================
+     STUDENT CLASS CARD
+     ============================================= */
+  .student-class-card {
+    background: var(--surface);
+    border-radius: var(--card-radius);
+    margin-bottom: var(--sp-4);
+    overflow: hidden;
+	margin-top: 10px;
+  }
+  .student-header {
+    padding: var(--sp-4);
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .school-name {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+  .class-name-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .class-name {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .class-switcher {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    background: var(--bg);
+    border-radius: 16px;
+    cursor: pointer;
+  }
+  .class-switcher svg { width: 14px; height: 14px; color: var(--text-muted); }
+  .class-switcher span { font-size: var(--text-xs); color: var(--text-secondary); }
+
+  /* =============================================
+     HOMEWORK BOARD — TODAY ONLY
+     ============================================= */
+  .homework-board { padding: var(--sp-4); }
+  .board-title {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: var(--sp-3);
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+  .board-title svg { width: 16px; height: 16px; color: var(--brand); }
+
+  .homework-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--sp-2);
+  }
+
+  /* =============================================
+     HOMEWORK ITEM — PROMINENT SUBJECT + COUNT ONLY
+     ============================================= */
+  .hw-item {
+    background: var(--bg);
+    border-radius: 12px;
+    padding: var(--sp-3);
+    cursor: pointer;
+    transition: all 0.18s;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .hw-item:active { transform: scale(0.97); }
+
+  /* 科目胶囊 — 醒目白字渐变 */
+  .hw-subject {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: #fff;
+    align-self: flex-start;
+    letter-spacing: 0.5px;
+  }
+  .hw-subject.math     { background: linear-gradient(135deg, #FF9500, #FF6B00); }
+  .hw-subject.chinese  { background: linear-gradient(135deg, #007AFF, #5856D6); }
+  .hw-subject.english  { background: linear-gradient(135deg, #34C759, #1A9E3F); }
+  .hw-subject.physics  { background: linear-gradient(135deg, #5856D6, #AF52DE); }
+  .hw-subject.chemistry{ background: linear-gradient(135deg, #FF2D55, #FF6482); }
+  .hw-subject.politics { background: linear-gradient(135deg, #5AC8FA, #007AFF); }
+  .hw-subject.history  { background: linear-gradient(135deg, #A2845E, #7B5E3A); }
+  .hw-subject.biology  { background: linear-gradient(135deg, #34C759, #00C7BE); }
+  .hw-subject.geography{ background: linear-gradient(135deg, #00C7BE, #009688); }
+
+  /* 标题 */
+  .hw-title {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  /* 底部：题数 + 截止标签 */
+  .hw-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 2px;
+  }
+  .hw-count { font-size: var(--text-xs); color: var(--text-muted); font-weight: 500; }
+  .hw-count strong { color: var(--orange); font-weight: 700; }
+  .hw-due {
+    font-size: 10px; font-weight: 600;
+    padding: 2px 8px; border-radius: 10px;
+    background: rgba(255,149,0,0.12); color: var(--orange);
+  }
+  .hw-due.overdue { background: rgba(255,59,48,0.1); color: var(--red); }
+
+  /* =============================================
+     NOTICE WALL
+     ============================================= */
+  .notice-wall { padding: var(--sp-4); border-top: 1px solid var(--border); }
+  .notice-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--sp-3);
+  }
+  .notice-title {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+  .notice-title svg { width: 16px; height: 16px; color: var(--orange); }
+  .notice-actions { display: flex; gap: var(--sp-2); }
+  .notice-btn {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    padding: 4px 10px;
+    border-radius: 12px;
+    background: var(--bg);
+    cursor: pointer;
+    border: none;
+    font-family: inherit;
+  }
+  .notice-list { display: flex; flex-direction: column; gap: var(--sp-2); }
+  .notice-item {
+    background: var(--bg);
+    border-radius: 10px;
+    padding: var(--sp-3);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .notice-item:active { background: var(--border); }
+  .notice-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-bottom: 6px;
+  }
+  .notice-tag.important { background: rgba(255,59,48,0.1); color: var(--red); }
+  .notice-tag.normal { background: rgba(0,122,255,0.1); color: var(--blue); }
+  .notice-text {
+    font-size: var(--text-base);
+    color: var(--text-primary);
+    line-height: 1.5;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  .notice-time {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    margin-top: 8px;
+  }
+
+  /* =============================================
+     STUDENT CLASS CARD — BODY CLASSES
+     (HTML uses different class names than CSS)
+     ============================================= */
+  .student-class-header {
+    padding: var(--sp-4);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+  }
+  .student-class-info { display: flex; flex-direction: column; gap: 2px; }
+  .student-school {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+  .student-class-name {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .switch-class-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    background: var(--bg);
+    border-radius: 16px;
+    border: none;
+    cursor: pointer;
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    font-family: inherit;
+  }
+  .switch-class-btn svg { width: 14px; height: 14px; color: var(--text-muted); }
+
+  /* =============================================
+     HOMEWORK ITEM INNER STRUCTURE
+     ============================================= */
+  .subject-homework-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--sp-3);
+    background: var(--bg);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    gap: var(--sp-2);
+  }
+  .subject-homework-item:active { background: var(--border); }
+  .subject-homework-item.done { opacity: 0.7; }
+  .subject-left { flex: 1; min-width: 0; }
+  .subject-tag {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 10px;
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+  }
+  .subject-tag.math { background: rgba(255,149,0,0.18); color: #C47000; }
+  .subject-tag.chinese { background: rgba(0,122,255,0.18); color: #0055CC; }
+  .subject-tag.english { background: rgba(52,199,89,0.18); color: #1A8A3E; }
+  .subject-tag.physics { background: rgba(88,86,214,0.18); color: #4A3DAF; }
+  .subject-tag.chemistry { background: rgba(255,45,85,0.18); color: #CC2244; }
+  .subject-tag.politics { background: rgba(90,200,250,0.18); color: #0088CC; }
+  .subject-tag.history { background: rgba(162,132,94,0.18); color: #7B5E3A; }
+  .subject-tag.biology { background: rgba(52,199,89,0.18); color: #1A8A3E; }
+  .subject-tag.geography { background: rgba(0,199,190,0.18); color: #008880; }
+  .subject-title {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .subject-meta { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+  .subject-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+  .due-tag {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: rgba(255,149,0,0.1);
+    color: var(--orange);
+  }
+  .due-tag.overdue { background: rgba(255,59,48,0.1); color: var(--red); }
+  .done-tag {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: var(--brand-light);
+    color: var(--brand);
+  }
+  .item-arrow { width: 16px; height: 16px; color: var(--text-muted); flex-shrink: 0; }
+
+  /* =============================================
+     HOMEWORK SECTION TITLE (alias for .section-title)
+     ============================================= */
+  .homework-section-title {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    margin-bottom: var(--sp-3);
+    padding-left: var(--sp-1);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .homework-section-title .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--orange); }
+  .homework-section-title.done .dot { background: var(--brand); }
+  .homework-section-title.pending { color: var(--orange); }
+  .homework-section-title.done { color: var(--brand); }
+
+  /* =============================================
+     CLASS SWITCHER MODAL
+     ============================================= */
+  .class-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 100000;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .class-modal-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .class-modal {
+    width: 100%;
+    background: var(--surface);
+    border-radius: 20px 20px 0 0;
+    padding: var(--sp-6) var(--sp-5) calc(var(--sp-8) + env(safe-area-inset-bottom, 0px));
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .class-modal-overlay.show .class-modal {
+    transform: translateY(0);
+  }
+  .class-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--sp-4);
+  }
+  .class-modal-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .class-modal-close {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .class-modal-close svg { width: 14px; height: 14px; color: var(--text-secondary); }
+
+  .class-modal-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+    max-height: 60vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .class-modal-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--sp-4);
+    border-radius: 12px;
+    background: var(--bg);
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .class-modal-item:active { transform: scale(0.98); background: var(--border); }
+  .class-modal-item.current {
+    background: var(--brand-light);
+    border: 1.5px solid var(--brand);
+  }
+  .class-modal-item-info { display: flex; flex-direction: column; gap: 2px; }
+  .class-modal-item-school {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+  .class-modal-item-name {
+    font-size: var(--text-md);
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .class-modal-item.current .class-modal-item-name { color: var(--brand); }
+  .class-modal-item-check {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--brand);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .class-modal-item.current .class-modal-item-check { opacity: 1; }
+  .class-modal-item-check svg { width: 12px; height: 12px; color: #fff; }
+
+  .class-modal-add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 14px 0;
+    margin-top: var(--sp-3);
+    border: 2px dashed var(--border-dark);
+    border-radius: 12px;
+    background: none;
+    font-size: var(--text-md);
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.18s;
+    font-family: inherit;
+  }
+  .class-modal-add:active { background: var(--bg); color: var(--brand); border-color: var(--brand); }
+  .class-modal-add svg { width: 18px; height: 18px; }
+
+  /* =============================================
+     FLOATING TAB BAR
+     ============================================= */
+
+.floating-tab-bar {
+    position: fixed;
+    bottom: var(--tab-inset-bottom);
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 40px);
+    max-width: 390px;
+    height: var(--tab-height);
+    background: var(--tab-bg);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-radius: var(--tab-radius);
+    box-shadow: var(--tab-shadow);
+    display: flex;
+    align-items: center;
+    padding: 0 6px;
+    will-change: transform;
+    z-index: 9999;
+    border-top: 0.5px solid rgba(255,255,255,0.6);
+  }
+
+  /* Tab 每一项 */
+  .tab-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    height: 56px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .tab-item:active { transform: scale(0.93); }
+
+  /* 图标 */
+  .tab-item svg {
+    width: 23px;
+    height: 23px;
+    transition: all 0.2s;
+  }
+
+  /* 文字 */
+  .tab-item .tab-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    transition: all 0.2s;
+  }
+
+  /* 未选中 */
+  .tab-item.inactive svg { color: var(--text-muted); }
+  .tab-item.inactive .tab-label { color: var(--text-muted); }
+
+  /* 选中态 */
+  .tab-item.active svg { color: var(--brand); }
+  .tab-item.active .tab-label { color: var(--brand); font-weight: 600; }
+
+  /* 选中态背景高亮 */
+  .tab-item.active::before {
+    content: '';
+    position: absolute;
+    inset: 4px 10px;
+    background: var(--brand-light);
+    border-radius: 16px;
+    z-index: -1;
+  }
+
+  /* 中间 Tab — 任务/发布按钮 */
+  .tab-item.center-tab { position: relative; }
+
+  .tab-item.center-tab .icon-wrap {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: var(--brand);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(45,200,156,0.45);
+    margin-top: -10px;
+    transition: all 0.2s;
+  }
+
+  .tab-item.center-tab .icon-wrap svg { color: white; width: 22px; height: 22px; }
+
+  .tab-item.center-tab.active::before { display: none; }
+  .tab-item.center-tab.active .icon-wrap {
+    box-shadow: 0 6px 20px rgba(45,200,156,0.55);
+    transform: scale(1.08);
+  }
+
+  .tab-item.center-tab .tab-label {
+    color: var(--brand);
+    font-weight: 600;
+    margin-top: 2px;
+    font-size: 10px;
+  }
+
+  /* 深色模式 */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1C1C1E;
+      --surface: #2C2C2E;
+      --text-primary: #FFFFFF;
+      --text-secondary: #ABABAB;
+      --text-muted: #636366;
+      --border: #3A3A3C;
+      --tab-bg: rgba(44,44,46,0.88);
+      --brand-light: rgba(45,200,156,0.18);
+    }
+    .info-card, .tip-card { box-shadow: 0 1px 6px rgba(0,0,0,0.3); }
+    .floating-tab-bar { border-top-color: rgba(255,255,255,0.1); }
+    .tip-card { color: #6FE3B4; }
+  }
+
+  @media (min-width: 500px) {
+    body { border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
+  }
+</style>
+</head>
+<body>
+<div class="page-wrapper">
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <div class="status-time">9:41</div>
+    <div class="status-icons">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- 班级卡片 -->
+    <div class="student-class-card">
+      <div class="student-class-header">
+        <div class="student-class-info">
+          <div class="student-school">北京市第一中学</div>
+          <div class="student-class-name">初二（3）班</div>
+        </div>
+        <button class="switch-class-btn" onclick="showClassList()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+          切换班级
+        </button>
+      </div>
+
+      <!-- 作业板 -->
+      <div class="homework-board">
+        <div class="board-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          作业板
+        </div>
+
+        <!-- 待完成 -->
+        <div class="homework-section">
+          <div class="homework-section-title">待完成</div>
+          <div class="homework-grid">
+            <div class="subject-homework-item" onclick="goToHomework('hw1')">
+              <div class="subject-left">
+                <div class="subject-tag math">数学</div>
+                <div class="subject-title">二次函数综合练习</div>
+                <div class="subject-meta">第3章 · 作业本B · 3题未做</div>
+              </div>
+              <div class="subject-right">
+                <svg class="item-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+              </div>
+            </div>
+            <div class="subject-homework-item" onclick="goToHomework('hw2')">
+              <div class="subject-left">
+                <div class="subject-tag chinese">语文</div>
+                <div class="subject-title">《背影》阅读理解</div>
+                <div class="subject-meta">课后练习 · 2题未做</div>
+              </div>
+              <div class="subject-right">
+                <svg class="item-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+              </div>
+            </div>
+            <div class="subject-homework-item" onclick="goToHomework('hw3')">
+              <div class="subject-left">
+                <div class="subject-tag english">英语</div>
+                <div class="subject-title">Unit 7 词汇与语法</div>
+                <div class="subject-meta">听说练习 · 5题未做</div>
+              </div>
+              <div class="subject-right">
+                <svg class="item-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 已完成 -->
+        <div class="homework-section">
+          <div class="homework-section-title">已完成</div>
+          <div class="homework-grid">
+            <div class="subject-homework-item done" onclick="goToHomework('hw4')">
+              <div class="subject-left">
+                <div class="subject-tag math">数学</div>
+                <div class="subject-title">一元二次方程检测</div>
+                <div class="subject-meta">用时45分钟 · 得分92分</div>
+              </div>
+              <div class="subject-right">
+                <div class="done-tag">已提交</div>
+                <svg class="item-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+              </div>
+            </div>
+            <div class="subject-homework-item done" onclick="goToHomework('hw5')">
+              <div class="subject-left">
+                <div class="subject-tag physics">物理</div>
+                <div class="subject-title">凸透镜成像规律练习</div>
+                <div class="subject-meta">用时30分钟 · 得分88分</div>
+              </div>
+              <div class="subject-right">
+                <div class="done-tag">已提交</div>
+                <svg class="item-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 通知墙 -->
+      <div class="notice-wall">
+        <div class="notice-header">
+          <div class="notice-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            通知墙
+          </div>
+          <button class="notice-btn" onclick="goToNoticeList()">查看全部</button>
+        </div>
+        <div class="notice-list">
+          <div class="notice-item" onclick="goToNoticeDetail('n1')">
+            <span class="notice-tag important">重要</span>
+            <div class="notice-text">本周五下午3点召开家长会，请各位于2:50前到教室准备。</div>
+            <div class="notice-time">10分钟前</div>
+          </div>
+          <div class="notice-item" onclick="goToNoticeDetail('n2')">
+            <span class="notice-tag normal">通知</span>
+            <div class="notice-text">下周一数学单元测试，范围：二次函数，请同学们提前复习。</div>
+            <div class="notice-time">2小时前</div>
+          </div>
+          <div class="notice-item" onclick="goToNoticeDetail('n3')">
+            <span class="notice-tag normal">通知</span>
+            <div class="notice-text">本周三下午有社团活动，请报名同学准时参加。</div>
+            <div class="notice-time">昨天</div>
+          </div>
+          <div class="notice-item" onclick="goToNoticeDetail('n4')">
+            <span class="notice-tag normal">通知</span>
+            <div class="notice-text">明天（周三）穿夏季校服，体育课需带运动鞋。</div>
+            <div class="notice-time">昨天</div>
+          </div>
+          <div class="notice-item" onclick="goToNoticeDetail('n5')">
+            <span class="notice-tag normal">通知</span>
+            <div class="notice-text">五一假期作业清单已发布，请家长查阅并督促完成。</div>
+            <div class="notice-time">3天前</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =============================================
+     悬浮岛底部 Tab 栏
+     ============================================= -->
+<nav class="floating-tab-bar">
+
+  <!-- 教学 -->
+  <div class="tab-item inactive" id="tab-teach" onclick="switchTab('teach')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+    </svg>
+    <span class="tab-label">教学</span>
+  </div>
+
+  <!-- 班级 -->
+  <div class="tab-item active" id="tab-class" onclick="switchTab('class')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+    </svg>
+    <span class="tab-label">班级</span>
+  </div>
+
+  <!-- 任务（中间凸起按钮） -->
+  <div class="tab-item inactive center-tab" id="tab-task" onclick="switchTab('task')">
+    <div class="icon-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="3 8 5 10 9 6"/><line x1="13" y1="8" x2="21" y2="8"/>
+        <polyline points="3 16 5 18 9 14"/><line x1="13" y1="16" x2="19" y2="16"/>
+      </svg>
+    </div>
+    <span class="tab-label">任务</span>
+  </div>
+
+  <!-- 收藏 -->
+  <div class="tab-item inactive" id="tab-star" onclick="switchTab('star')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+    </svg>
+    <span class="tab-label">收藏</span>
+  </div>
+
+  <!-- 我的 -->
+  <div class="tab-item inactive" id="tab-me" onclick="switchTab('me')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+    </svg>
+    <span class="tab-label">我的</span>
+  </div>
+
+</nav>
+<!-- 切换班级弹窗 -->
+<div class="class-modal-overlay" id="classModal" onclick="onModalOverlayClick(event)">
+  <div class="class-modal">
+    <div class="class-modal-header">
+      <div class="class-modal-title">切换班级</div>
+      <button class="class-modal-close" onclick="hideClassList()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="class-modal-list" id="classList"></div>
+    <button class="class-modal-add" onclick="joinClass()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+      加入班级
+    </button>
+  </div>
+</div>
+
+<script>
+/* ========== 班级数据 ========== */
+const myClasses = [
+  { school: '北京市第一中学', grade: '初二', className: '3班', id: 'cls1' },
+  { school: '北京市第一中学', grade: '初二', className: '5班', id: 'cls2' },
+  { school: '北京市实验中学', grade: '初一', className: '2班', id: 'cls3' },
+  { school: '北京市实验中学', grade: '初一', className: '6班', id: 'cls4' },
+];
+let currentClassId = 'cls1';
+
+/* ========== 弹窗控制 ========== */
+function showClassList() {
+  const list = document.getElementById('classList');
+  list.innerHTML = myClasses.map(c => {
+    const isCurrent = c.id === currentClassId;
+    return '<div class="class-modal-item' + (isCurrent ? ' current' : '') + '" onclick="selectClass(\'' + c.id + '\')">' +
+      '<div class="class-modal-item-info">' +
+        '<div class="class-modal-item-school">' + c.school + '</div>' +
+        '<div class="class-modal-item-name">' + c.grade + '（' + c.className + '）</div>' +
+      '</div>' +
+      '<div class="class-modal-item-check">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  document.getElementById('classModal').classList.add('show');
+}
+
+function hideClassList() {
+  document.getElementById('classModal').classList.remove('show');
+}
+
+function onModalOverlayClick(e) {
+  if (e.target === e.currentTarget) hideClassList();
+}
+
+function joinClass() {
+  hideClassList();
+  // TODO: 跳转加入班级页面或弹窗
+  alert('加入班级功能开发中');
+}
+
+function selectClass(id) {
+  if (id === currentClassId) { hideClassList(); return; }
+  currentClassId = id;
+  const cls = myClasses.find(c => c.id === id);
+  if (!cls) return;
+  /* 更新页面头部 */
+  document.querySelector('.student-school').textContent = cls.school;
+  document.querySelector('.student-class-name').textContent = cls.grade + '（' + cls.className + '）';
+  hideClassList();
+}
+
+/* ========== Tab 导航 ========== */
+const tabPages = {
+  'teach': 'teach.html',
+  'class': 'class.html',
+  'task': 'task.html',
+  'star': 'favorite.html',
+  'me': 'me.html'
+};
+function switchTab(name) {
+  window.location.href = tabPages[name];
+}
+
+function goToHomework(hwId) {
+  window.location.href = 'homework.html';
+}
+
+function goToNoticeList() {
+  alert('查看全部通知');
+}
+
+function goToNoticeDetail(nId) {
+  alert('通知详情');
+}
+</script>
+</body>
+</html>
