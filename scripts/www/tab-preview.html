@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>底部悬浮岛Tab栏预览</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F0F0F5;
+    --surface: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #6E6E73;
+    --text-muted: #AEAEB2;
+    --border: #E5E5EA;
+    --brand: #2dc89c;
+    --brand-light: rgba(45,200,156,0.12);
+    --tab-bg: rgba(255,255,255,0.88);
+    --tab-radius: 28px;
+    --tab-height: 68px;
+    --tab-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+    --tab-inset-bottom: 20px;
+    --card-radius: 16px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html { font-size: 14px; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans SC', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    max-width: 430px;
+    margin: 0 auto;
+    position: relative;
+    overflow-x: hidden;
+    color: var(--text-primary);
+  }
+
+  /* 页面内容 */
+  .page-content {
+    padding: 32px 24px;
+    padding-bottom: calc(var(--tab-height) + var(--tab-inset-bottom) + 40px);
+    min-height: 100vh;
+  }
+
+  .page-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+  }
+
+  .page-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 28px;
+  }
+
+  /* 提示条 */
+  .tip-card {
+    background: var(--brand-light);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #1A6B35;
+    font-weight: 500;
+  }
+
+  .tip-card svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  /* 说明卡片 */
+  .info-card {
+    background: var(--surface);
+    border-radius: var(--card-radius);
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+  }
+
+  .info-card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .info-card-title .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--brand);
+  }
+
+  .info-list {
+    list-style: none;
+  }
+
+  .info-list li {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 2;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .info-list li::before {
+    content: '•';
+    color: var(--brand);
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* 参数列表 */
+  .param-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+
+  .param-row:last-child { border-bottom: none; }
+  .param-row .label { color: var(--text-secondary); }
+  .param-row .val { color: var(--text-primary); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+  /* =============================================
+     悬浮岛底部Tab栏 — 核心样式
+     ============================================= */
+  .floating-tab-bar {
+    position: fixed;
+    bottom: var(--tab-inset-bottom);
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 40px);
+    max-width: 390px;
+    height: var(--tab-height);
+    background: var(--tab-bg);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-radius: var(--tab-radius);
+    box-shadow: var(--tab-shadow);
+    display: flex;
+    align-items: center;
+    padding: 0 6px;
+    will-change: transform;
+    z-index: 9999;
+    border-top: 0.5px solid rgba(255,255,255,0.6);
+  }
+
+  /* Tab 每一项 */
+  .tab-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    height: 56px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .tab-item:active { transform: scale(0.93); }
+
+  /* 图标 */
+  .tab-item svg {
+    width: 23px;
+    height: 23px;
+    transition: all 0.2s;
+  }
+
+  /* 文字 */
+  .tab-item .tab-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    transition: all 0.2s;
+  }
+
+  /* 未选中 */
+  .tab-item.inactive svg { color: var(--text-muted); }
+  .tab-item.inactive .tab-label { color: var(--text-muted); }
+
+  /* 选中态 */
+  .tab-item.active svg { color: var(--brand); }
+  .tab-item.active .tab-label { color: var(--brand); font-weight: 600; }
+
+  /* 选中态背景高亮 */
+  .tab-item.active::before {
+    content: '';
+    position: absolute;
+    inset: 4px 10px;
+    background: var(--brand-light);
+    border-radius: 16px;
+    z-index: -1;
+  }
+
+  /* 中间 Tab — 任务/发布按钮 */
+  .tab-item.center-tab { position: relative; }
+
+  .tab-item.center-tab .icon-wrap {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: var(--brand);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(45,200,156,0.45);
+    margin-top: -10px;
+    transition: all 0.2s;
+  }
+
+  .tab-item.center-tab .icon-wrap svg { color: white; width: 22px; height: 22px; }
+
+  .tab-item.center-tab.active::before { display: none; }
+  .tab-item.center-tab.active .icon-wrap {
+    box-shadow: 0 6px 20px rgba(45,200,156,0.55);
+    transform: scale(1.08);
+  }
+
+  .tab-item.center-tab .tab-label {
+    color: var(--brand);
+    font-weight: 600;
+    margin-top: 2px;
+    font-size: 10px;
+  }
+
+  /* 深色模式 */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1C1C1E;
+      --surface: #2C2C2E;
+      --text-primary: #FFFFFF;
+      --text-secondary: #ABABAB;
+      --text-muted: #636366;
+      --border: #3A3A3C;
+      --tab-bg: rgba(44,44,46,0.88);
+      --brand-light: rgba(45,200,156,0.18);
+    }
+    .info-card, .tip-card { box-shadow: 0 1px 6px rgba(0,0,0,0.3); }
+    .floating-tab-bar { border-top-color: rgba(255,255,255,0.1); }
+    .tip-card { color: #6FE3B4; }
+  }
+
+  @media (min-width: 500px) {
+    body { border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
+  }
+</style>
+</head>
+<body>
+
+<!-- 页面内容 -->
+<div class="page-content">
+  <div class="page-title">悬浮岛 Tab 栏</div>
+  <div class="page-sub">Floating Island Bottom Tab Bar</div>
+
+  <div class="tip-card">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+    <span>这是预览页面，下方即为悬浮岛Tab栏的实际效果</span>
+  </div>
+
+  <div class="info-card">
+    <div class="info-card-title"><span class="dot"></span>设计特点</div>
+    <ul class="info-list">
+      <li>悬浮于内容之上，距底部 20px，左右各留 20px 边距</li>
+      <li>毛玻璃（Glassmorphism）效果，backdrop-filter 模糊背景</li>
+      <li>圆角 28px，圆润的"岛"形态</li>
+      <li>选中态有小药丸高亮背景，中心按钮独立凸起</li>
+      <li>最大宽度 390px，自动适配深色模式</li>
+    </ul>
+  </div>
+
+  <div class="info-card">
+    <div class="info-card-title"><span class="dot"></span>当前参数</div>
+    <div class="param-row"><span class="label">Tab栏高度</span><span class="val">68px</span></div>
+    <div class="param-row"><span class="label">圆角</span><span class="val">28px</span></div>
+    <div class="param-row"><span class="label">距底部</span><span class="val">20px</span></div>
+    <div class="param-row"><span class="label">左右边距</span><span class="val">20px</span></div>
+    <div class="param-row"><span class="label">最大宽度</span><span class="val">390px</span></div>
+    <div class="param-row"><span class="label">模糊</span><span class="val">blur(20px)</span></div>
+  </div>
+</div>
+
+<!-- =============================================
+     悬浮岛底部 Tab 栏
+     ============================================= -->
+<nav class="floating-tab-bar">
+
+  <!-- 教学 -->
+  <div class="tab-item active" id="tab-teach" onclick="switchTab('teach')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+    </svg>
+    <span class="tab-label">教学</span>
+  </div>
+
+  <!-- 班级 -->
+  <div class="tab-item inactive" id="tab-class" onclick="switchTab('class')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+    </svg>
+    <span class="tab-label">班级</span>
+  </div>
+
+  <!-- 任务（中间凸起按钮） -->
+  <div class="tab-item inactive center-tab" id="tab-task" onclick="switchTab('task')">
+    <div class="icon-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="3 8 5 10 9 6"/><line x1="13" y1="8" x2="21" y2="8"/>
+        <polyline points="3 16 5 18 9 14"/><line x1="13" y1="16" x2="19" y2="16"/>
+      </svg>
+    </div>
+    <span class="tab-label">任务</span>
+  </div>
+
+  <!-- 收藏 -->
+  <div class="tab-item inactive" id="tab-star" onclick="switchTab('star')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+    </svg>
+    <span class="tab-label">收藏</span>
+  </div>
+
+  <!-- 我的 -->
+  <div class="tab-item inactive" id="tab-me" onclick="switchTab('me')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+    </svg>
+    <span class="tab-label">我的</span>
+  </div>
+
+</nav>
+
+<script>
+// Tab 与页面映射
+const tabPages = {
+  'teach': 'teach.html',
+  'class': 'class.html',
+  'task': 'task.html',
+  'star': 'favorite.html',  // 收藏对应 favorite.html
+  'me': 'me.html'
+};
+
+const tabs = ['teach', 'class', 'task', 'star', 'me'];
+
+function switchTab(name) {
+  // 切换高亮状态
+  tabs.forEach(t => {
+    const el = document.getElementById('tab-' + t);
+    if (!el) return;
+    if (t === name) {
+      el.classList.remove('inactive');
+      el.classList.add('active');
+    } else {
+      el.classList.remove('active');
+      el.classList.add('inactive');
+    }
+  });
+  
+  // 跳转到对应页面
+  if (tabPages[name]) {
+    window.location.href = tabPages[name];
+  }
+}
+</script>
+
+</body>
+</html>
