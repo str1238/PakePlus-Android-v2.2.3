@@ -1,0 +1,3879 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>数学作业答题页</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F2F2F7;
+    --surface: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #6E6E73;
+    --text-muted: #AEAEB2;
+    --border: #E5E5EA;
+    --border-dark: #D1D1D6;
+    --divider: #F2F2F7;
+    --blue: #007AFF;
+    --blue-light: #E8F4FF;
+    --primary: #007AFF;
+    --brand: #FF6B4A;
+    --brand-light: #FFF0EC;
+    --hint-1: #FF6B4A;
+    --hint-2: #FF9F43;
+    --hint-3: #FECA57;
+    --hint-4: #48C774;
+    --hint-5: #3273DC;
+    --answer-green: #34C759;
+    --answer-green-light: #EDFAF1;
+    --purple: #764ba2;
+    --purple-light: #F3EEFF;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans SC', 'Helvetica Neue', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    max-width: 100%;
+    margin: 0 auto;
+    position: relative;
+    overflow-x: hidden;
+  }
+  /* =============================================
+     PAGE WRAPPER
+     ============================================= */
+  .page-wrapper {
+    width: 100%;
+  }
+
+
+  /* ===== STATUS BAR ===== */
+    .status-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+    background: var(--surface);
+    height: 44px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 0 24px 8px;
+	    z-index: 999;
+  }
+  .status-time { font-size: var(--text-md); font-weight: 600; color: var(--text-primary); }
+  .status-icons { display: flex; align-items: center; gap: 5px; }
+  .status-icons svg { width: 17px; height: 17px; }
+
+  .nav-bar {
+    background: var(--surface);
+    height: 50px;
+	width: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    border-bottom: 0.5px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+	margin-top: 40px;
+	position: fixed;
+  }
+  .nav-back {
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; border-radius: 8px; flex-shrink: 0;
+  }
+  .nav-back:active { background: var(--divider); }
+  .nav-back svg { width: 22px; height: 22px; }
+  .nav-title {
+    flex: 1; text-align: center;
+    font-size: var(--text-xl); font-weight: 600;
+    color: var(--text-primary); margin-right: 36px;
+  }
+  .nav-badge {
+    flex-shrink: 0;
+    background: var(--brand);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 10px;
+    white-space: nowrap;
+  }
+.content {
+    padding: 12px 16px;
+    padding-bottom: 0;
+  }
+
+  /* Question Meta */
+  .question-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .question-meta-left { display: flex; align-items: center; gap: 8px; }
+  .subject-tag {
+    background: var(--brand-light);
+    color: var(--brand);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+  }
+  .question-num { font-size: 13px; color: var(--text-muted); }
+
+  .unanswered-badge {
+    font-size: 12px;
+    color: #FA5151;
+    background: #FFF2F0;
+    border: 1px solid #FFDAD6;
+    border-radius: 4px;
+    padding: 1px 6px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .unanswered-badge:hover { background: #FFE8E5; }
+  .unanswered-badge:active { background: #FFDAD6; }
+
+  .question-list-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+  }
+  .question-list-overlay.active { display: flex; }
+
+  .question-list-panel {
+    background: #fff;
+    border-radius: 12px;
+    width: 320px;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  }
+  .question-list-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  .question-list-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+  }
+  .ql-item {
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid #E5E5EA;
+    background: #F5F5F5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--text-secondary);
+  }
+  .ql-item:hover { border-color: var(--primary); color: var(--primary); background: #EBF0FF; }
+  .ql-item.answered { background: #16A34A; border-color: #16A34A; color: #fff; font-weight: 500; }
+  .ql-item.answered:hover { background: #15803D; border-color: #15803D; }
+  .ql-item.current { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+  .jump-confirm-card {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 28px 24px 24px;
+    width: 300px;
+    box-sizing: border-box;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  }
+  .jc-icon { margin-bottom: 14px; }
+  .jc-title { font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; }
+  .jc-body { font-size: 13px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5; }
+  .jc-actions { display: flex; gap: 10px; }
+  .jc-btn-cancel {
+    flex: 1; height: 40px; border-radius: 20px; border: 1px solid #E5E5EA;
+    background: #F5F5F5; color: var(--text-primary); font-size: 14px; cursor: pointer;
+    transition: background 0.15s;
+  }
+  .jc-btn-cancel:hover { background: #E8E8E8; }
+  .jc-btn-confirm {
+    flex: 1; height: 40px; border-radius: 20px; border: none;
+    background: var(--primary); color: #fff; font-size: 14px; cursor: pointer;
+    transition: background 0.15s;
+  }
+  .jc-btn-confirm:hover { background: #1A6BE8; }
+
+  .difficulty { display: flex; gap: 2px; }
+  .star { width: 14px; height: 14px; }
+
+  /* Question Card */
+  .question-card {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 12px;
+	margin-top: 70px;
+  }
+  .question-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+  }
+  .question-text {
+    font-size: 15px;
+    line-height: 1.85;
+    color: var(--text-primary);
+  }
+
+  /* 查看原题按钮 */
+  .view-original-wrap {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--divider);
+    display: flex;
+    justify-content: center;
+  }
+  .view-original-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border-dark);
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .view-original-btn:hover {
+    background: var(--blue-light);
+    border-color: var(--blue);
+    color: var(--blue);
+  }
+  .view-original-btn:active {
+    transform: scale(0.96);
+  }
+  .view-original-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* ===== ANSWER AREA ===== */
+  .answer-card {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 0;
+  }
+  .answer-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+  }
+  .answer-textarea {
+    width: 100%;
+    min-height: 100px;
+    border: 1px solid var(--border-dark);
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--text-primary);
+    background: var(--bg);
+    resize: none;
+    outline: none;
+    line-height: 1.7;
+    transition: border-color 0.2s;
+  }
+  .answer-textarea:focus { border-color: var(--blue); }
+  .answer-textarea::placeholder { color: var(--text-muted); }
+  .answer-textarea.readonly { background: #FAFAFA; color: var(--text-secondary); cursor: not-allowed; }
+  .answer-textarea:disabled { background: #FAFAFA; color: var(--text-secondary); cursor: not-allowed; }
+
+  .attach-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--divider);
+  }
+  .attach-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-family: inherit;
+    transition: all 0.15s;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .attach-btn:active { background: var(--divider); transform: scale(0.96); }
+  .attach-btn svg { width: 18px; height: 18px; }
+  .attach-thumbs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  .attach-thumb {
+    width: 60px; height: 60px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    position: relative;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .attach-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .attach-thumb .thumb-badge {
+    position: absolute;
+    bottom: 2px; right: 2px;
+    background: rgba(0,0,0,0.5);
+    color: white;
+    font-size: 9px;
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+  .attach-thumb .video-icon {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    width: 20px; height: 20px;
+  }
+  .attach-thumb .thumb-del {
+    position: absolute;
+    top: 2px; right: 2px;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.5);
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0;
+  }
+  .attach-thumb .thumb-del svg {
+    width: 10px; height: 10px;
+  }
+
+  /* ===== AI HINT SECTION ===== */
+  .hint-section {
+    margin-top: 12px;
+  }
+
+  .hint-trigger {
+    width: 100%;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1.5px dashed var(--brand);
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .hint-trigger:active { background: var(--brand-light); transform: scale(0.99); }
+  .hint-trigger.completed {
+    border-style: solid;
+    border-color: var(--hint-5);
+    background: #EEF3FF;
+  }
+  .hint-trigger.completed:active { background: #E4ECFF; transform: scale(0.99); }
+
+  .hint-trigger-icon {
+    width: 36px; height: 36px;
+    background: var(--brand);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .hint-trigger.completed .hint-trigger-icon { background: var(--hint-5); }
+  .hint-trigger-icon svg { width: 18px; height: 18px; }
+  .hint-trigger-info { flex: 1; }
+  .hint-trigger-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--brand);
+  }
+  .hint-trigger.completed .hint-trigger-title { color: var(--hint-5); }
+  .hint-trigger-sub {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 1px;
+  }
+
+  .hint-progress { display: flex; gap: 5px; }
+  .hint-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: all 0.3s;
+  }
+  .hint-dot.active { background: var(--brand); transform: scale(1.3); }
+  .hint-dot.done { background: var(--hint-5); }
+
+  .hint-cards {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .hint-card {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 14px 16px;
+    position: relative;
+    overflow: hidden;
+    animation: cardIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+  .hint-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    border-radius: 3px 0 0 3px;
+  }
+  .hint-card.step-1::before { background: var(--hint-1); }
+  .hint-card.step-2::before { background: var(--hint-2); }
+  .hint-card.step-3::before { background: var(--hint-3); }
+  .hint-card.step-4::before { background: var(--hint-4); }
+  .hint-card.step-5::before { background: var(--hint-5); }
+
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(-10px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .hint-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .hint-step-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+  .hint-step-num {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: white;
+  }
+  .hint-card.step-1 .hint-step-num { background: var(--hint-1); }
+  .hint-card.step-2 .hint-step-num { background: var(--hint-2); }
+  .hint-card.step-3 .hint-step-num { background: var(--hint-3); }
+  .hint-card.step-4 .hint-step-num { background: var(--hint-4); }
+  .hint-card.step-5 .hint-step-num { background: var(--hint-5); }
+
+  .hint-card-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hint-type-tag {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  .hint-card.step-1 .hint-type-tag { background: #FFF0EC; color: var(--hint-1); }
+  .hint-card.step-2 .hint-type-tag { background: #FFF5EC; color: #D4820A; }
+  .hint-card.step-3 .hint-type-tag { background: #FFFBEA; color: #B08A00; }
+  .hint-card.step-4 .hint-type-tag { background: #EBF8F0; color: #2E8B57; }
+  .hint-card.step-5 .hint-type-tag { background: #EEF3FF; color: var(--hint-5); }
+
+  /* ？追问按钮 */
+  .hint-ask-btn {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border-dark);
+    background: var(--surface);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+    flex-shrink: 0;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .hint-ask-btn:active { transform: scale(0.88); background: var(--blue-light); border-color: var(--blue); color: var(--blue); }
+  .hint-ask-btn.active { background: var(--blue-light); border-color: var(--blue); color: var(--blue); }
+
+  .hint-content {
+    font-size: 14px;
+    line-height: 1.75;
+    color: var(--text-primary);
+  }
+
+  /* 追问模版面板 */
+  .hint-followup-panel {
+    margin-top: 10px;
+    border-top: 1px solid var(--divider);
+    padding-top: 10px;
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    animation: fadeUp 0.25s ease both;
+  }
+  .hint-followup-panel.open { display: flex; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .followup-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 500;
+    letter-spacing: 0.3px;
+  }
+  .followup-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+  .followup-chip {
+    padding: 6px 11px;
+    border-radius: 16px;
+    background: var(--blue-light);
+    border: 1px solid rgba(0,122,255,0.2);
+    font-size: 12.5px;
+    color: var(--blue);
+    cursor: pointer;
+    transition: all 0.15s;
+    -webkit-user-select: none;
+    user-select: none;
+    line-height: 1.4;
+  }
+  .followup-chip:active { background: #D0E8FF; transform: scale(0.97); }
+
+  /* "其他问题" chip — 特殊样式 */
+  .followup-chip-custom {
+    padding: 6px 11px;
+    border-radius: 16px;
+    background: var(--purple-light);
+    border: 1px solid rgba(118,75,162,0.25);
+    font-size: 12.5px;
+    color: var(--purple);
+    cursor: pointer;
+    transition: all 0.15s;
+    -webkit-user-select: none;
+    user-select: none;
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .followup-chip-custom:active { background: #E8D8FF; transform: scale(0.97); }
+
+  /* 自定义输入行（其他问题展开） */
+  .followup-custom-input-row {
+    display: none;
+    gap: 8px;
+    align-items: center;
+    animation: fadeUp 0.2s ease both;
+  }
+  .followup-custom-input-row.open { display: flex; }
+  .followup-custom-input {
+    flex: 1;
+    border: 1.5px solid rgba(118,75,162,0.4);
+    border-radius: 20px;
+    padding: 7px 14px;
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--text-primary);
+    background: var(--surface);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .followup-custom-input:focus { border-color: var(--purple); }
+  .followup-custom-input::placeholder { color: var(--text-muted); }
+  .followup-custom-send {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    opacity: 0.45;
+  }
+  .followup-custom-send.active { opacity: 1; }
+  .followup-custom-send:active { transform: scale(0.9); }
+  .followup-custom-send svg { width: 14px; height: 14px; }
+
+  /* ===== 答案卡片 ===== */
+  .answer-reveal-btn {
+    width: 100%;
+    padding: 14px 16px;
+    background: var(--answer-green-light);
+    border: 1.5px solid var(--answer-green);
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s;
+    -webkit-user-select: none;
+    user-select: none;
+    margin-top: 0;
+    animation: cardIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+  .answer-reveal-btn:active { transform: scale(0.99); background: #D4F5E1; }
+  .answer-reveal-icon {
+    width: 36px; height: 36px;
+    background: var(--answer-green);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .answer-reveal-icon svg { width: 18px; height: 18px; }
+  .answer-reveal-info { flex: 1; }
+  .answer-reveal-title { font-size: 15px; font-weight: 600; color: var(--answer-green); }
+  .answer-reveal-sub { font-size: 12px; color: var(--text-secondary); margin-top: 1px; }
+  .answer-reveal-arrow { color: var(--answer-green); transition: transform 0.25s; }
+  .answer-reveal-arrow.rotated { transform: rotate(90deg); }
+
+  .answer-full-card {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 18px;
+    margin-top: 8px;
+    border: 1px solid rgba(52,199,89,0.25);
+    display: none;
+    animation: cardIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+  .answer-full-card.open { display: block; }
+  .answer-full-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--divider);
+  }
+  .answer-full-badge {
+    font-size: 11px; font-weight: 700; color: white;
+    background: var(--answer-green);
+    padding: 2px 8px; border-radius: 4px; letter-spacing: 0.5px;
+  }
+  .answer-full-title { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+  .answer-full-warn { font-size: 11px; color: var(--text-muted); margin-left: auto; }
+  .answer-section { margin-bottom: 16px; }
+  .answer-section:last-child { margin-bottom: 0; }
+  .answer-section-title {
+    font-size: 13px; font-weight: 700; color: var(--text-secondary);
+    margin-bottom: 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .answer-section-num {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--answer-green); color: white;
+    font-size: 10px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .answer-section-body {
+    font-size: 14px; line-height: 1.8; color: var(--text-primary);
+    background: var(--bg); padding: 12px; border-radius: 8px;
+  }
+  .answer-section-body strong { color: #1A6B35; }
+  .answer-section-body .ans-final {
+    display: inline-block; margin-top: 6px;
+    background: #C7F0D8; color: #1A6B35;
+    padding: 3px 10px; border-radius: 6px;
+    font-weight: 700; font-size: 13px;
+  }
+
+  /* ===== AI 对话区域 ===== */
+  .ai-chat-section {
+    margin-top: 12px;
+    padding-bottom: 100px;
+  }
+  .ai-chat-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 2px;
+    margin-bottom: 8px;
+  }
+  .ai-chat-header-icon {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .ai-chat-header-icon svg { width: 15px; height: 15px; }
+  .ai-chat-header-title { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+  .ai-chat-header-sub { font-size: 12px; color: var(--text-muted); margin-left: auto; }
+
+  /* 消息列表 */
+  .chat-messages {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .chat-msg {
+    display: flex;
+    gap: 8px;
+    animation: fadeUp 0.3s ease both;
+  }
+  .chat-msg.user { flex-direction: row-reverse; }
+
+  .chat-avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: white;
+  }
+  .chat-avatar.ai { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+  .chat-avatar.user { background: var(--blue); }
+
+  .chat-bubble {
+    max-width: calc(100% - 80px);
+    padding: 10px 13px;
+    border-radius: 14px;
+    font-size: 14px;
+    line-height: 1.65;
+  }
+  .chat-msg.ai .chat-bubble {
+    background: var(--surface);
+    color: var(--text-primary);
+    border-radius: 4px 14px 14px 14px;
+  }
+  .chat-msg.user .chat-bubble {
+    background: var(--blue);
+    color: white;
+    border-radius: 14px 4px 14px 14px;
+  }
+
+  /* 正在输入 */
+  .chat-typing-dots {
+    display: flex; gap: 4px; align-items: center; padding: 4px 2px;
+  }
+  .chat-typing-dots span {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--text-muted);
+    animation: dotBounce 1.2s infinite;
+  }
+  .chat-typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .chat-typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes dotBounce {
+    0%,80%,100% { transform: scale(0.7); opacity: 0.5; }
+    40% { transform: scale(1); opacity: 1; }
+  }
+
+  /* ===== AI 输入框（嵌入页面内，非底部） ===== */
+  .ai-chat-input-area {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 10px 12px;
+    border: 1px solid var(--border-dark);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .ai-chat-input-area:focus-within {
+    border-color: var(--purple);
+    box-shadow: 0 0 0 3px rgba(118,75,162,0.08);
+  }
+
+  .ai-input-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+  }
+  .ai-input-field {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--text-primary);
+    outline: none;
+    line-height: 1;
+    resize: none;
+    min-height: 22px;
+    max-height: 88px;
+    overflow-y: auto;
+  }
+  .ai-input-field::placeholder { color: var(--text-muted); }
+
+  .ai-input-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  /* 语音按钮 */
+  .ai-voice-btn {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border-dark);
+    background: var(--surface);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .ai-voice-btn svg { width: 17px; height: 17px; color: var(--text-secondary); }
+  .ai-voice-btn:active { background: var(--purple-light); border-color: var(--purple); }
+  .ai-voice-btn.recording {
+    background: #FF3B30;
+    border-color: #FF3B30;
+    animation: pulse 1s infinite;
+  }
+  .ai-voice-btn.recording svg { color: white; }
+  @keyframes pulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(255,59,48,0.4); }
+    50% { box-shadow: 0 0 0 6px rgba(255,59,48,0); }
+  }
+
+  /* 发送按钮 */
+  .ai-send-btn {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    opacity: 0.35;
+  }
+  .ai-send-btn.active { opacity: 1; }
+  .ai-send-btn:active { transform: scale(0.9); }
+  .ai-send-btn svg { width: 15px; height: 15px; }
+
+  /* 录音状态提示 */
+  .ai-recording-hint {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 0 2px;
+    font-size: 12px;
+    color: #FF3B30;
+    font-weight: 500;
+  }
+  .ai-recording-hint.show { display: flex; }
+  .recording-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #FF3B30;
+    animation: blink 0.8s infinite;
+  }
+  @keyframes blink { 0%,100% { opacity:1 } 50% { opacity:0.2 } }
+
+  /* ===== TYPING CURSOR ===== */
+  .typing-cursor {
+    display: inline-block;
+    width: 2px; height: 14px;
+    background: var(--brand);
+    margin-left: 2px;
+    animation: blinkCursor 0.7s infinite;
+    vertical-align: middle;
+  }
+  .chat-msg.ai .typing-cursor { background: var(--purple); }
+  @keyframes blinkCursor { 0%,100% { opacity:1 } 50% { opacity:0 } }
+
+  /* ===== BOTTOM BAR ===== */
+  .bottom-bar {
+    position: sticky;
+    bottom: 0;
+    width: 100%;
+    background: var(--surface);
+    border-top: 0.5px solid var(--border);
+    padding: 10px 16px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    display: flex;
+    gap: 10px;
+    z-index: 200;
+  }
+  .bottom-btn {
+    height: 44px;
+    border-radius: 10px;
+    border: none;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: all 0.2s;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .bottom-btn:active { transform: scale(0.97); }
+  .bottom-btn-nav {
+    background: var(--surface);
+    color: var(--blue);
+    border: 1px solid var(--border-dark);
+    flex: 0 0 auto;
+    width: 80px;
+    font-size: 14px;
+  }
+  .bottom-btn-nav:active { background: var(--blue-light); }
+  .bottom-btn-submit {
+    background: var(--blue);
+    color: white;
+    flex: 1;
+  }
+  .bottom-btn-submit:active { background: #0062CC; }
+  .bottom-btn svg { width: 17px; height: 17px; }
+
+  /* ===== 空状态 ===== */
+  .chat-empty {
+    text-align: center;
+    padding: 20px 16px;
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .chat-empty-icon { font-size: 28px; margin-bottom: 8px; }
+
+  /* ===== 引用消息 ===== */
+  .chat-quote-msg {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    animation: fadeUp 0.3s ease both;
+  }
+
+  .chat-quote-card {
+    flex: 1;
+    background: linear-gradient(135deg, #FFF5F0 0%, #FFE8E0 100%);
+    border: 1px solid rgba(255, 107, 74, 0.3);
+    border-left: 3px solid var(--brand);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-left: 36px;
+    position: relative;
+  }
+
+  .chat-quote-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+
+  .chat-quote-badge {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--brand);
+    background: rgba(255, 107, 74, 0.15);
+    padding: 2px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.3px;
+  }
+
+  .chat-quote-toggle {
+    font-size: 11px;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    transition: color 0.2s;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .chat-quote-toggle:active { color: var(--brand); }
+
+  .chat-quote-toggle svg {
+    width: 12px;
+    height: 12px;
+    transition: transform 0.25s;
+  }
+  .chat-quote-toggle.collapsed svg {
+    transform: rotate(-90deg);
+  }
+
+  .chat-quote-content {
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--text-secondary);
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.2s ease;
+  }
+  .chat-quote-content.collapsed {
+    max-height: 42px;
+    opacity: 0.85;
+  }
+  .chat-quote-content.expanded {
+    max-height: 500px;
+    opacity: 1;
+  }
+
+  .chat-quote-fade {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 24px;
+    background: linear-gradient(to bottom, transparent, #FFF5F0);
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .chat-quote-content.expanded + .chat-quote-fade {
+    opacity: 0;
+  }
+
+  /* ===== 已提交的解答展示 ===== */
+  .answer-submitted-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--divider);
+  }
+  .submitted-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+  .submitted-time {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+  .answer-submitted-content {
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-primary);
+    min-height: 40px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .answer-submitted-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    justify-content: flex-end;
+  }
+  .answer-action-btn {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border-dark);
+    background: var(--surface);
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .answer-action-btn:active { transform: scale(0.97); background: var(--divider); }
+  .answer-action-btn.edit { color: var(--blue); border-color: var(--blue); background: var(--blue-light); }
+  .answer-action-btn.edit:active { background: #D0E8FF; }
+  .answer-action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .answer-action-btn:disabled:active { transform: none; }
+
+  /* 二次解答卡片 */
+  .second-answer {
+    margin-top: 12px;
+    border: 1.5px dashed var(--border-dark);
+    animation: cardIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+
+  /* 提示区：查看答案后锁定样式 */
+  .hint-card.locked { opacity: 0.6; pointer-events: none; filter: grayscale(0.3); }
+  .hint-trigger.locked { opacity: 0.5; pointer-events: none; }
+  @media (min-width: 600px) {
+    :root {
+      --content-pad: 32px;
+      --text-md: 16px;
+      --text-base: 15px;
+      --card-radius: 16px;
+    }
+
+    .content { padding: 24px 32px; }
+
+    .question-card { padding: 22px; border-radius: 16px; }
+    .question-text { font-size: 16px; }
+    .answer-card { padding: 22px; border-radius: 16px; }
+    .answer-textarea { font-size: 15px; min-height: 120px; }
+    .answer-label { font-size: 13px; }
+    .attach-btn { font-size: 14px; padding: 8px 14px; }
+    .attach-btn svg { width: 20px; height: 20px; }
+    .hint-card { padding: 16px 22px; border-radius: 16px; }
+    .hint-trigger { padding: 16px 22px; border-radius: 16px; }
+    .hint-trigger-title { font-size: 16px; }
+    .hint-content { font-size: 15px; }
+    .ai-chat-input-area { padding: 12px 16px; border-radius: 18px; }
+    .ai-input-field { font-size: 15px; }
+    .chat-bubble { font-size: 15px; }
+    .jc-title { font-size: 17px; }
+    .jc-body { font-size: 14px; }
+    .jc-btn-cancel, .jc-btn-confirm { font-size: 15px; height: 44px; border-radius: 22px; }
+    .answer-reveal-toggle { padding: 16px 22px; border-radius: 16px; font-size: 16px; }
+    .answer-full-card { border-radius: 16px; }
+    .second-answer-card { padding: 20px; border-radius: 16px; }
+    .submit-btn { height: 52px; border-radius: 16px; font-size: 17px; }
+        .status-bar { padding: 0 28px 8px; }
+
+        .nav-bar { height: 52px; padding: 0 16px; }
+
+        .nav-title { font-size: 18px; }
+
+  
+    .bottom-bar { padding: 12px 24px; }
+    .bottom-btn { height: 48px; font-size: 16px; border-radius: 12px; }
+}
+
+  @media (min-width: 768px) {
+    :root {
+      --content-pad: 48px;
+      --text-xl: 18px;
+      --text-lg: 17px;
+      --text-base: 15px;
+      --card-radius: 20px;
+      --btn-height: 54px;
+    }
+
+    body { background: #E8E8EE; }
+
+    .page-wrapper {
+      max-width: 680px;
+      margin: 0 auto;
+      background: var(--bg);
+      min-height: 100vh;
+      box-shadow: 0 0 40px rgba(0,0,0,0.06);
+    }
+
+    .content { padding: 32px 48px; }
+
+    .question-card { padding: 26px; border-radius: 20px; }
+    .question-label { font-size: 13px; }
+    .question-text { font-size: 16px; line-height: 1.9; }
+    .answer-card { padding: 26px; border-radius: 20px; }
+    .answer-textarea { font-size: 15px; min-height: 130px; border-radius: 14px; }
+    .answer-label { font-size: 13px; }
+    .attach-btn { font-size: 14px; padding: 8px 16px; border-radius: 10px; }
+    .attach-btn svg { width: 20px; height: 20px; }
+    .attach-thumb { width: 68px; height: 68px; border-radius: 10px; }
+    .hint-card { padding: 18px 26px; border-radius: 20px; }
+    .hint-trigger { padding: 18px 26px; border-radius: 20px; }
+    .hint-trigger-title { font-size: 17px; }
+    .hint-trigger-sub { font-size: 13px; }
+    .hint-trigger-icon { width: 40px; height: 40px; }
+    .hint-trigger-icon svg { width: 20px; height: 20px; }
+    .hint-content { font-size: 15px; line-height: 1.8; }
+    .hint-ask-btn { width: 26px; height: 26px; font-size: 14px; }
+    .followup-chip { font-size: 13px; padding: 6px 13px; }
+    .followup-chip-custom { font-size: 13px; padding: 6px 13px; }
+
+    .ai-chat-section { padding: 20px 0; }
+    .ai-chat-header { margin-bottom: 12px; }
+    .ai-chat-header-title { font-size: 17px; }
+    .ai-chat-header-sub { font-size: 13px; }
+    .chat-bubble { font-size: 15px; max-width: 72%; }
+    .chat-empty { padding: 28px; }
+    .chat-avatar { width: 32px; height: 32px; font-size: 14px; }
+
+    .jc-title { font-size: 18px; }
+    .jc-body { font-size: 14px; }
+    .jc-btn-cancel, .jc-btn-confirm { font-size: 15px; height: 46px; border-radius: 23px; }
+    .jc-icon svg { width: 52px; height: 52px; }
+
+    .answer-reveal-toggle { padding: 20px 28px; border-radius: 20px; font-size: 17px; }
+    .answer-full-card { border-radius: 20px; }
+    .answer-section-body { font-size: 15px; }
+    .second-answer-card { padding: 24px; border-radius: 20px; }
+    .submit-btn { height: 56px; border-radius: 20px; font-size: 18px; }
+
+    .question-list-panel { width: min(460px, 88vw); padding: 22px; border-radius: 22px; }
+    .question-list-title { font-size: 17px; }
+    .question-list-grid { grid-template-columns: repeat(5, 1fr); gap: 10px; }
+    .ql-item { height: 44px; font-size: 15px; border-radius: 10px; }
+
+        .status-bar { padding: 0 32px 8px; }
+
+        .nav-bar { height: 56px; padding: 0 16px; }
+    .nav-badge { font-size: 12px; padding: 4px 11px; }
+
+        .nav-title { font-size: 18px; }
+
+    .nav-badge { font-size: 12px; padding: 4px 11px; }
+  
+    .bottom-bar { padding: 14px 32px; }
+    .bottom-btn { height: 50px; font-size: 16px; border-radius: 14px; }
+}
+
+  @media (min-width: 1024px) {
+    :root {
+      --content-pad: 60px;
+      --text-2xl: 22px;
+      --text-xl: 19px;
+      --text-lg: 17px;
+      --text-md: 16px;
+      --text-base: 15px;
+      --card-radius: 24px;
+      --btn-height: 56px;
+    }
+
+    body { background: #D8D8E0; }
+
+    .page-wrapper {
+      max-width: 760px;
+      box-shadow: 0 0 60px rgba(0,0,0,0.08);
+    }
+
+    .content { padding: 40px 60px; }
+
+    .question-card { padding: 32px; border-radius: 24px; margin-bottom: 16px; }
+    .question-label { font-size: 13px; }
+    .question-text { font-size: 17px; line-height: 1.95; }
+    .answer-card { padding: 32px; border-radius: 24px; }
+    .answer-textarea { font-size: 16px; min-height: 150px; border-radius: 16px; padding: 16px; }
+    .answer-label { font-size: 13px; }
+    .attach-btn { font-size: 15px; padding: 9px 18px; border-radius: 12px; }
+    .attach-btn svg { width: 22px; height: 22px; }
+    .attach-thumb { width: 76px; height: 76px; border-radius: 12px; }
+    .hint-card { padding: 22px 32px; border-radius: 24px; margin-bottom: 12px; }
+    .hint-trigger { padding: 22px 32px; border-radius: 24px; }
+    .hint-trigger-title { font-size: 18px; }
+    .hint-trigger-sub { font-size: 14px; }
+    .hint-trigger-icon { width: 44px; height: 44px; }
+    .hint-trigger-icon svg { width: 22px; height: 22px; }
+    .hint-content { font-size: 16px; line-height: 1.85; }
+    .hint-ask-btn { width: 28px; height: 28px; font-size: 15px; }
+    .followup-chip { font-size: 14px; padding: 7px 14px; }
+    .followup-chip-custom { font-size: 14px; padding: 7px 14px; }
+    .followup-custom-input { font-size: 14px; border-radius: 22px; }
+
+    .ai-chat-section { padding: 24px 0; }
+    .ai-chat-header { margin-bottom: 14px; }
+    .ai-chat-header-title { font-size: 18px; }
+    .ai-chat-header-sub { font-size: 14px; }
+    .chat-bubble { font-size: 16px; max-width: 68%; }
+    .chat-messages { max-height: 460px; }
+    .chat-empty { padding: 36px; font-size: 15px; }
+    .chat-avatar { width: 34px; height: 34px; font-size: 15px; }
+    .ai-chat-input-area { padding: 14px 18px; border-radius: 22px; }
+    .ai-input-field { font-size: 16px; }
+    .ai-voice-btn, .ai-send-btn { width: 38px; height: 38px; }
+    .ai-voice-btn svg, .ai-send-btn svg { width: 18px; height: 18px; }
+
+    .jc-title { font-size: 20px; }
+    .jc-body { font-size: 15px; }
+    .jc-btn-cancel, .jc-btn-confirm { font-size: 16px; height: 50px; border-radius: 25px; }
+    .jc-icon svg { width: 60px; height: 60px; }
+
+    .answer-reveal-toggle { padding: 24px 34px; border-radius: 24px; font-size: 18px; }
+    .answer-full-card { border-radius: 24px; }
+    .answer-section-body { font-size: 16px; line-height: 1.9; }
+    .second-answer-card { padding: 28px; border-radius: 24px; }
+    .submit-btn { height: 58px; border-radius: 24px; font-size: 19px; }
+
+    .question-list-panel { width: min(560px, 85vw); padding: 26px; border-radius: 26px; }
+    .question-list-title { font-size: 18px; }
+    .question-list-grid { grid-template-columns: repeat(5, 1fr); gap: 12px; }
+    .ql-item { height: 48px; font-size: 16px; border-radius: 12px; }
+
+        .status-bar { padding: 0 44px 8px; }
+
+        .nav-bar { height: 60px; padding: 0 24px; }
+    .nav-badge { font-size: 13px; padding: 5px 13px; }
+
+        .nav-title { font-size: 20px; }
+
+    .nav-badge { font-size: 13px; padding: 5px 13px; }
+  
+    .bottom-bar { padding: 16px 40px; }
+    .bottom-btn { height: 52px; font-size: 17px; border-radius: 14px; }
+}
+
+  @media (min-width: 1280px) {
+    :root {
+      --content-pad: 80px;
+      --card-radius: 28px;
+      --btn-height: 58px;
+        .nav-bar { height: 64px; padding: 0 28px;     .status-bar { padding: 0 52px 8px; }
+}
+    .nav-badge { font-size: 13px; padding: 5px 13px; }
+}
+
+    .page-wrapper { max-width: 860px; }
+
+    .content { padding: 48px 80px; }
+
+    .question-card { padding: 38px; border-radius: 28px; }
+    .answer-card { padding: 38px; border-radius: 28px; }
+    .answer-textarea { font-size: 16px; min-height: 160px; padding: 18px; }
+    .hint-card { padding: 26px 38px; border-radius: 28px; }
+    .hint-trigger { padding: 26px 38px; border-radius: 28px; }
+    .ai-chat-section { padding: 28px 0; }
+    .chat-bubble { font-size: 16px; max-width: 65%; }
+    .ai-chat-input-area { border-radius: 26px; }
+    .answer-reveal-toggle { padding: 28px 40px; border-radius: 28px; }
+    .answer-full-card { border-radius: 28px; }
+    .second-answer-card { padding: 32px; border-radius: 28px; }
+    .submit-btn { height: 62px; border-radius: 28px; }
+    .question-list-panel { width: min(640px, 82vw); padding: 30px; border-radius: 30px; }
+    .question-list-title { font-size: 19px; }
+    .ql-item { height: 52px; font-size: 17px; }
+  
+    .bottom-bar { padding: 18px 48px; }
+    .bottom-btn { height: 54px; font-size: 17px; border-radius: 16px; }
+}
+
+
+</style>
+</head>
+<body>
+
+
+<!-- NAV BAR -->
+<div class="page-wrapper">
+  <div class="status-bar">
+  <span class="status-time">09:53</span>
+  <div class="status-icons">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+  </div>
+</div>
+  <div class="nav-bar">
+  <div class="nav-back" onclick="history.back()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M15 18L9 12L15 6"/>
+    </svg>
+  </div>
+  <span class="nav-title">作业</span>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- Question Meta -->
+  <div class="question-meta">
+    <div class="question-meta-left">
+      <span class="subject-tag">数学 · 九年级</span>
+      <span class="question-num" id="questionNumDisplay">第3/10题</span>
+      <span class="unanswered-badge" id="unansweredBadge" onclick="showQuestionList()">未答<span id="unansweredCount">0</span>题</span>
+    </div>
+    <div class="difficulty">
+      <svg class="star" viewBox="0 0 24 24" fill="#FF9F0A"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+      <svg class="star" viewBox="0 0 24 24" fill="#FF9F0A"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+      <svg class="star" viewBox="0 0 24 24" fill="#FF9F0A"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+      <svg class="star" viewBox="0 0 24 24" fill="#FF9F0A"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+      <svg class="star" viewBox="0 0 24 24" fill="#D1D1D6"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+    </div>
+  </div>
+
+  <!-- 题目列表弹窗 -->
+  <div class="question-list-overlay" id="questionListOverlay" onclick="onOverlayClick(event)">
+    <div class="question-list-panel" onclick="event.stopPropagation()">
+      <div class="question-list-title">答题情况</div>
+      <div class="question-list-grid" id="questionListGrid"></div>
+    </div>
+  </div>
+
+  <!-- 题目跳转确认弹窗 -->
+  <div class="question-list-overlay" id="jumpConfirmOverlay" onclick="closeJumpConfirm()">
+    <div class="jump-confirm-card" onclick="event.stopPropagation()">
+      <div class="jc-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="#F59E0B"/></svg>
+      </div>
+      <div class="jc-title">是否跳转？</div>
+      <div id="jumpConfirmMsg" class="jc-body">跳转后当前题目作答内容不保存。</div>
+      <div class="jc-actions">
+        <button class="jc-btn-cancel" onclick="closeJumpConfirm()">取消</button>
+        <button class="jc-btn-confirm" onclick="confirmJump()">确认跳转</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Question Card -->
+  <div class="question-card">
+    <div class="question-label">题目</div>
+    <div class="question-text">
+      已知二次函数 y = ax² + bx + c（a ≠ 0）的图像经过点 A(1, 2)、B(3, 6)，且对称轴为 x = 2。<br><br>
+      (1) 求该二次函数的解析式；<br>
+      (2) 若该函数图像与 x 轴交于 M、N 两点，求线段 MN 的长度；<br>
+      (3) 当 x 为何值时，y 随 x 增大而减小？
+    </div>
+    <div class="view-original-wrap" id="viewOriginalWrap" style="display:none;">
+      <button class="view-original-btn" onclick="viewOriginalQuestion()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+          <polyline points="15 3 21 3 21 9"/>
+          <line x1="10" y1="14" x2="21" y2="3"/>
+        </svg>
+        查看原题
+      </button>
+    </div>
+  </div>
+
+  <!-- Answer Card -->
+  <div class="answer-card">
+    <div class="answer-label" id="firstAnswerLabel">你的解答</div>
+    <textarea
+      class="answer-textarea"
+      id="firstAnswerTextarea"
+      placeholder="请在此输入你的解答..."
+      oninput="onFirstAnswerChange()"
+    ></textarea>
+    <div class="attach-toolbar" id="firstAttachToolbar">
+      <button class="attach-btn" onclick="addDemoImage()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#007AFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+          <circle cx="8.5" cy="8.5" r="1.5"/>
+          <polyline points="21 15 16 10 5 21"/>
+        </svg>
+        图片
+      </button>
+      <button class="attach-btn" onclick="addDemoVideo()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#007AFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="23 7 16 12 23 17 23 7"/>
+          <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+        </svg>
+        视频
+      </button>
+    </div>
+
+    <!-- 附件缩略图 -->
+    <div class="attach-thumbs" id="firstAttachThumbs"></div>
+
+    <!-- 初次解答提交后的已提交内容展示 -->
+    <div id="firstAnswerSubmitted" style="display:none;">
+      <div class="answer-submitted-header">
+        <span class="submitted-label">已提交的初次解答</span>
+        <span class="submitted-time" id="firstSubmitTime"></span>
+      </div>
+      <div class="answer-submitted-content" id="firstSubmitContent"></div>
+      <div class="answer-submitted-actions" id="firstSubmitActions"></div>
+    </div>
+  </div>
+
+  <!-- 二次解答区域 -->
+  <div class="answer-card second-answer" id="secondAnswerCard" style="display:none;">
+    <div class="answer-label">二次解答</div>
+    <textarea
+      class="answer-textarea"
+      id="secondAnswerTextarea"
+      placeholder="请在此输入你的二次解答..."
+      oninput="onSecondAnswerChange()"
+    ></textarea>
+    <div class="attach-toolbar" id="secondAttachToolbar">
+      <button class="attach-btn" onclick="addDemoImage2()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#007AFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+          <circle cx="8.5" cy="8.5" r="1.5"/>
+          <polyline points="21 15 16 10 5 21"/>
+        </svg>
+        图片
+      </button>
+      <button class="attach-btn" onclick="addDemoVideo2()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#007AFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="23 7 16 12 23 17 23 7"/>
+          <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+        </svg>
+        视频
+      </button>
+    </div>
+    <!-- 附件缩略图 -->
+    <div class="attach-thumbs" id="secondAttachThumbs"></div>
+    <!-- 二次解答已提交内容 -->
+    <div id="secondAnswerSubmitted" style="display:none;">
+      <div class="answer-submitted-header">
+        <span class="submitted-label">已提交的二次解答</span>
+        <span class="submitted-time" id="secondSubmitTime"></span>
+      </div>
+      <div class="answer-submitted-content" id="secondSubmitContent"></div>
+    </div>
+  </div>
+
+  <!-- AI HINT SECTION -->
+  <div class="hint-section">
+    <button class="hint-trigger" id="hintBtn" onclick="requestHint()">
+      <div class="hint-trigger-icon">
+        <svg viewBox="0 0 24 24" fill="white"><path d="M9 18h6v-2H9v2zm3-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>
+      </div>
+      <div class="hint-trigger-info">
+        <span class="hint-trigger-title" id="hintBtnTitle">💡 思路提示</span><br>
+        <span class="hint-trigger-sub" id="hintBtnSub">点击获取解题思路</span>
+      </div>
+      <div class="hint-progress" id="hintProgress">
+        <div class="hint-dot" id="dot1"></div>
+        <div class="hint-dot" id="dot2"></div>
+        <div class="hint-dot" id="dot3"></div>
+        <div class="hint-dot" id="dot4"></div>
+        <div class="hint-dot" id="dot5"></div>
+      </div>
+    </button>
+
+    <div class="hint-cards" id="hintCards"></div>
+
+    <!-- 查看答案按钮（全部提示后出现） -->
+    <div id="answerRevealWrap" style="display:none; margin-top:8px;">
+      <button class="answer-reveal-btn" onclick="toggleAnswer()">
+        <div class="answer-reveal-icon">
+          <svg viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+        </div>
+        <div class="answer-reveal-info">
+          <div class="answer-reveal-title">📖 查看完整答案</div>
+          <div class="answer-reveal-sub">已看完全部提示，确认需要参考答案？</div>
+        </div>
+        <svg class="answer-reveal-arrow" id="answerArrow" viewBox="0 0 24 24" fill="none" stroke="#34C759" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+          <path d="M9 18L15 12L9 6"/>
+        </svg>
+      </button>
+
+      <div class="answer-full-card" id="answerFullCard">
+        <div class="answer-full-header">
+          <span class="answer-full-badge">参考答案</span>
+          <span class="answer-full-title">二次函数压轴题</span>
+          <span class="answer-full-warn">仅供参考</span>
+        </div>
+        <div class="answer-section">
+          <div class="answer-section-title">
+            <div class="answer-section-num">1</div>求解析式
+          </div>
+          <div class="answer-section-body">
+            由对称轴 x = 2，得 −b/(2a) = 2，即 <strong>b = −4a</strong><br>
+            代入 A(1, 2)：a − 4a + c = 2 → <strong>c = 2 + 3a</strong><br>
+            代入 B(3, 6)：9a − 12a + c = 6 → c = 6 + 3a<br>
+            联立得 <strong>a = 2, b = −8, c = 8</strong><br>
+            <span class="ans-final">y = 2x² − 8x + 8</span>
+          </div>
+        </div>
+        <div class="answer-section">
+          <div class="answer-section-title">
+            <div class="answer-section-num">2</div>求 MN 的长度
+          </div>
+          <div class="answer-section-body">
+            令 y = 0：2x² − 8x + 8 = 0 → (x − 2)² = 0<br>
+            抛物线与 x 轴只有一个交点 x = 2<br>
+            <span class="ans-final">MN = 0（相切，只有一个交点）</span>
+          </div>
+        </div>
+        <div class="answer-section">
+          <div class="answer-section-title">
+            <div class="answer-section-num">3</div>y 随 x 增大而减小的范围
+          </div>
+          <div class="answer-section-body">
+            a = 2 > 0，开口向上，对称轴 x = 2<br>
+            对称轴左侧单调递减<br>
+            <span class="ans-final">x &lt; 2 时，y 随 x 增大而减小</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== AI 实时问答区 ===== -->
+  <div class="ai-chat-section" id="aiChatSection">
+    <div class="ai-chat-header">
+      <div class="ai-chat-header-icon">
+        <svg viewBox="0 0 24 24" fill="white"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+      </div>
+      <span class="ai-chat-header-title">AI助教 答疑</span>
+      <span class="ai-chat-header-sub" id="chatCount">随时提问</span>
+    </div>
+
+    <!-- 消息列表 -->
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-empty">
+        <div class="chat-empty-icon">💬</div>
+        对这道题有任何疑问？<br>直接在下方提问，或点击提示卡片的 <strong>?</strong> 快速追问
+      </div>
+    </div>
+
+    <!-- 输入框（嵌入页面，非底部固定） -->
+    <div class="ai-chat-input-area">
+      <div class="ai-input-row">
+        <textarea
+          class="ai-input-field"
+          id="aiInput"
+          placeholder="输入问题，向 萤火AI助教 提问…"
+          rows="1"
+          maxlength="300"
+          oninput="onInputChange(this)"
+          onkeydown="onInputKeydown(event)"
+        ></textarea>
+        <div class="ai-input-actions">
+          <button class="ai-voice-btn" id="aiVoiceBtn" onclick="toggleVoice()" title="语音输入">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+              <line x1="12" y1="19" x2="12" y2="23"/>
+              <line x1="8" y1="23" x2="16" y2="23"/>
+            </svg>
+          </button>
+          <button class="ai-send-btn" id="aiSendBtn" onclick="sendUserMsg()">
+            <svg viewBox="0 0 24 24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+          </button>
+        </div>
+      </div>
+      <!-- 录音状态提示 -->
+      <div class="ai-recording-hint" id="recordingHint">
+        <div class="recording-dot"></div>
+        正在录音，再次点击停止…
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- /.page-wrapper -->
+
+
+
+<!-- BOTTOM BAR：上一题 + 提交答案 + 下一题 -->
+<div class="bottom-bar">
+  <button class="bottom-btn bottom-btn-nav" id="prevBtn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 18L9 12L15 6"/></svg>
+    上一题
+  </button>
+  <button class="bottom-btn bottom-btn-submit" id="submitBtn" onclick="handleSubmit()">
+    提交答案
+  </button>
+  <button class="bottom-btn bottom-btn-nav" id="nextBtn">
+    下一题
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 18L15 12L9 6"/></svg>
+  </button>
+</div>
+
+<script>
+  /* =========================================================
+     DATA
+  ========================================================= */
+  const HINTS = [
+    {
+      step: 1, type: '引导型',
+      content: '先仔细读题，找出题目给出了哪些<strong>已知条件</strong>：图像经过 A(1,2) 和 B(3,6)，还有对称轴 x = 2。把这些信息在草稿纸上列出来看看？',
+      followups: [
+        '已知条件里哪个信息最关键？',
+        '对称轴 x=2 在这里有什么用？',
+        '二次函数一共有几个未知数，几个条件？',
+      ]
+    },
+    {
+      step: 2, type: '反问型',
+      content: '对称轴 x = 2 意味着什么？对于二次函数 y = ax² + bx + c，<strong>对称轴公式</strong>是什么？',
+      followups: [
+        '对称轴公式 x = -b/(2a) 怎么推导出来的？',
+        '知道对称轴能求出 a 和 b 的关系吗？',
+        '如果 A、B 两点关于对称轴对称，怎么验证？',
+      ]
+    },
+    {
+      step: 3, type: '提示型',
+      content: '对称轴 x = 2，所以 -b/(2a) = 2，即 <strong>b = -4a</strong>。再把 A、B 两点代入，能列出几个方程？',
+      followups: [
+        'b = -4a 怎么从 -b/(2a) = 2 推出来的？',
+        '把 A(1,2) 代入方程后能得到什么？',
+        '三个方程联立，用哪种方法解比较快？',
+      ]
+    },
+    {
+      step: 4, type: '提示型',
+      content: '从 A(1,2) 得到 a + b + c = 2，从 B(3,6) 得到 9a + 3b + c = 6。联立这三个方程，<strong>解出 a、b、c</strong> 的值。',
+      followups: [
+        '三个方程联立，怎么消去 c？',
+        '解出 a 之后怎么依次求 b 和 c？',
+        '解完之后要不要验证代回原来的点？',
+      ]
+    },
+    {
+      step: 5, type: '总结型',
+      content: '解析式求出来了！第 (2) 问求 MN 长度，想想<strong>求根公式</strong>。第 (3) 问注意看二次项系数 a 的符号 🌟',
+      followups: [
+        '判别式 Δ = b²-4ac 为什么可以判断交点个数？',
+        '如果只有一个交点，MN 的长度是多少？',
+        'a > 0 时，抛物线开口朝上，单调性怎么判断？',
+      ]
+    },
+  ];
+
+  const AI_FOLLOWUP_REPLIES = {
+    '已知条件里哪个信息最关键': '三个条件各有用处：对称轴帮你建立 a、b 的关系，A、B 两点各提供一个方程。可以说**对称轴最独特**，因为它直接给出 -b/(2a) = 2 这个关系式，缺少它方程组无法唯一确定解析式。',
+    '对称轴 x=2 在这里有什么用': '对称轴公式是 x = -b/(2a)，代入 x = 2 后得到 b = -4a。这就把三个未知量（a、b、c）减少到两个有效未知量，再加上 A、B 两个点方程就刚好够用了。',
+    '二次函数一共有几个未知数': '有 3 个未知数：a、b、c。题目给了 3 个已知条件（A 点、B 点、对称轴），恰好构成三元一次方程组，有唯一解。',
+    '对称轴公式 x = -b/(2a) 怎么推导出来的': '对 y = ax² + bx + c 配方：y = a(x + b/(2a))² + c - b²/(4a)，括号内为 0 时 y 最小/最大，所以对称轴 x = -b/(2a)。',
+    '知道对称轴能求出 a 和 b 的关系吗': '可以！-b/(2a) = 2 直接给出 b = -4a。这是一个含 a 的线性关系，相当于把两个未知量合并成一个，降低了方程组的自由度。',
+    '如果 A、B 两点关于对称轴对称，怎么验证': 'A(1,2) 和 B(3,6)：对称轴两侧的 x 坐标应满足 (1+3)/2 = 2，确实等于 2。不过 y 坐标不同（2 ≠ 6），说明 A、B **不关于对称轴对称**，它们在抛物线不同高度。',
+    'b = -4a 怎么从 -b/(2a) = 2 推出来的': '两边同乘 2a（a≠0）：-b = 4a，再乘以 -1 就得到 b = -4a。简单的代数变形，注意不要漏掉负号。',
+    '把 A(1,2) 代入方程后能得到什么': '把 x=1, y=2 代入 y = ax²+bx+c：a + b + c = 2。再把 b = -4a 代入：a - 4a + c = 2，得 **c = 2 + 3a**。',
+    '三个方程联立，用哪种方法解比较快': '推荐**代入消元法**：先用 b = -4a 消去 b，再用任意一个点方程表示 c，最后代入另一个点方程求 a。逐步代入，不容易出错。',
+    '三个方程联立，怎么消去 c': '两个点方程相减即可消去 c：(9a + 3b + c) - (a + b + c) = 6 - 2，化简得 **8a + 2b = 4**，即 4a + b = 2。再代入 b = -4a 即可求出 a。',
+    '解出 a 之后怎么依次求 b 和 c': '求出 a 后，代入 b = -4a 求 b；然后将 a、b 代入 a + b + c = 2 求 c。最后验证 B 点是否满足方程。',
+    '解完之后要不要验证代回原来的点': '**强烈建议验证**！把求出的 a、b、c 分别代入 A(1,2) 和 B(3,6)，若两个等式都成立才算正确。这步只要 30 秒，却能避免失分。',
+    '判别式 Δ = b²-4ac 为什么可以判断交点个数': 'Δ > 0 时方程有两个不同实数根，即抛物线与 x 轴交两点；Δ = 0 时有一个重根（相切）；Δ < 0 时无实数根，不与 x 轴相交。',
+    '如果只有一个交点，MN 的长度是多少': '若 Δ = 0，M 与 N 是同一个点，所以 MN = **0**。对于这道题 y = 2x²-8x+8，Δ = 64 - 64 = 0，正好是这种情况，抛物线与 x 轴相切于 (2,0)。',
+    'a > 0 时，抛物线开口朝上，单调性怎么判断': '开口朝上的抛物线在**对称轴左侧单调递减**，右侧单调递增。对称轴 x = 2，所以 x < 2 时 y 随 x 增大而减小，x > 2 时 y 随 x 增大而增大。',
+  };
+
+  const AI_GENERIC_REPLIES = [
+    '这是个很好的问题！对于二次函数 y = 2x²-8x+8，它的对称轴是 x = 2，开口朝上。你具体是哪步卡住了？我可以帮你一步步分析。',
+    '来帮你梳理一下。这道题的关键是：①用对称轴建立 b 和 a 的关系；②用两个点列方程；③联立求解。你现在做到哪一步了？',
+    '好问题！解二次函数题时，建议先把已知条件整理成方程，逐步代入消元。如果你把当前步骤发给我，我来帮你检查思路是否正确。',
+    '对于这类压轴题，思路是：已知条件 → 建立方程组 → 代入求解 → 验证。你对哪个环节不确定？可以具体说说。',
+  ];
+
+  let genericReplyIdx = 0;
+
+  /* =========================================================
+     STATE
+  ========================================================= */
+  let shownCount = 0;
+  let isLoading = false;
+  let answerOpen = false;
+  let chatMsgCount = 0;
+  let isRecording = false;
+  let recordingTimer = null;
+
+  // 解答状态
+  let isFirstSubmitted = false;      // 是否已提交初次解答
+  let hasSeenAnswer = false;         // 是否查看过答案
+  let firstAnswerText = '';          // 初次解答内容
+  let secondAnswerText = '';         // 二次解答内容
+  let isSecondSubmitted = false;     // 是否已提交二次解答
+  let secondSubmitCount = 0;         // 二次解答提交次数
+  let viewOriginalWrap = null;        // 查看原题按钮容器
+
+  const TOTAL_QUESTIONS = 10;         // 总题数
+  const CURRENT_QUESTION = 3;         // 当前题号
+  let pendingJumpTarget = null;       // 待跳转题号（编辑状态下点击时暂存）
+
+  /* =========================================================
+     DOM REFS
+  ========================================================= */
+  const hintBtn          = document.getElementById('hintBtn');
+  const hintBtnTitle     = document.getElementById('hintBtnTitle');
+  const hintBtnSub       = document.getElementById('hintBtnSub');
+  const hintCards        = document.getElementById('hintCards');
+  const answerRevealWrap = document.getElementById('answerRevealWrap');
+  const answerFullCard   = document.getElementById('answerFullCard');
+  const answerArrow      = document.getElementById('answerArrow');
+  const chatMessages     = document.getElementById('chatMessages');
+  const aiInput          = document.getElementById('aiInput');
+  const aiSendBtn        = document.getElementById('aiSendBtn');
+  const aiVoiceBtn       = document.getElementById('aiVoiceBtn');
+  const recordingHint    = document.getElementById('recordingHint');
+  const chatCount        = document.getElementById('chatCount');
+  const submitBtn        = document.getElementById('submitBtn');
+
+  // 解答区DOM
+  const firstAnswerTextarea   = document.getElementById('firstAnswerTextarea');
+  const firstAnswerSubmitted  = document.getElementById('firstAnswerSubmitted');
+  const firstSubmitContent    = document.getElementById('firstSubmitContent');
+  const firstSubmitTime       = document.getElementById('firstSubmitTime');
+  const firstSubmitActions    = document.getElementById('firstSubmitActions');
+  const firstAttachToolbar    = document.getElementById('firstAttachToolbar');
+  const secondAnswerCard      = document.getElementById('secondAnswerCard');
+  const secondAnswerTextarea  = document.getElementById('secondAnswerTextarea');
+  const secondAnswerSubmitted = document.getElementById('secondAnswerSubmitted');
+  const secondSubmitContent   = document.getElementById('secondSubmitContent');
+  const secondSubmitTime      = document.getElementById('secondSubmitTime');
+
+  /* =========================================================
+     HINT LOGIC
+  ========================================================= */
+  function updateDots() {
+    for (let i = 1; i <= 5; i++) {
+      const dot = document.getElementById('dot' + i);
+      if (i <= shownCount)      dot.className = 'hint-dot done';
+      else if (i === shownCount + 1) dot.className = 'hint-dot active';
+      else                      dot.className = 'hint-dot';
+    }
+  }
+
+  function updateBtn() {
+    if (shownCount === 0) {
+      hintBtn.className = 'hint-trigger';
+      hintBtnTitle.textContent = '💡 思路提示';
+      hintBtnSub.textContent = '点击获取解题思路';
+    } else if (shownCount >= 5) {
+      hintBtn.className = 'hint-trigger completed';
+      hintBtnTitle.textContent = '✨ 已获得全部提示';
+      hintBtnSub.textContent = isFirstSubmitted
+        ? '已提交初次解答，请查看答案'
+        : '继续点击获得完整答案';
+      // 仅在已提交初次解答后才显示答案模块
+      if (isFirstSubmitted) {
+        answerRevealWrap.style.display = 'block';
+      }
+    } else {
+      hintBtn.className = 'hint-trigger';
+      hintBtnTitle.textContent = '🔄 再想想看？';
+      hintBtnSub.textContent = `还有 ${5 - shownCount} 条提示可查看`;
+    }
+  }
+
+  /* =========================================================
+     解答状态管理
+  ========================================================= */
+
+  function updateHintTriggerState() {
+    // 获取提示按钮
+    const btn = document.getElementById('hintBtn');
+    if (!btn) return;
+
+    // 查看过答案后，锁定提示区域（不再显示获取提示按钮）
+    if (hasSeenAnswer) {
+      btn.className = 'hint-trigger locked';
+      btn.style.display = 'none';
+      return;
+    }
+
+    // 已提交初次解答，但未查看答案，可以继续获取提示
+    if (isFirstSubmitted && !hasSeenAnswer) {
+      btn.style.display = '';
+    }
+  }
+
+  function updateSubmitButton() {
+    if (!submitBtn) return;
+    submitBtn.textContent = '提交解答';
+
+    // 判断当前阶段是否处于编辑状态
+    const inSecondPhase = secondAnswerCard.style.display !== 'none';
+    const textarea = inSecondPhase ? secondAnswerTextarea : firstAnswerTextarea;
+    const attachThumbs = inSecondPhase
+      ? document.getElementById('secondAttachThumbs')
+      : document.getElementById('firstAttachThumbs');
+
+    const isEditing = textarea && textarea.style.display !== 'none';
+    const hasText = textarea && textarea.value.trim().length > 0;
+    const hasAttach = attachThumbs && attachThumbs.children.length > 0;
+    const canSubmit = isEditing && (hasText || hasAttach);
+
+    submitBtn.disabled = !canSubmit;
+    submitBtn.style.opacity = canSubmit ? '' : '0.4';
+    submitBtn.style.cursor = canSubmit ? 'pointer' : 'not-allowed';
+
+    // 非编辑状态下隐藏删除按钮；二次解答时锁定初次解答的附件
+    document.querySelectorAll('#firstAttachThumbs .thumb-del, #secondAttachThumbs .thumb-del')
+      .forEach(btn => {
+        btn.style.display = isEditing ? '' : 'none';
+      });
+    // 二次解答时，隐藏初次解答附件区的删除按钮（锁定）
+    if (inSecondPhase) {
+      document.querySelectorAll('#firstAttachThumbs .thumb-del')
+        .forEach(btn => { btn.style.display = 'none'; });
+    }
+  }
+
+  function onFirstAnswerChange() {
+    updateSubmitButton();
+  }
+
+  function onSecondAnswerChange() {
+    updateSubmitButton();
+  }
+
+  function handleSubmit() {
+    // 第二阶段（二次解答区已显示）：提交二次解答
+    if (secondAnswerCard.style.display !== 'none') {
+      submitSecondAnswer();
+    } else if (!isFirstSubmitted) {
+      // 初次解答提交
+      submitFirstAnswer();
+    } else if (!hasSeenAnswer) {
+      // 提交初次解答后未查看答案，再次提交 = 覆盖内容
+      submitFirstAnswer(true);
+    } else {
+      // 已查看答案 → 提交二次解答
+      submitSecondAnswer();
+    }
+  }
+
+  function submitFirstAnswer(isOverwrite) {
+    const text = firstAnswerTextarea.value.trim();
+    const hasAttach = firstAttachThumbs.children.length > 0;
+    if (!text && !hasAttach && !isOverwrite) {
+      firstAnswerTextarea.style.borderColor = '#FF3B30';
+      setTimeout(() => { firstAnswerTextarea.style.borderColor = ''; }, 1000);
+      return;
+    }
+
+    const now = new Date();
+    const timeStr = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+
+    firstAnswerText = text;
+    isFirstSubmitted = true;
+
+    // 显示已提交的解答
+    firstAnswerTextarea.style.display = 'none';
+    firstAttachToolbar.style.display = 'none';
+    firstSubmitContent.textContent = firstAnswerText || '(无文字内容)';
+    firstSubmitTime.textContent = timeStr;
+    firstAnswerSubmitted.style.display = 'block';
+
+    // 构建操作按钮：答案已展开则锁定，否则显示重新编辑
+    if (answerOpen) {
+      firstSubmitActions.innerHTML = `
+        <span style="font-size:11px;color:var(--text-muted);margin-right:8px;">初次解答已锁定</span>
+        <button class="answer-action-btn" onclick="showSecondAnswer()">重新解答</button>
+      `;
+    } else {
+      firstSubmitActions.innerHTML = `
+        <button class="answer-action-btn" onclick="editFirstAnswer()">重新编辑</button>
+      `;
+    }
+
+    // 锁定提示触发按钮（不再获取新提示）
+    updateHintTriggerState();
+
+    // 如果已经看过答案，还需要显示二次解答区
+    if (hasSeenAnswer) {
+      secondAnswerCard.style.display = 'block';
+    }
+
+    // 已获取全部提示时，提交后立即显示答案模块
+    if (shownCount >= 5) {
+      answerRevealWrap.style.display = 'block';
+    }
+
+    updateSubmitButton();
+    updateQuestionBadge();
+    updateViewOriginalButton();
+  }
+
+  function editFirstAnswer() {
+    if (hasSeenAnswer) return; // 查看过答案就不能编辑了
+
+    // 恢复编辑状态
+    firstAnswerTextarea.style.display = '';
+    firstAnswerTextarea.disabled = false;
+    firstAnswerTextarea.readOnly = false;
+    firstAnswerTextarea.classList.remove('readonly');
+    firstAttachToolbar.style.display = '';
+    firstAnswerSubmitted.style.display = 'none';
+
+    updateSubmitButton();
+
+    // 重新聚焦
+    setTimeout(() => {
+      firstAnswerTextarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      firstAnswerTextarea.focus();
+    }, 100);
+  }
+
+  function viewAnswer() {
+    hasSeenAnswer = true;
+
+    // 锁定初次解答：显示"重新解答"按钮
+    firstSubmitActions.innerHTML = `
+      <span style="font-size:11px;color:var(--text-muted);margin-right:8px;">初次解答已锁定</span>
+      <button class="answer-action-btn" onclick="showSecondAnswer()">重新解答</button>
+    `;
+
+    // 锁定提示区
+    updateHintTriggerState();
+
+    // 显示答案（自动展开）
+    answerOpen = true;
+    answerFullCard.classList.add('open');
+    answerArrow.classList.add('rotated');
+
+    // 不显示二次解答区，仅展示答案模块
+    secondAnswerCard.style.display = 'none';
+
+    updateSubmitButton();
+
+    setTimeout(() => {
+      answerFullCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  }
+
+  function showSecondAnswer() {
+    // 隐藏初次解答已提交内容
+    firstAnswerSubmitted.style.display = 'none';
+
+    // 锁定初次解答 textarea（保留内容，不可编辑）
+    firstAnswerTextarea.style.display = '';
+    firstAnswerTextarea.disabled = true;
+    firstAnswerTextarea.readOnly = true;
+    firstAnswerTextarea.classList.add('readonly');
+    firstAnswerTextarea.value = firstAnswerText; // 保留原内容
+
+    // 锁定初次解答的附件工具栏
+    firstAttachToolbar.style.display = 'none';
+
+    // 重置二次解答区：清空内容，回到可编辑状态
+    secondAnswerCard.style.display = 'block';
+    secondAnswerTextarea.style.display = '';
+    secondAnswerTextarea.value = '';
+    secondAnswerTextarea.disabled = false;
+    secondAnswerTextarea.readOnly = false;
+    secondAnswerTextarea.classList.remove('readonly');
+    secondAnswerSubmitted.style.display = 'none';
+
+    // 隐藏答案模块
+    answerOpen = false;
+    answerFullCard.classList.remove('open');
+    answerArrow.classList.remove('rotated');
+
+    updateSubmitButton();
+    updateQuestionBadge();
+
+    setTimeout(() => {
+      secondAnswerTextarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      secondAnswerTextarea.focus();
+    }, 100);
+  }
+
+  function resetForSecondAnswer() {
+    // 隐藏初次解答编辑区，显示二次解答区
+    hasSeenAnswer = false;
+
+    // 隐藏初次解答textarea区域（保留已提交内容）
+    firstAnswerTextarea.style.display = 'none';
+    firstAttachToolbar.style.display = 'none';
+
+    // 展开二次解答区
+    secondAnswerCard.style.display = 'block';
+    secondAnswerTextarea.style.display = '';
+    secondAnswerTextarea.value = '';
+    secondAnswerTextarea.disabled = false;
+    secondAnswerTextarea.readOnly = false;
+    secondAnswerTextarea.classList.remove('readonly');
+    secondAnswerSubmitted.style.display = 'none';
+
+    // 隐藏答案模块
+    answerOpen = false;
+    answerFullCard.classList.remove('open');
+    answerArrow.classList.remove('rotated');
+
+    updateSubmitButton();
+
+    setTimeout(() => {
+      secondAnswerTextarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      secondAnswerTextarea.focus();
+    }, 100);
+  }
+
+  function submitSecondAnswer() {
+    const text = secondAnswerTextarea.value.trim();
+
+    const now = new Date();
+    const timeStr = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+
+    secondAnswerText = text;
+    secondSubmitCount++;
+    isSecondSubmitted = true;
+
+    // 初次解答标签改为"初次解答"
+    const firstLabel = document.getElementById('firstAnswerLabel');
+    if (firstLabel) firstLabel.textContent = '初次解答';
+
+    // 显示已提交的二次解答（带重新编辑按钮，无限次）
+    secondAnswerTextarea.style.display = 'none';
+    secondAnswerSubmitted.style.display = 'block';
+    secondSubmitContent.textContent = secondAnswerText || '(无文字内容)';
+    secondSubmitTime.textContent = `第 ${secondSubmitCount} 次提交 · ${timeStr}`;
+
+    // 在时间戳后面加重新编辑按钮
+    const existingBtn = secondSubmitTime.nextElementSibling;
+    if (existingBtn && existingBtn.classList.contains('answer-action-btn')) {
+      existingBtn.remove();
+    }
+    const editBtn = document.createElement('button');
+    editBtn.className = 'answer-action-btn';
+    editBtn.style.marginLeft = '8px';
+    editBtn.textContent = '重新编辑';
+    editBtn.onclick = editSecondAnswer;
+    secondSubmitTime.after(editBtn);
+
+    updateSubmitButton();
+    updateQuestionBadge();
+  }
+
+  function editSecondAnswer() {
+    // 恢复二次解答编辑状态（无限次）
+    secondAnswerTextarea.style.display = '';
+    secondAnswerTextarea.value = secondAnswerText;
+    secondAnswerSubmitted.style.display = 'none';
+    updateSubmitButton();
+    setTimeout(() => {
+      secondAnswerTextarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      secondAnswerTextarea.focus();
+    }, 100);
+  }
+
+  function typeText(el, html, cb) {
+    let i = 0;
+    el.innerHTML = '';
+    const cursor = document.createElement('span');
+    cursor.className = 'typing-cursor';
+    function tick() {
+      if (i < html.length) {
+        if (html[i] === '<') {
+          const close = html.indexOf('>', i);
+          if (close !== -1) { i = close + 1; } else { i++; }
+        } else { i++; }
+        el.innerHTML = html.substring(0, i);
+        el.appendChild(cursor);
+        setTimeout(tick, 14 + Math.random() * 10);
+      } else {
+        cursor.remove();
+        el.innerHTML = html;
+        if (cb) cb();
+      }
+    }
+    tick();
+  }
+
+  function requestHint() {
+    if (isLoading) return;
+    // 全部提示已展示 → 点击查看完整答案（仅在已提交初次解答后才可查看）
+    if (shownCount >= 5) {
+      if (isFirstSubmitted) {
+        viewAnswer();
+      } else {
+        // 未提交初次解答时提示用户
+        hintBtnSub.textContent = '请先提交你的解答';
+        setTimeout(() => {
+          hintBtnSub.textContent = '继续点击获得完整答案';
+        }, 1500);
+      }
+      return;
+    }
+    isLoading = true;
+    const hint = HINTS[shownCount];
+    shownCount++;
+
+    hintBtnTitle.textContent = '⏳ AI 正在思考...';
+    hintBtnSub.textContent = '稍等一下';
+
+    setTimeout(() => {
+      isLoading = false;
+      const cardId = shownCount;
+      const card = document.createElement('div');
+      card.className = `hint-card step-${hint.step}`;
+      card.innerHTML = `
+        <div class="hint-card-header">
+          <div class="hint-step-badge">
+            <div class="hint-step-num">${hint.step}</div>
+            提示 ${hint.step} / 5
+          </div>
+          <div class="hint-card-right">
+            <span class="hint-type-tag">${hint.type}</span>
+            <button class="hint-ask-btn" onclick="toggleFollowup(this)" title="追问这条提示">?</button>
+          </div>
+        </div>
+        <div class="hint-content" id="typing${cardId}"></div>
+        <div class="hint-followup-panel" id="followup${cardId}">
+          <div class="followup-label">💬 关于此提示，你可以问：</div>
+          <div class="followup-chips" id="chips${cardId}"></div>
+          <div class="followup-custom-input-row" id="customRow${cardId}">
+            <input
+              class="followup-custom-input"
+              id="customInput${cardId}"
+              type="text"
+              placeholder="输入你的问题…"
+              maxlength="200"
+              oninput="onCustomInputChange(this, ${cardId})"
+              onkeydown="onCustomKeydown(event, ${cardId})"
+            />
+            <button class="followup-custom-send" id="customSend${cardId}" onclick="sendCustomFollowup(${cardId})">
+              <svg viewBox="0 0 24 24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+        </div>
+      `;
+      hintCards.appendChild(card);
+
+      // 填充推荐模版语 - 传递当前提示内容用于引用
+      const chipsContainer = card.querySelector(`#chips${cardId}`);
+      hint.followups.forEach(q => {
+        const chip = document.createElement('div');
+        chip.className = 'followup-chip';
+        chip.textContent = q;
+        // 传递问题、提示步骤和提示内容
+        chip.onclick = () => sendFollowupQuestion(q, hint.step, hint.content);
+        chipsContainer.appendChild(chip);
+      });
+
+      // "其他问题" chip
+      const customChip = document.createElement('div');
+      customChip.className = 'followup-chip-custom';
+      customChip.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> 其他问题`;
+      // 同样传递提示信息
+      customChip.onclick = () => toggleCustomInput(cardId, customChip, hint.step, hint.content);
+      chipsContainer.appendChild(customChip);
+
+      updateDots();
+      updateBtn();
+
+      const target = document.getElementById('typing' + cardId);
+      typeText(target, hint.content, () => {
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+    }, 900 + Math.random() * 400);
+  }
+
+  /* =========================================================
+     FOLLOWUP PANEL
+  ========================================================= */
+  function toggleFollowup(btn) {
+    const cardEl = btn.closest('.hint-card');
+    const panel = cardEl.querySelector('.hint-followup-panel');
+    const isOpen = panel.classList.contains('open');
+
+    // 关闭所有
+    document.querySelectorAll('.hint-followup-panel.open').forEach(p => p.classList.remove('open'));
+    document.querySelectorAll('.hint-ask-btn.active').forEach(b => b.classList.remove('active'));
+
+    if (!isOpen) {
+      panel.classList.add('open');
+      btn.classList.add('active');
+    }
+  }
+
+  // 存储当前提示信息，用于自定义问题引用
+  let currentHintStep = null;
+  let currentHintContent = null;
+
+  function toggleCustomInput(cardId, chipEl, hintStep, hintContent) {
+    const row = document.getElementById('customRow' + cardId);
+    const isOpen = row.classList.contains('open');
+    if (isOpen) {
+      row.classList.remove('open');
+      chipEl.style.background = '';
+    } else {
+      row.classList.add('open');
+      chipEl.style.background = '#E8D8FF';
+      // 保存当前提示信息
+      currentHintStep = hintStep;
+      currentHintContent = hintContent;
+      setTimeout(() => {
+        const inp = document.getElementById('customInput' + cardId);
+        if (inp) inp.focus();
+      }, 50);
+    }
+  }
+
+  function onCustomInputChange(inp, cardId) {
+    const btn = document.getElementById('customSend' + cardId);
+    btn.classList.toggle('active', inp.value.trim().length > 0);
+  }
+
+  function onCustomKeydown(e, cardId) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      sendCustomFollowup(cardId);
+    }
+  }
+
+  function sendCustomFollowup(cardId) {
+    const inp = document.getElementById('customInput' + cardId);
+    const text = inp.value.trim();
+    if (!text) return;
+    inp.value = '';
+    document.getElementById('customSend' + cardId).classList.remove('active');
+
+    // 关闭面板
+    document.querySelectorAll('.hint-followup-panel.open').forEach(p => p.classList.remove('open'));
+    document.querySelectorAll('.hint-ask-btn.active').forEach(b => b.classList.remove('active'));
+
+    // 使用保存的提示信息发送
+    sendFollowupQuestion(text, currentHintStep, currentHintContent);
+  }
+
+  /**
+   * 发送追问问题
+   * @param {string} question - 用户问题
+   * @param {number} hintStep - 提示步骤号
+   * @param {string} hintContent - 提示内容（HTML）
+   */
+  function sendFollowupQuestion(question, hintStep, hintContent) {
+    // 关闭所有追问面板
+    document.querySelectorAll('.hint-followup-panel.open').forEach(p => p.classList.remove('open'));
+    document.querySelectorAll('.hint-ask-btn.active').forEach(b => b.classList.remove('active'));
+
+    // 如果有提示内容，先显示引用
+    if (hintStep && hintContent) {
+      appendQuoteMsg(hintStep, hintContent);
+    }
+
+    // 滚到聊天区并发送
+    aiInput.value = question;
+    sendUserMsg();
+    setTimeout(() => {
+      document.getElementById('aiChatSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 200);
+  }
+
+  /**
+   * 追加引用消息（显示被追问的提示）
+   */
+  function appendQuoteMsg(hintStep, hintContent) {
+    clearEmptyState();
+
+    // 去除HTML标签，用于判断长度
+    const plainText = hintContent.replace(/<[^>]+>/g, '');
+    const isLong = plainText.length > 60;
+
+    const quoteMsg = document.createElement('div');
+    quoteMsg.className = 'chat-quote-msg';
+    quoteMsg.innerHTML = `
+      <div class="chat-quote-card">
+        <div class="chat-quote-header">
+          <span class="chat-quote-badge">📖 引用提示 ${hintStep}</span>
+          <div class="chat-quote-toggle ${isLong ? 'collapsed' : ''}" onclick="toggleQuoteContent(this)">
+            <span>${isLong ? '展开' : ''}</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </div>
+        </div>
+        <div class="chat-quote-content ${isLong ? 'collapsed' : 'expanded'}">
+          ${hintContent}
+        </div>
+        ${isLong ? '<div class="chat-quote-fade"></div>' : ''}
+      </div>
+    `;
+    chatMessages.appendChild(quoteMsg);
+    scrollChatToBottom();
+  }
+
+  /**
+   * 切换引用内容的展开/折叠
+   */
+  function toggleQuoteContent(toggleEl) {
+    const content = toggleEl.closest('.chat-quote-card').querySelector('.chat-quote-content');
+    const fade = toggleEl.closest('.chat-quote-card').querySelector('.chat-quote-fade');
+    const isCollapsed = content.classList.contains('collapsed');
+
+    if (isCollapsed) {
+      content.classList.remove('collapsed');
+      content.classList.add('expanded');
+      toggleEl.classList.remove('collapsed');
+      toggleEl.querySelector('span').textContent = '收起';
+      if (fade) fade.style.opacity = '0';
+    } else {
+      content.classList.remove('expanded');
+      content.classList.add('collapsed');
+      toggleEl.classList.add('collapsed');
+      toggleEl.querySelector('span').textContent = '展开';
+      if (fade) fade.style.opacity = '1';
+    }
+  }
+
+  /* =========================================================
+     ANSWER REVEAL
+  ========================================================= */
+  function toggleAnswer() {
+    answerOpen = !answerOpen;
+    if (answerOpen) {
+      // 展开答案 → 锁定初次解答，显示重新解答按钮
+      firstSubmitActions.innerHTML = `
+        <span style="font-size:11px;color:var(--text-muted);margin-right:8px;">初次解答已锁定</span>
+        <button class="answer-action-btn" onclick="showSecondAnswer()">重新解答</button>
+      `;
+      answerFullCard.classList.add('open');
+      answerArrow.classList.add('rotated');
+      setTimeout(() => answerFullCard.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+    } else {
+      // 收起答案时保持锁定状态，不还原按钮
+      answerFullCard.classList.remove('open');
+      answerArrow.classList.remove('rotated');
+    }
+  }
+
+  /* =========================================================
+     AI CHAT
+  ========================================================= */
+  function onInputChange(el) {
+    // 自动撑高
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 88) + 'px';
+    aiSendBtn.classList.toggle('active', el.value.trim().length > 0);
+  }
+
+  function onInputKeydown(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendUserMsg();
+    }
+  }
+
+  function clearEmptyState() {
+    const empty = chatMessages.querySelector('.chat-empty');
+    if (empty) empty.remove();
+  }
+
+  function appendUserMsg(text) {
+    clearEmptyState();
+    const msg = document.createElement('div');
+    msg.className = 'chat-msg user';
+    msg.innerHTML = `
+      <div class="chat-avatar user">我</div>
+      <div class="chat-bubble">${escHtml(text)}</div>
+    `;
+    chatMessages.appendChild(msg);
+    scrollChatToBottom();
+    chatMsgCount++;
+    updateChatCount();
+  }
+
+  function appendAITyping() {
+    clearEmptyState();
+    const msg = document.createElement('div');
+    msg.className = 'chat-msg ai';
+    msg.id = 'aiTypingIndicator';
+    msg.innerHTML = `
+      <div class="chat-avatar ai">AI</div>
+      <div class="chat-bubble">
+        <div class="chat-typing-dots"><span></span><span></span><span></span></div>
+      </div>
+    `;
+    chatMessages.appendChild(msg);
+    scrollChatToBottom();
+    return msg;
+  }
+
+  function replaceTypingWithMsg(typingEl, html) {
+    const bubble = typingEl.querySelector('.chat-bubble');
+    bubble.innerHTML = '';
+    const cursor = document.createElement('span');
+    cursor.className = 'typing-cursor';
+    bubble.appendChild(cursor);
+    let i = 0;
+    function tick() {
+      if (i < html.length) {
+        if (html[i] === '<') {
+          const close = html.indexOf('>', i);
+          if (close !== -1) { i = close + 1; } else { i++; }
+        } else { i++; }
+        bubble.innerHTML = html.substring(0, i);
+        bubble.appendChild(cursor);
+        scrollChatToBottom();
+        setTimeout(tick, 16 + Math.random() * 8);
+      } else {
+        cursor.remove();
+        bubble.innerHTML = html;
+        typingEl.removeAttribute('id');
+        chatMsgCount++;
+        updateChatCount();
+        scrollChatToBottom();
+      }
+    }
+    tick();
+  }
+
+  function getAIReply(question) {
+    for (const key of Object.keys(AI_FOLLOWUP_REPLIES)) {
+      if (question.includes(key.substring(0, Math.min(key.length, 10)))) {
+        return markdownBold(AI_FOLLOWUP_REPLIES[key]);
+      }
+    }
+    const reply = AI_GENERIC_REPLIES[genericReplyIdx % AI_GENERIC_REPLIES.length];
+    genericReplyIdx++;
+    return markdownBold(reply);
+  }
+
+  function markdownBold(str) {
+    return str.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  }
+
+  function sendUserMsg() {
+    const text = aiInput.value.trim();
+    if (!text) return;
+    aiInput.value = '';
+    aiInput.style.height = 'auto';
+    aiSendBtn.classList.remove('active');
+
+    appendUserMsg(text);
+
+    const typingEl = appendAITyping();
+    setTimeout(() => {
+      replaceTypingWithMsg(typingEl, getAIReply(text));
+    }, 800 + Math.random() * 600);
+  }
+
+  /* =========================================================
+     VOICE INPUT
+  ========================================================= */
+  function toggleVoice() {
+    if (!isRecording) {
+      // 开始录音
+      isRecording = true;
+      aiVoiceBtn.classList.add('recording');
+      recordingHint.classList.add('show');
+      // 模拟 5 秒后自动停止
+      recordingTimer = setTimeout(() => stopRecording(true), 5000);
+    } else {
+      stopRecording(true);
+    }
+  }
+
+  function stopRecording(withResult) {
+    clearTimeout(recordingTimer);
+    isRecording = false;
+    aiVoiceBtn.classList.remove('recording');
+    recordingHint.classList.remove('show');
+
+    if (withResult) {
+      // 模拟语音识别结果
+      const voiceTexts = [
+        '对称轴公式是怎么推导出来的？',
+        '为什么 b 等于负 4a？',
+        '第二问 MN 的长度怎么算？',
+        '判别式小于零是什么意思？',
+      ];
+      const result = voiceTexts[Math.floor(Math.random() * voiceTexts.length)];
+      aiInput.value = result;
+      onInputChange(aiInput);
+      aiInput.focus();
+    }
+  }
+
+  function scrollChatToBottom() {
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function updateChatCount() {
+    const userMsgs = chatMessages.querySelectorAll('.chat-msg.user').length;
+    chatCount.textContent = userMsgs > 0 ? `已提问 ${userMsgs} 次` : '随时提问';
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  /* =========================================================
+     演示：图片/视频附件
+  ========================================================= */
+  const DEMO_IMAGE = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='120'%3E%3Crect fill='%23F0F4FF' width='200' height='120'/%3E%3Ctext x='100' y='55' text-anchor='middle' fill='%236E6E73' font-size='13'%3E二次函数图像%3C/text%3E%3Ctext x='100' y='75' text-anchor='middle' fill='%23AEAEB2' font-size='11'%3E（示例图片）%3C/text%3E%3C/svg%3E";
+  const DEMO_VIDEO = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='120'%3E%3Crect fill='%23FFF9F0' width='200' height='120'/%3E%3Ccircle cx='100' cy='60' r='22' fill='rgba(255,107,74,0.15)'/%3E%3Cpolygon points='92,50 112,60 92,70' fill='%23FF6B4A'/%3E%3Ctext x='100' y='95' text-anchor='middle' fill='%23AEAEB2' font-size='11'%3E解题视频（示例）%3C/text%3E%3C/svg%3E";
+
+    function addDemoImage() {
+    const container = document.getElementById('firstAttachThumbs');
+    addThumb(container, DEMO_IMAGE, '图片', false);
+    updateSubmitButton();
+  }
+  function addDemoVideo() {
+    const container = document.getElementById('firstAttachThumbs');
+    addThumb(container, DEMO_VIDEO, '视频', true);
+    updateSubmitButton();
+  }
+  function addDemoImage2() {
+    const container = document.getElementById('secondAttachThumbs');
+    addThumb(container, DEMO_IMAGE, '图片', false);
+    updateSubmitButton();
+  }
+  function addDemoVideo2() {
+    const container = document.getElementById('secondAttachThumbs');
+    addThumb(container, DEMO_VIDEO, '视频', true);
+    updateSubmitButton();
+  }
+
+  function addThumb(container, src, label, isVideo) {
+    if (!container) return;
+    const thumb = document.createElement('div');
+    thumb.className = 'attach-thumb';
+    thumb.innerHTML = `
+      <img src="${src}" alt="${label}">
+      <span class="thumb-badge">${label}</span>
+      <button class="thumb-del" onclick="removeThumb(this)" title="删除">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+      ${isVideo ? `<svg class="video-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+        <circle cx="12" cy="12" r="10" fill="rgba(0,0,0,0.4)"/>
+        <polygon points="10 8 16 12 10 16 10 8" fill="white"/>
+      </svg>` : ''}
+    `;
+    container.appendChild(thumb);
+    thumb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function removeThumb(btn) {
+    btn.closest('.attach-thumb').remove();
+    updateSubmitButton();
+  }
+
+  /* =========================================================
+     题目列表弹窗
+  ========================================================= */
+  function getAnsweredCount() {
+    // 模拟：当前题目是否已提交初次解答
+    // 后续真实场景：从全局/父页面读取所有题目的答题状态
+    return isFirstSubmitted ? 1 : 0;
+  }
+
+  function updateQuestionBadge() {
+    const display = document.getElementById('questionNumDisplay');
+    const badge = document.getElementById('unansweredBadge');
+    const count = document.getElementById('unansweredCount');
+    const unanswered = TOTAL_QUESTIONS - getAnsweredCount();
+    display.textContent = `第${CURRENT_QUESTION}/${TOTAL_QUESTIONS}题`;
+    count.textContent = unanswered;
+    badge.style.display = unanswered > 0 ? 'inline-block' : 'none';
+  }
+
+  function isCurrentAnswerDirty() {
+    // 当前题目的编辑状态：textarea 显示且有内容
+    const inSecond = secondAnswerCard.style.display !== 'none';
+    const ta = inSecond ? secondAnswerTextarea : firstAnswerTextarea;
+    const hasContent = ta && (ta.value.trim().length > 0 || (ta.nextElementSibling && ta.nextElementSibling.children.length > 0));
+    return ta && ta.style.display !== 'none' && hasContent;
+  }
+
+  function showQuestionList() {
+    const grid = document.getElementById('questionListGrid');
+    grid.innerHTML = '';
+    for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
+      const item = document.createElement('div');
+      item.className = 'ql-item';
+      const isAnswered = (i < CURRENT_QUESTION) || (i === CURRENT_QUESTION && isFirstSubmitted);
+      const isCurrent = i === CURRENT_QUESTION;
+      if (isAnswered) item.classList.add('answered');
+      if (isCurrent) item.classList.add('current');
+      item.textContent = i;
+      item.onclick = () => onQuestionItemClick(i, isCurrent, isAnswered);
+      grid.appendChild(item);
+    }
+    document.getElementById('questionListOverlay').classList.add('active');
+  }
+
+  function onQuestionItemClick(num, isCurrent, isAnswered) {
+    closeQuestionList();
+    if (isCurrent) return; // 点击当前题，不跳转
+    // 只有 textarea 显示且有内容（或附件）时才弹确认
+    const firstTA = firstAnswerTextarea;
+    const secondTA = secondAnswerTextarea;
+    const firstVisible = firstTA && firstTA.style.display !== 'none';
+    const secondVisible = secondTA && secondTA.style.display !== 'none';
+    const hasContent =
+      (firstVisible && (firstTA.value.trim() || firstTA.nextElementSibling?.children.length > 0)) ||
+      (secondVisible && (secondTA.value.trim() || secondTA.nextElementSibling?.children.length > 0));
+    if (hasContent) {
+      pendingJumpTarget = num;
+      document.getElementById('jumpConfirmMsg').textContent =
+        `是否跳转至第 ${num} 题？当前题目作答内容不保存。`;
+      document.getElementById('jumpConfirmOverlay').classList.add('active');
+    } else {
+      doJump(num);
+    }
+  }
+
+  function doJump(target) {
+    // 原型演示：仅弹出提示，实际项目中调用父页面切换逻辑
+    alert(`已跳转至第 ${target} 题`);
+    // 模拟切换题目：重置当前题目的状态（原型演示用）
+    // resetQuestionState();
+  }
+
+  function confirmJump() {
+    closeJumpConfirm();
+    if (pendingJumpTarget !== null) {
+      doJump(pendingJumpTarget);
+      pendingJumpTarget = null;
+    }
+  }
+
+  function closeJumpConfirm() {
+    document.getElementById('jumpConfirmOverlay').classList.remove('active');
+    pendingJumpTarget = null;
+  }
+
+  function closeQuestionList() {
+    document.getElementById('questionListOverlay').classList.remove('active');
+  }
+
+  function onOverlayClick(e) {
+    if (e.target.id === 'questionListOverlay') closeQuestionList();
+  }
+
+  /* =========================================================
+     INIT
+  ========================================================= */
+  // 初始化查看原题按钮
+  viewOriginalWrap = document.getElementById('viewOriginalWrap');
+
+  updateDots();
+  updateBtn();
+  updateSubmitButton();
+  updateQuestionBadge();
+
+  /* =========================================================
+     查看原题按钮控制
+  ========================================================= */
+  function updateViewOriginalButton() {
+    if (!viewOriginalWrap) return;
+    if (isFirstSubmitted) {
+      viewOriginalWrap.style.display = 'flex';
+    } else {
+      viewOriginalWrap.style.display = 'none';
+    }
+  }
+
+
+  function viewOriginalQuestion() {
+    hasViewedOriginal = true;
+    lockFirstAnswer();
+    // 保存状态，刷新/返回后仍然锁定
+    localStorage.setItem('homework_viewedOriginal_' + CURRENT_QUESTION, 'true');
+    window.location.href = 'exercise-detail.html';
+  }
+
+  function lockFirstAnswer() {
+    // 锁定首次解答区域
+    if (firstAnswerTextarea) {
+      firstAnswerTextarea.disabled = true;
+      firstAnswerTextarea.style.cursor = 'not-allowed';
+      firstAnswerTextarea.style.opacity = '0.7';
+    }
+    if (firstAttachToolbar) firstAttachToolbar.style.display = 'none';
+    // 隐藏重新编辑按钮（如果有）
+    if (firstSubmitActions) {
+      firstSubmitActions.querySelectorAll('button').forEach(function(btn) {
+        if (btn.textContent.includes('重新编辑')) {
+          btn.style.display = 'none';
+        }
+      });
+    }
+  }
+
+  function unlockFirstAnswer() {
+    if (firstAnswerTextarea) {
+      firstAnswerTextarea.disabled = false;
+      firstAnswerTextarea.style.cursor = '';
+      firstAnswerTextarea.style.opacity = '';
+    }
+    if (firstAttachToolbar) firstAttachToolbar.style.display = '';
+    if (firstSubmitActions) {
+      firstSubmitActions.querySelectorAll('button').forEach(function(btn) {
+        if (btn.textContent.includes('重新编辑')) {
+          btn.style.display = '';
+        }
+      });
+    }
+  }
+
+  setTimeout(updateViewOriginalButton, 100);
+</script>
+
+</div>
+
+
+
+<script>
+  /* =========================================================
+     DATA
+  ========================================================= */
+  const HINTS = [
+    {
+      step: 1, type: '引导型',
+      content: '先仔细读题，找出题目给出了哪些<strong>已知条件</strong>：图像经过 A(1,2) 和 B(3,6)，还有对称轴 x = 2。把这些信息在草稿纸上列出来看看？',
+      followups: [
+        '已知条件里哪个信息最关键？',
+        '对称轴 x=2 在这里有什么用？',
+        '二次函数一共有几个未知数，几个条件？',
+      ]
+    },
+    {
+      step: 2, type: '反问型',
+      content: '对称轴 x = 2 意味着什么？对于二次函数 y = ax² + bx + c，<strong>对称轴公式</strong>是什么？',
+      followups: [
+        '对称轴公式 x = -b/(2a) 怎么推导出来的？',
+        '知道对称轴能求出 a 和 b 的关系吗？',
+        '如果 A、B 两点关于对称轴对称，怎么验证？',
+      ]
+    },
+    {
+      step: 3, type: '提示型',
+      content: '对称轴 x = 2，所以 -b/(2a) = 2，即 <strong>b = -4a</strong>。再把 A、B 两点代入，能列出几个方程？',
+      followups: [
+        'b = -4a 怎么从 -b/(2a) = 2 推出来的？',
+        '把 A(1,2) 代入方程后能得到什么？',
+        '三个方程联立，用哪种方法解比较快？',
+      ]
+    },
+    {
+      step: 4, type: '提示型',
+      content: '从 A(1,2) 得到 a + b + c = 2，从 B(3,6) 得到 9a + 3b + c = 6。联立这三个方程，<strong>解出 a、b、c</strong> 的值。',
+      followups: [
+        '三个方程联立，怎么消去 c？',
+        '解出 a 之后怎么依次求 b 和 c？',
+        '解完之后要不要验证代回原来的点？',
+      ]
+    },
+    {
+      step: 5, type: '总结型',
+      content: '解析式求出来了！第 (2) 问求 MN 长度，想想<strong>求根公式</strong>。第 (3) 问注意看二次项系数 a 的符号 🌟',
+      followups: [
+        '判别式 Δ = b²-4ac 为什么可以判断交点个数？',
+        '如果只有一个交点，MN 的长度是多少？',
+        'a > 0 时，抛物线开口朝上，单调性怎么判断？',
+      ]
+    },
+  ];
+
+  const AI_FOLLOWUP_REPLIES = {
+    '已知条件里哪个信息最关键': '三个条件各有用处：对称轴帮你建立 a、b 的关系，A、B 两点各提供一个方程。可以说**对称轴最独特**，因为它直接给出 -b/(2a) = 2 这个关系式，缺少它方程组无法唯一确定解析式。',
+    '对称轴 x=2 在这里有什么用': '对称轴公式是 x = -b/(2a)，代入 x = 2 后得到 b = -4a。这就把三个未知量（a、b、c）减少到两个有效未知量，再加上 A、B 两个点方程就刚好够用了。',
+    '二次函数一共有几个未知数': '有 3 个未知数：a、b、c。题目给了 3 个已知条件（A 点、B 点、对称轴），恰好构成三元一次方程组，有唯一解。',
+    '对称轴公式 x = -b/(2a) 怎么推导出来的': '对 y = ax² + bx + c 配方：y = a(x + b/(2a))² + c - b²/(4a)，括号内为 0 时 y 最小/最大，所以对称轴 x = -b/(2a)。',
+    '知道对称轴能求出 a 和 b 的关系吗': '可以！-b/(2a) = 2 直接给出 b = -4a。这是一个含 a 的线性关系，相当于把两个未知量合并成一个，降低了方程组的自由度。',
+    '如果 A、B 两点关于对称轴对称，怎么验证': 'A(1,2) 和 B(3,6)：对称轴两侧的 x 坐标应满足 (1+3)/2 = 2，确实等于 2。不过 y 坐标不同（2 ≠ 6），说明 A、B **不关于对称轴对称**，它们在抛物线不同高度。',
+    'b = -4a 怎么从 -b/(2a) = 2 推出来的': '两边同乘 2a（a≠0）：-b = 4a，再乘以 -1 就得到 b = -4a。简单的代数变形，注意不要漏掉负号。',
+    '把 A(1,2) 代入方程后能得到什么': '把 x=1, y=2 代入 y = ax²+bx+c：a + b + c = 2。再把 b = -4a 代入：a - 4a + c = 2，得 **c = 2 + 3a**。',
+    '三个方程联立，用哪种方法解比较快': '推荐**代入消元法**：先用 b = -4a 消去 b，再用任意一个点方程表示 c，最后代入另一个点方程求 a。逐步代入，不容易出错。',
+    '三个方程联立，怎么消去 c': '两个点方程相减即可消去 c：(9a + 3b + c) - (a + b + c) = 6 - 2，化简得 **8a + 2b = 4**，即 4a + b = 2。再代入 b = -4a 即可求出 a。',
+    '解出 a 之后怎么依次求 b 和 c': '求出 a 后，代入 b = -4a 求 b；然后将 a、b 代入 a + b + c = 2 求 c。最后验证 B 点是否满足方程。',
+    '解完之后要不要验证代回原来的点': '**强烈建议验证**！把求出的 a、b、c 分别代入 A(1,2) 和 B(3,6)，若两个等式都成立才算正确。这步只要 30 秒，却能避免失分。',
+    '判别式 Δ = b²-4ac 为什么可以判断交点个数': 'Δ > 0 时方程有两个不同实数根，即抛物线与 x 轴交两点；Δ = 0 时有一个重根（相切）；Δ < 0 时无实数根，不与 x 轴相交。',
+    '如果只有一个交点，MN 的长度是多少': '若 Δ = 0，M 与 N 是同一个点，所以 MN = **0**。对于这道题 y = 2x²-8x+8，Δ = 64 - 64 = 0，正好是这种情况，抛物线与 x 轴相切于 (2,0)。',
+    'a > 0 时，抛物线开口朝上，单调性怎么判断': '开口朝上的抛物线在**对称轴左侧单调递减**，右侧单调递增。对称轴 x = 2，所以 x < 2 时 y 随 x 增大而减小，x > 2 时 y 随 x 增大而增大。',
+  };
+
+  const AI_GENERIC_REPLIES = [
+    '这是个很好的问题！对于二次函数 y = 2x²-8x+8，它的对称轴是 x = 2，开口朝上。你具体是哪步卡住了？我可以帮你一步步分析。',
+    '来帮你梳理一下。这道题的关键是：①用对称轴建立 b 和 a 的关系；②用两个点列方程；③联立求解。你现在做到哪一步了？',
+    '好问题！解二次函数题时，建议先把已知条件整理成方程，逐步代入消元。如果你把当前步骤发给我，我来帮你检查思路是否正确。',
+    '对于这类压轴题，思路是：已知条件 → 建立方程组 → 代入求解 → 验证。你对哪个环节不确定？可以具体说说。',
+  ];
+
+  let genericReplyIdx = 0;
+
+  /* =========================================================
+     STATE
+  ========================================================= */
+  let shownCount = 0;
+  let isLoading = false;
+  let answerOpen = false;
+  let chatMsgCount = 0;
+  let isRecording = false;
+  let recordingTimer = null;
+
+  // 解答状态
+  let isFirstSubmitted = false;      // 是否已提交初次解答
+  let hasSeenAnswer = false;         // 是否查看过答案
+  let firstAnswerText = '';          // 初次解答内容
+  let secondAnswerText = '';         // 二次解答内容
+  let isSecondSubmitted = false;     // 是否已提交二次解答
+  let secondSubmitCount = 0;         // 二次解答提交次数
+  let hasViewedOriginal = false;     // 是否查看过原题（查看后锁定首次解答）
+
+  const TOTAL_QUESTIONS = 10;         // 总题数
+  const CURRENT_QUESTION = 3;         // 当前题号
+  let pendingJumpTarget = null;       // 待跳转题号（编辑状态下点击时暂存）
+
+  /* =========================================================
+     DOM REFS
+  ========================================================= */
+  const hintBtn          = document.getElementById('hintBtn');
+  const hintBtnTitle     = document.getElementById('hintBtnTitle');
+  const hintBtnSub       = document.getElementById('hintBtnSub');
+  const hintCards        = document.getElementById('hintCards');
+  const answerRevealWrap = document.getElementById('answerRevealWrap');
+  const answerFullCard   = document.getElementById('answerFullCard');
+  const answerArrow      = document.getElementById('answerArrow');
+  const chatMessages     = document.getElementById('chatMessages');
+  const aiInput          = document.getElementById('aiInput');
+  const aiSendBtn        = document.getElementById('aiSendBtn');
+  const aiVoiceBtn       = document.getElementById('aiVoiceBtn');
+  const recordingHint    = document.getElementById('recordingHint');
+  const chatCount        = document.getElementById('chatCount');
+  const submitBtn        = document.getElementById('submitBtn');
+
+  // 解答区DOM
+  const firstAnswerTextarea   = document.getElementById('firstAnswerTextarea');
+  const firstAnswerSubmitted  = document.getElementById('firstAnswerSubmitted');
+  const firstSubmitContent    = document.getElementById('firstSubmitContent');
+  const firstSubmitTime       = document.getElementById('firstSubmitTime');
+  const firstSubmitActions    = document.getElementById('firstSubmitActions');
+  const firstAttachToolbar    = document.getElementById('firstAttachToolbar');
+  const secondAnswerCard      = document.getElementById('secondAnswerCard');
+  const secondAnswerTextarea  = document.getElementById('secondAnswerTextarea');
+  const secondAnswerSubmitted = document.getElementById('secondAnswerSubmitted');
+  const secondSubmitContent   = document.getElementById('secondSubmitContent');
+  const secondSubmitTime      = document.getElementById('secondSubmitTime');
+
+  /* =========================================================
+     HINT LOGIC
+  ========================================================= */
+  function updateDots() {
+    for (let i = 1; i <= 5; i++) {
+      const dot = document.getElementById('dot' + i);
+      if (i <= shownCount)      dot.className = 'hint-dot done';
+      else if (i === shownCount + 1) dot.className = 'hint-dot active';
+      else                      dot.className = 'hint-dot';
+    }
+  }
+
+  function updateBtn() {
+    if (shownCount === 0) {
+      hintBtn.className = 'hint-trigger';
+      hintBtnTitle.textContent = '💡 思路提示';
+      hintBtnSub.textContent = '点击获取解题思路';
+    } else if (shownCount >= 5) {
+      hintBtn.className = 'hint-trigger completed';
+      hintBtnTitle.textContent = '✨ 已获得全部提示';
+      hintBtnSub.textContent = isFirstSubmitted
+        ? '已提交初次解答，请查看答案'
+        : '继续点击获得完整答案';
+      // 仅在已提交初次解答后才显示答案模块
+      if (isFirstSubmitted) {
+        answerRevealWrap.style.display = 'block';
+      }
+    } else {
+      hintBtn.className = 'hint-trigger';
+      hintBtnTitle.textContent = '🔄 再想想看？';
+      hintBtnSub.textContent = `还有 ${5 - shownCount} 条提示可查看`;
+    }
+  }
+
+  /* =========================================================
+     解答状态管理
+  ========================================================= */
+
+  function updateHintTriggerState() {
+    // 获取提示按钮
+    const btn = document.getElementById('hintBtn');
+    if (!btn) return;
+
+    // 查看过答案后，锁定提示区域（不再显示获取提示按钮）
+    if (hasSeenAnswer) {
+      btn.className = 'hint-trigger locked';
+      btn.style.display = 'none';
+      return;
+    }
+
+    // 已提交初次解答，但未查看答案，可以继续获取提示
+    if (isFirstSubmitted && !hasSeenAnswer) {
+      btn.style.display = '';
+    }
+  }
+
+  function updateSubmitButton() {
+    if (!submitBtn) return;
+    submitBtn.textContent = '提交解答';
+
+    // 判断当前阶段是否处于编辑状态
+    const inSecondPhase = secondAnswerCard.style.display !== 'none';
+    const textarea = inSecondPhase ? secondAnswerTextarea : firstAnswerTextarea;
+    const attachThumbs = inSecondPhase
+      ? document.getElementById('secondAttachThumbs')
+      : document.getElementById('firstAttachThumbs');
+
+    const isEditing = textarea && textarea.style.display !== 'none';
+    const hasText = textarea && textarea.value.trim().length > 0;
+    const hasAttach = attachThumbs && attachThumbs.children.length > 0;
+    const canSubmit = isEditing && (hasText || hasAttach);
+
+    submitBtn.disabled = !canSubmit;
+    submitBtn.style.opacity = canSubmit ? '' : '0.4';
+    submitBtn.style.cursor = canSubmit ? 'pointer' : 'not-allowed';
+
+    // 非编辑状态下隐藏删除按钮；二次解答时锁定初次解答的附件
+    document.querySelectorAll('#firstAttachThumbs .thumb-del, #secondAttachThumbs .thumb-del')
+      .forEach(btn => {
+        btn.style.display = isEditing ? '' : 'none';
+      });
+    // 二次解答时，隐藏初次解答附件区的删除按钮（锁定）
+    if (inSecondPhase) {
+      document.querySelectorAll('#firstAttachThumbs .thumb-del')
+        .forEach(btn => { btn.style.display = 'none'; });
+    }
+  }
+
+  function onFirstAnswerChange() {
+    updateSubmitButton();
+  }
+
+  function onSecondAnswerChange() {
+    updateSubmitButton();
+  }
+
+  function handleSubmit() {
+    // 第二阶段（二次解答区已显示）：提交二次解答
+    if (secondAnswerCard.style.display !== 'none') {
+      submitSecondAnswer();
+    } else if (!isFirstSubmitted) {
+      // 初次解答提交
+      submitFirstAnswer();
+    } else if (!hasSeenAnswer) {
+      // 提交初次解答后未查看答案，再次提交 = 覆盖内容
+      submitFirstAnswer(true);
+    } else {
+      // 已查看答案 → 提交二次解答
+      submitSecondAnswer();
+    }
+  }
+
+  function submitFirstAnswer(isOverwrite) {
+    const text = firstAnswerTextarea.value.trim();
+    const hasAttach = firstAttachThumbs.children.length > 0;
+    if (!text && !hasAttach && !isOverwrite) {
+      firstAnswerTextarea.style.borderColor = '#FF3B30';
+      setTimeout(() => { firstAnswerTextarea.style.borderColor = ''; }, 1000);
+      return;
+    }
+
+    const now = new Date();
+    const timeStr = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+
+    firstAnswerText = text;
+    isFirstSubmitted = true;
+
+    // 显示已提交的解答
+    firstAnswerTextarea.style.display = 'none';
+    firstAttachToolbar.style.display = 'none';
+    firstSubmitContent.textContent = firstAnswerText || '(无文字内容)';
+    firstSubmitTime.textContent = timeStr;
+    firstAnswerSubmitted.style.display = 'block';
+
+    // 构建操作按钮：答案已展开则锁定，否则显示重新编辑
+    if (answerOpen) {
+      firstSubmitActions.innerHTML = `
+        <span style="font-size:11px;color:var(--text-muted);margin-right:8px;">初次解答已锁定</span>
+        <button class="answer-action-btn" onclick="showSecondAnswer()">重新解答</button>
+      `;
+    } else {
+      firstSubmitActions.innerHTML = `
+        <button class="answer-action-btn" onclick="editFirstAnswer()">重新编辑</button>
+      `;
+    }
+
+    // 锁定提示触发按钮（不再获取新提示）
+    updateHintTriggerState();
+
+    // 如果已经看过答案，还需要显示二次解答区
+    if (hasSeenAnswer) {
+      secondAnswerCard.style.display = 'block';
+    }
+
+    // 已获取全部提示时，提交后立即显示答案模块
+    if (shownCount >= 5) {
+      answerRevealWrap.style.display = 'block';
+    }
+
+    updateSubmitButton();
+    updateQuestionBadge();
+  }
+
+  function editFirstAnswer() {
+    if (hasSeenAnswer) return; // 查看过答案就不能编辑了
+
+    // 恢复编辑状态
+    firstAnswerTextarea.style.display = '';
+    firstAnswerTextarea.disabled = false;
+    firstAnswerTextarea.readOnly = false;
+    firstAnswerTextarea.classList.remove('readonly');
+    firstAttachToolbar.style.display = '';
+    firstAnswerSubmitted.style.display = 'none';
+
+    updateSubmitButton();
+
+    // 重新聚焦
+    setTimeout(() => {
+      firstAnswerTextarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      firstAnswerTextarea.focus();
+    }, 100);
+  }
+
+  function viewAnswer() {
+    hasSeenAnswer = true;
+
+    // 锁定初次解答：显示"重新解答"按钮
+    firstSubmitActions.innerHTML = `
+      <span style="font-size:11px;color:var(--text-muted);margin-right:8px;">初次解答已锁定</span>
+      <button class="answer-action-btn" onclick="showSecondAnswer()">重新解答</button>
+    `;
+
+    // 锁定提示区
+    updateHintTriggerState();
+
+    // 显示答案（自动展开）
+    answerOpen = true;
+    answerFullCard.classList.add('open');
+    answerArrow.classList.add('rotated');
+
+    // 不显示二次解答区，仅展示答案模块
+    secondAnswerCard.style.display = 'none';
+
+    updateSubmitButton();
+
+    setTimeout(() => {
+      answerFullCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  }
+
+  function showSecondAnswer() {
+    // 隐藏初次解答已提交内容
+    firstAnswerSubmitted.style.display = 'none';
+
+    // 锁定初次解答 textarea（保留内容，不可编辑）
+    firstAnswerTextarea.style.display = '';
+    firstAnswerTextarea.disabled = true;
+    firstAnswerTextarea.readOnly = true;
+    firstAnswerTextarea.classList.add('readonly');
+    firstAnswerTextarea.value = firstAnswerText; // 保留原内容
+
+    // 锁定初次解答的附件工具栏
+    firstAttachToolbar.style.display = 'none';
+
+    // 重置二次解答区：清空内容，回到可编辑状态
+    secondAnswerCard.style.display = 'block';
+    secondAnswerTextarea.style.display = '';
+    secondAnswerTextarea.value = '';
+    secondAnswerTextarea.disabled = false;
+    secondAnswerTextarea.readOnly = false;
+    secondAnswerTextarea.classList.remove('readonly');
+    secondAnswerSubmitted.style.display = 'none';
+
+    // 隐藏答案模块
+    answerOpen = false;
+    answerFullCard.classList.remove('open');
+    answerArrow.classList.remove('rotated');
+
+    updateSubmitButton();
+    updateQuestionBadge();
+
+    setTimeout(() => {
+      secondAnswerTextarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      secondAnswerTextarea.focus();
+    }, 100);
+  }
+
+  function resetForSecondAnswer() {
+    // 隐藏初次解答编辑区，显示二次解答区
+    hasSeenAnswer = false;
+
+    // 隐藏初次解答textarea区域（保留已提交内容）
+    firstAnswerTextarea.style.display = 'none';
+    firstAttachToolbar.style.display = 'none';
+
+    // 展开二次解答区
+    secondAnswerCard.style.display = 'block';
+    secondAnswerTextarea.style.display = '';
+    secondAnswerTextarea.value = '';
+    secondAnswerTextarea.disabled = false;
+    secondAnswerTextarea.readOnly = false;
+    secondAnswerTextarea.classList.remove('readonly');
+    secondAnswerSubmitted.style.display = 'none';
+
+    // 隐藏答案模块
+    answerOpen = false;
+    answerFullCard.classList.remove('open');
+    answerArrow.classList.remove('rotated');
+
+    updateSubmitButton();
+
+    setTimeout(() => {
+      secondAnswerTextarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      secondAnswerTextarea.focus();
+    }, 100);
+  }
+
+  function submitSecondAnswer() {
+    const text = secondAnswerTextarea.value.trim();
+
+    const now = new Date();
+    const timeStr = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+
+    secondAnswerText = text;
+    secondSubmitCount++;
+    isSecondSubmitted = true;
+
+    // 初次解答标签改为"初次解答"
+    const firstLabel = document.getElementById('firstAnswerLabel');
+    if (firstLabel) firstLabel.textContent = '初次解答';
+
+    // 显示已提交的二次解答（带重新编辑按钮，无限次）
+    secondAnswerTextarea.style.display = 'none';
+    secondAnswerSubmitted.style.display = 'block';
+    secondSubmitContent.textContent = secondAnswerText || '(无文字内容)';
+    secondSubmitTime.textContent = `第 ${secondSubmitCount} 次提交 · ${timeStr}`;
+
+    // 在时间戳后面加重新编辑按钮
+    const existingBtn = secondSubmitTime.nextElementSibling;
+    if (existingBtn && existingBtn.classList.contains('answer-action-btn')) {
+      existingBtn.remove();
+    }
+    const editBtn = document.createElement('button');
+    editBtn.className = 'answer-action-btn';
+    editBtn.style.marginLeft = '8px';
+    editBtn.textContent = '重新编辑';
+    editBtn.onclick = editSecondAnswer;
+    secondSubmitTime.after(editBtn);
+
+    updateSubmitButton();
+    updateQuestionBadge();
+  }
+
+  function editSecondAnswer() {
+    // 恢复二次解答编辑状态（无限次）
+    secondAnswerTextarea.style.display = '';
+    secondAnswerTextarea.value = secondAnswerText;
+    secondAnswerSubmitted.style.display = 'none';
+    updateSubmitButton();
+    setTimeout(() => {
+      secondAnswerTextarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      secondAnswerTextarea.focus();
+    }, 100);
+  }
+
+  function typeText(el, html, cb) {
+    let i = 0;
+    el.innerHTML = '';
+    const cursor = document.createElement('span');
+    cursor.className = 'typing-cursor';
+    function tick() {
+      if (i < html.length) {
+        if (html[i] === '<') {
+          const close = html.indexOf('>', i);
+          if (close !== -1) { i = close + 1; } else { i++; }
+        } else { i++; }
+        el.innerHTML = html.substring(0, i);
+        el.appendChild(cursor);
+        setTimeout(tick, 14 + Math.random() * 10);
+      } else {
+        cursor.remove();
+        el.innerHTML = html;
+        if (cb) cb();
+      }
+    }
+    tick();
+  }
+
+  function requestHint() {
+    if (isLoading) return;
+    // 全部提示已展示 → 点击查看完整答案（仅在已提交初次解答后才可查看）
+    if (shownCount >= 5) {
+      if (isFirstSubmitted) {
+        viewAnswer();
+      } else {
+        // 未提交初次解答时提示用户
+        hintBtnSub.textContent = '请先提交你的解答';
+        setTimeout(() => {
+          hintBtnSub.textContent = '继续点击获得完整答案';
+        }, 1500);
+      }
+      return;
+    }
+    isLoading = true;
+    const hint = HINTS[shownCount];
+    shownCount++;
+
+    hintBtnTitle.textContent = '⏳ AI 正在思考...';
+    hintBtnSub.textContent = '稍等一下';
+
+    setTimeout(() => {
+      isLoading = false;
+      const cardId = shownCount;
+      const card = document.createElement('div');
+      card.className = `hint-card step-${hint.step}`;
+      card.innerHTML = `
+        <div class="hint-card-header">
+          <div class="hint-step-badge">
+            <div class="hint-step-num">${hint.step}</div>
+            提示 ${hint.step} / 5
+          </div>
+          <div class="hint-card-right">
+            <span class="hint-type-tag">${hint.type}</span>
+            <button class="hint-ask-btn" onclick="toggleFollowup(this)" title="追问这条提示">?</button>
+          </div>
+        </div>
+        <div class="hint-content" id="typing${cardId}"></div>
+        <div class="hint-followup-panel" id="followup${cardId}">
+          <div class="followup-label">💬 关于此提示，你可以问：</div>
+          <div class="followup-chips" id="chips${cardId}"></div>
+          <div class="followup-custom-input-row" id="customRow${cardId}">
+            <input
+              class="followup-custom-input"
+              id="customInput${cardId}"
+              type="text"
+              placeholder="输入你的问题…"
+              maxlength="200"
+              oninput="onCustomInputChange(this, ${cardId})"
+              onkeydown="onCustomKeydown(event, ${cardId})"
+            />
+            <button class="followup-custom-send" id="customSend${cardId}" onclick="sendCustomFollowup(${cardId})">
+              <svg viewBox="0 0 24 24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+        </div>
+      `;
+      hintCards.appendChild(card);
+
+      // 填充推荐模版语 - 传递当前提示内容用于引用
+      const chipsContainer = card.querySelector(`#chips${cardId}`);
+      hint.followups.forEach(q => {
+        const chip = document.createElement('div');
+        chip.className = 'followup-chip';
+        chip.textContent = q;
+        // 传递问题、提示步骤和提示内容
+        chip.onclick = () => sendFollowupQuestion(q, hint.step, hint.content);
+        chipsContainer.appendChild(chip);
+      });
+
+      // "其他问题" chip
+      const customChip = document.createElement('div');
+      customChip.className = 'followup-chip-custom';
+      customChip.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> 其他问题`;
+      // 同样传递提示信息
+      customChip.onclick = () => toggleCustomInput(cardId, customChip, hint.step, hint.content);
+      chipsContainer.appendChild(customChip);
+
+      updateDots();
+      updateBtn();
+
+      const target = document.getElementById('typing' + cardId);
+      typeText(target, hint.content, () => {
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+    }, 900 + Math.random() * 400);
+  }
+
+  /* =========================================================
+     FOLLOWUP PANEL
+  ========================================================= */
+  function toggleFollowup(btn) {
+    const cardEl = btn.closest('.hint-card');
+    const panel = cardEl.querySelector('.hint-followup-panel');
+    const isOpen = panel.classList.contains('open');
+
+    // 关闭所有
+    document.querySelectorAll('.hint-followup-panel.open').forEach(p => p.classList.remove('open'));
+    document.querySelectorAll('.hint-ask-btn.active').forEach(b => b.classList.remove('active'));
+
+    if (!isOpen) {
+      panel.classList.add('open');
+      btn.classList.add('active');
+    }
+  }
+
+  // 存储当前提示信息，用于自定义问题引用
+  let currentHintStep = null;
+  let currentHintContent = null;
+
+  function toggleCustomInput(cardId, chipEl, hintStep, hintContent) {
+    const row = document.getElementById('customRow' + cardId);
+    const isOpen = row.classList.contains('open');
+    if (isOpen) {
+      row.classList.remove('open');
+      chipEl.style.background = '';
+    } else {
+      row.classList.add('open');
+      chipEl.style.background = '#E8D8FF';
+      // 保存当前提示信息
+      currentHintStep = hintStep;
+      currentHintContent = hintContent;
+      setTimeout(() => {
+        const inp = document.getElementById('customInput' + cardId);
+        if (inp) inp.focus();
+      }, 50);
+    }
+  }
+
+  function onCustomInputChange(inp, cardId) {
+    const btn = document.getElementById('customSend' + cardId);
+    btn.classList.toggle('active', inp.value.trim().length > 0);
+  }
+
+  function onCustomKeydown(e, cardId) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      sendCustomFollowup(cardId);
+    }
+  }
+
+  function sendCustomFollowup(cardId) {
+    const inp = document.getElementById('customInput' + cardId);
+    const text = inp.value.trim();
+    if (!text) return;
+    inp.value = '';
+    document.getElementById('customSend' + cardId).classList.remove('active');
+
+    // 关闭面板
+    document.querySelectorAll('.hint-followup-panel.open').forEach(p => p.classList.remove('open'));
+    document.querySelectorAll('.hint-ask-btn.active').forEach(b => b.classList.remove('active'));
+
+    // 使用保存的提示信息发送
+    sendFollowupQuestion(text, currentHintStep, currentHintContent);
+  }
+
+  /**
+   * 发送追问问题
+   * @param {string} question - 用户问题
+   * @param {number} hintStep - 提示步骤号
+   * @param {string} hintContent - 提示内容（HTML）
+   */
+  function sendFollowupQuestion(question, hintStep, hintContent) {
+    // 关闭所有追问面板
+    document.querySelectorAll('.hint-followup-panel.open').forEach(p => p.classList.remove('open'));
+    document.querySelectorAll('.hint-ask-btn.active').forEach(b => b.classList.remove('active'));
+
+    // 如果有提示内容，先显示引用
+    if (hintStep && hintContent) {
+      appendQuoteMsg(hintStep, hintContent);
+    }
+
+    // 滚到聊天区并发送
+    aiInput.value = question;
+    sendUserMsg();
+    setTimeout(() => {
+      document.getElementById('aiChatSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 200);
+  }
+
+  /**
+   * 追加引用消息（显示被追问的提示）
+   */
+  function appendQuoteMsg(hintStep, hintContent) {
+    clearEmptyState();
+
+    // 去除HTML标签，用于判断长度
+    const plainText = hintContent.replace(/<[^>]+>/g, '');
+    const isLong = plainText.length > 60;
+
+    const quoteMsg = document.createElement('div');
+    quoteMsg.className = 'chat-quote-msg';
+    quoteMsg.innerHTML = `
+      <div class="chat-quote-card">
+        <div class="chat-quote-header">
+          <span class="chat-quote-badge">📖 引用提示 ${hintStep}</span>
+          <div class="chat-quote-toggle ${isLong ? 'collapsed' : ''}" onclick="toggleQuoteContent(this)">
+            <span>${isLong ? '展开' : ''}</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </div>
+        </div>
+        <div class="chat-quote-content ${isLong ? 'collapsed' : 'expanded'}">
+          ${hintContent}
+        </div>
+        ${isLong ? '<div class="chat-quote-fade"></div>' : ''}
+      </div>
+    `;
+    chatMessages.appendChild(quoteMsg);
+    scrollChatToBottom();
+  }
+
+  /**
+   * 切换引用内容的展开/折叠
+   */
+  function toggleQuoteContent(toggleEl) {
+    const content = toggleEl.closest('.chat-quote-card').querySelector('.chat-quote-content');
+    const fade = toggleEl.closest('.chat-quote-card').querySelector('.chat-quote-fade');
+    const isCollapsed = content.classList.contains('collapsed');
+
+    if (isCollapsed) {
+      content.classList.remove('collapsed');
+      content.classList.add('expanded');
+      toggleEl.classList.remove('collapsed');
+      toggleEl.querySelector('span').textContent = '收起';
+      if (fade) fade.style.opacity = '0';
+    } else {
+      content.classList.remove('expanded');
+      content.classList.add('collapsed');
+      toggleEl.classList.add('collapsed');
+      toggleEl.querySelector('span').textContent = '展开';
+      if (fade) fade.style.opacity = '1';
+    }
+  }
+
+  /* =========================================================
+     ANSWER REVEAL
+  ========================================================= */
+  function toggleAnswer() {
+    answerOpen = !answerOpen;
+    if (answerOpen) {
+      // 展开答案 → 锁定初次解答，显示重新解答按钮
+      firstSubmitActions.innerHTML = `
+        <span style="font-size:11px;color:var(--text-muted);margin-right:8px;">初次解答已锁定</span>
+        <button class="answer-action-btn" onclick="showSecondAnswer()">重新解答</button>
+      `;
+      answerFullCard.classList.add('open');
+      answerArrow.classList.add('rotated');
+      setTimeout(() => answerFullCard.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+    } else {
+      // 收起答案时保持锁定状态，不还原按钮
+      answerFullCard.classList.remove('open');
+      answerArrow.classList.remove('rotated');
+    }
+  }
+
+  /* =========================================================
+     AI CHAT
+  ========================================================= */
+  function onInputChange(el) {
+    // 自动撑高
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 88) + 'px';
+    aiSendBtn.classList.toggle('active', el.value.trim().length > 0);
+  }
+
+  function onInputKeydown(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendUserMsg();
+    }
+  }
+
+  function clearEmptyState() {
+    const empty = chatMessages.querySelector('.chat-empty');
+    if (empty) empty.remove();
+  }
+
+  function appendUserMsg(text) {
+    clearEmptyState();
+    const msg = document.createElement('div');
+    msg.className = 'chat-msg user';
+    msg.innerHTML = `
+      <div class="chat-avatar user">我</div>
+      <div class="chat-bubble">${escHtml(text)}</div>
+    `;
+    chatMessages.appendChild(msg);
+    scrollChatToBottom();
+    chatMsgCount++;
+    updateChatCount();
+  }
+
+  function appendAITyping() {
+    clearEmptyState();
+    const msg = document.createElement('div');
+    msg.className = 'chat-msg ai';
+    msg.id = 'aiTypingIndicator';
+    msg.innerHTML = `
+      <div class="chat-avatar ai">AI</div>
+      <div class="chat-bubble">
+        <div class="chat-typing-dots"><span></span><span></span><span></span></div>
+      </div>
+    `;
+    chatMessages.appendChild(msg);
+    scrollChatToBottom();
+    return msg;
+  }
+
+  function replaceTypingWithMsg(typingEl, html) {
+    const bubble = typingEl.querySelector('.chat-bubble');
+    bubble.innerHTML = '';
+    const cursor = document.createElement('span');
+    cursor.className = 'typing-cursor';
+    bubble.appendChild(cursor);
+    let i = 0;
+    function tick() {
+      if (i < html.length) {
+        if (html[i] === '<') {
+          const close = html.indexOf('>', i);
+          if (close !== -1) { i = close + 1; } else { i++; }
+        } else { i++; }
+        bubble.innerHTML = html.substring(0, i);
+        bubble.appendChild(cursor);
+        scrollChatToBottom();
+        setTimeout(tick, 16 + Math.random() * 8);
+      } else {
+        cursor.remove();
+        bubble.innerHTML = html;
+        typingEl.removeAttribute('id');
+        chatMsgCount++;
+        updateChatCount();
+        scrollChatToBottom();
+      }
+    }
+    tick();
+  }
+
+  function getAIReply(question) {
+    for (const key of Object.keys(AI_FOLLOWUP_REPLIES)) {
+      if (question.includes(key.substring(0, Math.min(key.length, 10)))) {
+        return markdownBold(AI_FOLLOWUP_REPLIES[key]);
+      }
+    }
+    const reply = AI_GENERIC_REPLIES[genericReplyIdx % AI_GENERIC_REPLIES.length];
+    genericReplyIdx++;
+    return markdownBold(reply);
+  }
+
+  function markdownBold(str) {
+    return str.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  }
+
+  function sendUserMsg() {
+    const text = aiInput.value.trim();
+    if (!text) return;
+    aiInput.value = '';
+    aiInput.style.height = 'auto';
+    aiSendBtn.classList.remove('active');
+
+    appendUserMsg(text);
+
+    const typingEl = appendAITyping();
+    setTimeout(() => {
+      replaceTypingWithMsg(typingEl, getAIReply(text));
+    }, 800 + Math.random() * 600);
+  }
+
+  /* =========================================================
+     VOICE INPUT
+  ========================================================= */
+  function toggleVoice() {
+    if (!isRecording) {
+      // 开始录音
+      isRecording = true;
+      aiVoiceBtn.classList.add('recording');
+      recordingHint.classList.add('show');
+      // 模拟 5 秒后自动停止
+      recordingTimer = setTimeout(() => stopRecording(true), 5000);
+    } else {
+      stopRecording(true);
+    }
+  }
+
+  function stopRecording(withResult) {
+    clearTimeout(recordingTimer);
+    isRecording = false;
+    aiVoiceBtn.classList.remove('recording');
+    recordingHint.classList.remove('show');
+
+    if (withResult) {
+      // 模拟语音识别结果
+      const voiceTexts = [
+        '对称轴公式是怎么推导出来的？',
+        '为什么 b 等于负 4a？',
+        '第二问 MN 的长度怎么算？',
+        '判别式小于零是什么意思？',
+      ];
+      const result = voiceTexts[Math.floor(Math.random() * voiceTexts.length)];
+      aiInput.value = result;
+      onInputChange(aiInput);
+      aiInput.focus();
+    }
+  }
+
+  function scrollChatToBottom() {
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function updateChatCount() {
+    const userMsgs = chatMessages.querySelectorAll('.chat-msg.user').length;
+    chatCount.textContent = userMsgs > 0 ? `已提问 ${userMsgs} 次` : '随时提问';
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  /* =========================================================
+     演示：图片/视频附件
+  ========================================================= */
+  const DEMO_IMAGE = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='120'%3E%3Crect fill='%23F0F4FF' width='200' height='120'/%3E%3Ctext x='100' y='55' text-anchor='middle' fill='%236E6E73' font-size='13'%3E二次函数图像%3C/text%3E%3Ctext x='100' y='75' text-anchor='middle' fill='%23AEAEB2' font-size='11'%3E（示例图片）%3C/text%3E%3C/svg%3E";
+  const DEMO_VIDEO = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='120'%3E%3Crect fill='%23FFF9F0' width='200' height='120'/%3E%3Ccircle cx='100' cy='60' r='22' fill='rgba(255,107,74,0.15)'/%3E%3Cpolygon points='92,50 112,60 92,70' fill='%23FF6B4A'/%3E%3Ctext x='100' y='95' text-anchor='middle' fill='%23AEAEB2' font-size='11'%3E解题视频（示例）%3C/text%3E%3C/svg%3E";
+
+    function addDemoImage() {
+    const container = document.getElementById('firstAttachThumbs');
+    addThumb(container, DEMO_IMAGE, '图片', false);
+    updateSubmitButton();
+  }
+  function addDemoVideo() {
+    const container = document.getElementById('firstAttachThumbs');
+    addThumb(container, DEMO_VIDEO, '视频', true);
+    updateSubmitButton();
+  }
+  function addDemoImage2() {
+    const container = document.getElementById('secondAttachThumbs');
+    addThumb(container, DEMO_IMAGE, '图片', false);
+    updateSubmitButton();
+  }
+  function addDemoVideo2() {
+    const container = document.getElementById('secondAttachThumbs');
+    addThumb(container, DEMO_VIDEO, '视频', true);
+    updateSubmitButton();
+  }
+
+  function addThumb(container, src, label, isVideo) {
+    if (!container) return;
+    const thumb = document.createElement('div');
+    thumb.className = 'attach-thumb';
+    thumb.innerHTML = `
+      <img src="${src}" alt="${label}">
+      <span class="thumb-badge">${label}</span>
+      <button class="thumb-del" onclick="removeThumb(this)" title="删除">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+      ${isVideo ? `<svg class="video-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+        <circle cx="12" cy="12" r="10" fill="rgba(0,0,0,0.4)"/>
+        <polygon points="10 8 16 12 10 16 10 8" fill="white"/>
+      </svg>` : ''}
+    `;
+    container.appendChild(thumb);
+    thumb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function removeThumb(btn) {
+    btn.closest('.attach-thumb').remove();
+    updateSubmitButton();
+  }
+
+  /* =========================================================
+     题目列表弹窗
+  ========================================================= */
+  function getAnsweredCount() {
+    // 模拟：当前题目是否已提交初次解答
+    // 后续真实场景：从全局/父页面读取所有题目的答题状态
+    return isFirstSubmitted ? 1 : 0;
+  }
+
+  function updateQuestionBadge() {
+    const display = document.getElementById('questionNumDisplay');
+    const badge = document.getElementById('unansweredBadge');
+    const count = document.getElementById('unansweredCount');
+    const unanswered = TOTAL_QUESTIONS - getAnsweredCount();
+    display.textContent = `第${CURRENT_QUESTION}/${TOTAL_QUESTIONS}题`;
+    count.textContent = unanswered;
+    badge.style.display = unanswered > 0 ? 'inline-block' : 'none';
+  }
+
+  function isCurrentAnswerDirty() {
+    // 当前题目的编辑状态：textarea 显示且有内容
+    const inSecond = secondAnswerCard.style.display !== 'none';
+    const ta = inSecond ? secondAnswerTextarea : firstAnswerTextarea;
+    const hasContent = ta && (ta.value.trim().length > 0 || (ta.nextElementSibling && ta.nextElementSibling.children.length > 0));
+    return ta && ta.style.display !== 'none' && hasContent;
+  }
+
+  function showQuestionList() {
+    const grid = document.getElementById('questionListGrid');
+    grid.innerHTML = '';
+    for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
+      const item = document.createElement('div');
+      item.className = 'ql-item';
+      const isAnswered = (i < CURRENT_QUESTION) || (i === CURRENT_QUESTION && isFirstSubmitted);
+      const isCurrent = i === CURRENT_QUESTION;
+      if (isAnswered) item.classList.add('answered');
+      if (isCurrent) item.classList.add('current');
+      item.textContent = i;
+      item.onclick = () => onQuestionItemClick(i, isCurrent, isAnswered);
+      grid.appendChild(item);
+    }
+    document.getElementById('questionListOverlay').classList.add('active');
+  }
+
+  function onQuestionItemClick(num, isCurrent, isAnswered) {
+    closeQuestionList();
+    if (isCurrent) return; // 点击当前题，不跳转
+    // 只有 textarea 显示且有内容（或附件）时才弹确认
+    const firstTA = firstAnswerTextarea;
+    const secondTA = secondAnswerTextarea;
+    const firstVisible = firstTA && firstTA.style.display !== 'none';
+    const secondVisible = secondTA && secondTA.style.display !== 'none';
+    const hasContent =
+      (firstVisible && (firstTA.value.trim() || firstTA.nextElementSibling?.children.length > 0)) ||
+      (secondVisible && (secondTA.value.trim() || secondTA.nextElementSibling?.children.length > 0));
+    if (hasContent) {
+      pendingJumpTarget = num;
+      document.getElementById('jumpConfirmMsg').textContent =
+        `是否跳转至第 ${num} 题？当前题目作答内容不保存。`;
+      document.getElementById('jumpConfirmOverlay').classList.add('active');
+    } else {
+      doJump(num);
+    }
+  }
+
+  function doJump(target) {
+    // 原型演示：仅弹出提示，实际项目中调用父页面切换逻辑
+    alert(`已跳转至第 ${target} 题`);
+    // 模拟切换题目：重置当前题目的状态（原型演示用）
+    // resetQuestionState();
+  }
+
+  function confirmJump() {
+    closeJumpConfirm();
+    if (pendingJumpTarget !== null) {
+      doJump(pendingJumpTarget);
+      pendingJumpTarget = null;
+    }
+  }
+
+  function closeJumpConfirm() {
+    document.getElementById('jumpConfirmOverlay').classList.remove('active');
+    pendingJumpTarget = null;
+  }
+
+  function closeQuestionList() {
+    document.getElementById('questionListOverlay').classList.remove('active');
+  }
+
+  function onOverlayClick(e) {
+    if (e.target.id === 'questionListOverlay') closeQuestionList();
+  }
+
+  /* =========================================================
+     INIT
+  ========================================================= */
+  // 检查是否查看过原题（锁定首次解答）
+  if (localStorage.getItem('homework_viewedOriginal_' + CURRENT_QUESTION) === 'true') {
+    hasViewedOriginal = true;
+  }
+  if (hasViewedOriginal) {
+    lockFirstAnswer();
+  }
+
+  updateDots();
+  updateBtn();
+  updateSubmitButton();
+  updateQuestionBadge();
+</script>
+
+</div>
+<!-- /.page-wrapper -->
+</body>
+</html>
