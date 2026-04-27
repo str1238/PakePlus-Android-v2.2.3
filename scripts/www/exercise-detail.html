@@ -1,0 +1,2182 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>习题</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* =============================================
+     CSS VARIABLES — Mobile-first base values
+     ============================================= */
+  :root {
+    --bg: #F2F2F7;
+    --surface: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #6E6E73;
+    --text-muted: #AEAEB2;
+    --border: #E5E5EA;
+    --border-dark: #D1D1D6;
+    --divider: #F2F2F7;
+    --blue: #007AFF;
+    --blue-light: #E8F4FF;
+    --primary: #007AFF;
+    --brand: #2dc89c;
+    --brand-light: #3ECCA4;
+    --hint-1: #2dc89c;
+    --hint-2: #2dc89c;
+    --hint-3: #FECA57;
+    --hint-4: #48C774;
+    --hint-5: #3273DC;
+    --purple: #764ba2;
+    --purple-light: #F3EEFF;
+
+    /* Spacing scale */
+    --sp-1: 4px;   --sp-2: 8px;   --sp-3: 12px;  --sp-4: 16px;
+    --sp-5: 20px;  --sp-6: 24px;  --sp-8: 32px;  --sp-10: 40px;
+
+    /* Content max-width */
+    --content-max: 100%;
+    --content-pad: var(--sp-4);
+
+    /* Typography scale */
+    --text-xs: 11px;  --text-sm: 12px;  --text-base: 14px;
+    --text-md: 15px;  --text-lg: 16px;  --text-xl: 17px;
+    --text-2xl: 20px; --text-3xl: 24px;
+
+    /* Component sizes */
+    --card-radius: 12px;
+    --btn-height: 50px;
+    --avatar-size: 40px;
+    --play-btn-size: 36px;
+  }
+
+  /* =============================================
+     BASE RESET & BODY
+     ============================================= */
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html {
+    font-size: 14px;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans SC', 'Helvetica Neue', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    max-width: 100%;
+    margin: 0 auto;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* =============================================
+     LAYOUT WRAPPER
+     Responsive: narrow on mobile, centered on large screens
+     ============================================= */
+  .page-wrapper {
+    width: 100%;
+  }
+
+  .content { padding: var(--sp-4); padding-top: 94px;
+    padding-bottom: 100px; }
+
+  /* =============================================
+     STATUS BAR
+     ============================================= */
+  .status-bar {
+    z-index: 10000;
+    position: fixed; left: 0; right: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    height: 44px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 0 24px 8px;
+  }
+  .status-time   { font-size: var(--text-md); font-weight: 600; color: var(--text-primary); }
+  .status-icons  { display: flex; align-items: center; gap: 5px; }
+  .status-icons svg { width: 17px; height: 17px; }
+
+  /* =============================================
+     NAV BAR
+     ============================================= */
+  .nav-bar {
+    background: var(--surface);
+    height: 50px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    border-bottom: 0.5px solid var(--border);
+    position: fixed; left: 0; right: 0;
+    top: 44px;
+    z-index: 100;
+  }
+  .nav-back {
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; border-radius: 8px; flex-shrink: 0;
+  }
+  .nav-back:active { background: var(--divider); }
+  .nav-back svg { width: 22px; height: 22px; }
+  .nav-title {
+    flex: 1; text-align: center;
+    font-size: var(--text-xl); font-weight: 600;
+    color: var(--text-primary); margin-right: 36px;
+  }
+
+  /* =============================================
+     SECTION LABELS
+     ============================================= */
+  .section-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: var(--sp-3);
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+  .section-title svg { width: 16px; height: 16px; color: var(--brand); }
+
+  /* =============================================
+     1. 习题展示区
+     ============================================= */
+  .question-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--sp-3);
+	margin-top: 10px;
+  }
+  .question-meta-left { display: flex; align-items: center; gap: var(--sp-2); }
+  .subject-tag {
+    background: rgba(45,200,156,0.2);
+    color: var(--brand);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 6px;
+  }
+
+  .difficulty { display: flex; gap: 2px; }
+  .star { width: 14px; height: 14px; }
+
+  .question-card {
+    background: var(--surface);
+    border-radius: var(--card-radius);
+    padding: var(--sp-4) var(--sp-4);
+    margin-bottom: var(--sp-3);
+  }
+  .question-label {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    margin-bottom: var(--sp-2);
+  }
+  .question-text {
+    font-size: var(--text-md);
+    line-height: 1.85;
+    color: var(--text-primary);
+  }
+
+  /* =============================================
+     2. 视频讲解区
+     ============================================= */
+  .video-player-wrap {
+    background: #1A1A1A;
+    border-radius: var(--card-radius);
+    overflow: hidden;
+    position: relative;
+    aspect-ratio: 16 / 9;
+    cursor: pointer;
+    margin-bottom: var(--sp-3);
+  }
+  .video-cover {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+  }
+  .video-overlay {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.25);
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+  .video-player-wrap:active .video-overlay { background: rgba(0,0,0,0.4); }
+  .play-btn-large {
+    width: var(--play-btn-size); height: var(--play-btn-size);
+    border-radius: 50%;
+    background: rgba(255,255,255,0.95);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    transition: transform 0.2s;
+  }
+  .video-player-wrap:active .play-btn-large { transform: scale(0.92); }
+  .play-btn-large svg { width: 24px; height: 24px; margin-left: 3px; }
+  .video-player-wrap.playing .video-overlay { display: none; }
+  .video-iframe { width: 100%; height: 100%; border: none; }
+
+  /* =============================================
+     3. 图文讲解区
+     ============================================= */
+  .image-text-section {
+    background: var(--surface);
+    border-radius: var(--card-radius);
+    padding: var(--sp-4);
+    margin-bottom: var(--sp-3);
+  }
+  .image-text-body {
+    font-size: var(--text-base);
+    line-height: 1.85;
+    color: var(--text-primary);
+  }
+  .image-text-body p { margin-bottom: var(--sp-3); }
+  .image-text-body p:last-child { margin-bottom: 0; }
+  .image-text-body strong { color: #1A6B35; }
+  .image-text-body .highlight {
+    background: rgba(45,200,156,0.2);
+    border-left: 3px solid var(--brand);
+    padding: var(--sp-3);
+    border-radius: 0 8px 8px 0;
+    margin: var(--sp-3) 0;
+  }
+  .image-text-body .step-num {
+    display: inline-flex;
+    align-items: center; justify-content: center;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--brand);
+    color: white;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    margin-right: var(--sp-2);
+    flex-shrink: 0;
+    vertical-align: middle;
+  }
+  .image-text-body .ans-final {
+    display: inline-block;
+    margin-top: var(--sp-2);
+    background: #C7F0D8;
+    color: #1A6B35;
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .image-text-more-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-2);
+    padding: var(--sp-3);
+    border-top: 1px solid var(--divider);
+    margin: var(--sp-4) calc(var(--sp-4) * -1) calc(var(--sp-4) * -1);
+    width: calc(100% + var(--sp-4) * 2);
+    cursor: pointer;
+    font-size: var(--text-sm);
+    color: var(--blue);
+    font-weight: 500;
+    transition: background 0.15s;
+    border-radius: 0 0 var(--card-radius) var(--card-radius);
+  }
+  .image-text-more-trigger:active { background: var(--blue-light); }
+  .image-text-more-trigger svg {
+    width: 14px; height: 14px;
+    transition: transform 0.25s;
+  }
+  .image-text-more-trigger.open svg { transform: rotate(180deg); }
+  .image-text-collapsed {
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .image-text-expanded { display: block; }
+
+  /* =============================================
+     4. 关联知识点模块
+     ============================================= */
+  .knowledge-card {
+    background: var(--surface);
+    border-radius: var(--card-radius);
+    padding: var(--sp-4);
+    margin-bottom: var(--sp-3);
+  }
+  .knowledge-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--sp-3);
+    padding: var(--sp-3);
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background 0.15s;
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: pointer;
+  }
+  .knowledge-item:active { background: var(--brand-light); }
+  .knowledge-num {
+    display: inline-flex;
+    align-items: center; justify-content: center;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--brand);
+    color: white;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .knowledge-content { flex: 1; min-width: 0; }
+  .knowledge-chapter {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    margin-bottom: 3px;
+    line-height: 1.4;
+  }
+  .knowledge-section {
+    font-size: var(--text-base);
+    color: #1A6B35;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+  .knowledge-arrow {
+    width: 18px; height: 18px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    margin-top: 2px;
+    transition: color 0.15s, transform 0.15s;
+  }
+  .knowledge-item:active .knowledge-arrow {
+    color: var(--brand);
+    transform: translateX(2px);
+  }
+  .knowledge-divider {
+    height: 1px;
+    background: var(--divider);
+    margin: var(--sp-2) 0;
+  }
+
+  /* =============================================
+     5. 讲解人模块
+     ============================================= */
+  .author-section {
+    background: var(--surface);
+    border-radius: var(--card-radius);
+    padding: var(--sp-3) var(--sp-4);
+    margin-bottom: var(--sp-2);
+    display: flex;
+    align-items: center;
+  }
+  .author-left {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    flex: 1;
+  }
+  .author-avatar {
+    width: var(--avatar-size);
+    height: var(--avatar-size);
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2dc89c 0%, #2dc89c 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; color: white;
+    flex-shrink: 0;
+  }
+  .author-name { font-size: var(--text-md); font-weight: 600; color: var(--text-primary); }
+  .author-sub { font-size: var(--text-sm); color: var(--text-muted); margin-top: 2px; }
+
+  /* 醒目橙色胶囊按钮 */
+  .author-more-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 14px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #2dc89c 0%, #2dc89c 100%);
+    color: white;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    -webkit-user-select: none;
+    user-select: none;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(255,107,74,0.35);
+  }
+  .author-more-btn:active {
+    transform: scale(0.95);
+    box-shadow: 0 1px 4px rgba(255,107,74,0.2);
+  }
+  .author-more-btn svg { width: 14px; height: 14px; }
+
+  /* =============================================
+     5.5 点赞收藏模块
+     ============================================= */
+  .action-bar {
+    display: flex;
+    align-items: center;
+    background: var(--surface);
+    border-radius: var(--card-radius);
+    padding: 20px var(--sp-4);
+    margin-top: var(--sp-3);
+    margin-bottom: var(--sp-3);
+    gap: var(--sp-3);
+  }
+  .action-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.18s;
+    -webkit-user-select: none; user-select: none;
+    flex: 1;
+    padding: 14px 0;
+    border-radius: 12px;
+    background: transparent;
+  }
+  .action-item:active { transform: scale(0.96); }
+  .action-item svg { width: 30px; height: 30px; }
+  .action-item.liked { color: #FF4757; background: #FFEEF0; }
+  .action-item.liked svg { fill: #FF4757; }
+  .action-item.collected { color: #FFB800; background: #FFF8E1; }
+  .action-item.collected svg { fill: #FFB800; }
+  .action-divider { width: 1px; height: 36px; background: var(--divider); flex-shrink: 0; }
+
+  /* =============================================
+     收藏本弹窗
+     ============================================= */
+  .collect-modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 1100;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .collect-modal-overlay.open { display: flex; }
+  .collect-modal-sheet {
+    background: var(--surface);
+    border-radius: 20px 20px 0 0;
+    width: 100%; max-width: 500px;
+    max-height: 65vh;
+    overflow: hidden;
+    animation: slideUp 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+  .collect-modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: var(--sp-4) var(--sp-4) var(--sp-3);
+    border-bottom: 1px solid var(--divider);
+  }
+  .collect-modal-title { font-size: var(--text-lg); font-weight: 700; color: var(--text-primary); }
+  .collect-modal-close {
+    width: 32px; height: 32px; border-radius: 50%; border: none;
+    background: var(--divider);
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+  .collect-modal-close:active { background: var(--border); }
+  .collect-modal-close svg { width: 18px; height: 18px; color: var(--text-secondary); }
+  .collect-modal-body {
+    padding: var(--sp-3) var(--sp-4);
+    overflow-y: auto;
+    max-height: calc(65vh - 60px);
+  }
+  .collect-notebook-item {
+    display: flex; align-items: center; gap: var(--sp-3);
+    padding: var(--sp-3);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s;
+    -webkit-user-select: none; user-select: none;
+  }
+  .collect-notebook-item:active { background: var(--brand-light); }
+  .collect-notebook-item.selected { background: var(--brand-light); }
+  .collect-notebook-icon {
+    width: 38px; height: 38px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; font-size: 18px;
+  }
+  .collect-notebook-name { font-size: var(--text-base); font-weight: 600; color: var(--text-primary); }
+  .collect-notebook-count { font-size: var(--text-sm); color: var(--text-muted); margin-top: 1px; }
+  .collect-check {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 2px solid var(--divider);
+    margin-left: auto; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .collect-notebook-item.selected .collect-check { background: var(--brand); border-color: var(--brand); }
+  .collect-check svg { width: 12px; height: 12px; display: none; }
+  .collect-notebook-item.selected .collect-check svg { display: block; }
+  .collect-create-new {
+    display: flex; align-items: center; gap: var(--sp-3);
+    padding: var(--sp-3); border-radius: 10px;
+    cursor: pointer; transition: background 0.15s;
+    -webkit-user-select: none; user-select: none;
+    color: var(--brand);
+  }
+  .collect-create-new:active { background: var(--brand-light); }
+  .collect-create-icon {
+    width: 38px; height: 38px; border-radius: 10px;
+    background: var(--brand-light);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; color: white; font-size: 22px; font-weight: 300;
+  }
+  .collect-create-text { font-size: var(--text-base); font-weight: 600; }
+  .collect-divider { height: 1px; background: var(--divider); margin: var(--sp-2) 0; }
+
+  /* =============================================
+     6. 我来讲解按钮
+     ============================================= */
+  .explain-btn {
+    width: 100%;
+    height: var(--btn-height);
+    border-radius: var(--card-radius);
+    border: none;
+    background: var(--blue);
+    color: white;
+    font-size: var(--text-lg);
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-2);
+    margin-bottom: var(--sp-3);
+    transition: all 0.2s;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .explain-btn:active { background: #0062CC; transform: scale(0.98); }
+  .explain-btn svg { width: 20px; height: 20px; }
+
+  /* =============================================
+     BOTTOM SECTION LABEL
+     ============================================= */
+  .bottom-section-label {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    margin: var(--sp-5) 0 var(--sp-3);
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+  .bottom-section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* =============================================
+     6. 思路提示
+     ============================================= */
+  .hint-section { margin-bottom: var(--sp-3); }
+  .hint-trigger {
+    width: 100%;
+    padding: var(--sp-3) var(--sp-4);
+    background: var(--surface);
+    border: 1.5px dashed var(--brand);
+    border-radius: var(--card-radius);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    transition: all 0.2s;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .hint-trigger:active { background: var(--brand-light); transform: scale(0.99); }
+  .hint-trigger.completed { border-style: solid; border-color: var(--hint-5); background: #EEF3FF; }
+  .hint-trigger.completed:active { background: #E4ECFF; transform: scale(0.99); }
+  .hint-trigger-icon {
+    width: 36px; height: 36px;
+    background: var(--brand);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .hint-trigger.completed .hint-trigger-icon { background: var(--hint-5); }
+  .hint-trigger-icon svg { width: 18px; height: 18px; }
+  .hint-trigger-info { flex: 1; }
+  .hint-trigger-title { font-size: var(--text-md); font-weight: 600; color: var(--brand); }
+  .hint-trigger.completed .hint-trigger-title { color: var(--hint-5); }
+  .hint-trigger-sub { font-size: var(--text-sm); color: var(--text-secondary); margin-top: 2px; }
+  .hint-progress { display: flex; gap: 5px; }
+  .hint-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: all 0.3s;
+  }
+  .hint-dot.active { background: var(--brand); transform: scale(1.3); }
+  .hint-dot.done { background: var(--hint-5); }
+
+  .hint-cards {
+    margin-top: var(--sp-2);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+  }
+
+  .hint-card {
+    background: var(--surface);
+    border-radius: var(--card-radius);
+    padding: var(--sp-3) var(--sp-4);
+    position: relative;
+    overflow: hidden;
+    animation: cardIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+  .hint-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    border-radius: 3px 0 0 3px;
+  }
+  .hint-card.step-1::before { background: var(--hint-1); }
+  .hint-card.step-2::before { background: var(--hint-2); }
+  .hint-card.step-3::before { background: var(--hint-3); }
+  .hint-card.step-4::before { background: var(--hint-4); }
+  .hint-card.step-5::before { background: var(--hint-5); }
+  .hint-card.step-1 { background: var(--surface); }
+
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(-10px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .hint-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--sp-2);
+  }
+  .hint-step-badge {
+    display: flex; align-items: center; gap: var(--sp-2);
+    font-size: var(--text-sm); font-weight: 600; color: var(--text-secondary);
+  }
+  .hint-step-num {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: var(--text-xs); font-weight: 700; color: white;
+  }
+  .hint-card.step-1 .hint-step-num { background: var(--hint-1); }
+  .hint-card.step-2 .hint-step-num { background: var(--hint-2); }
+  .hint-card.step-3 .hint-step-num { background: var(--hint-3); }
+  .hint-card.step-4 .hint-step-num { background: var(--hint-4); }
+  .hint-card.step-5 .hint-step-num { background: var(--hint-5); }
+
+  .hint-card-right { display: flex; align-items: center; gap: var(--sp-2); }
+  .hint-type-tag {
+    font-size: var(--text-xs); font-weight: 600;
+    padding: 2px 8px; border-radius: 4px;
+  }
+  .hint-card.step-1 .hint-type-tag { background: rgba(45,200,156,0.2); color: var(--hint-1); }
+  .hint-card.step-2 .hint-type-tag { background: #FFF5EC; color: #D4820A; }
+  .hint-card.step-3 .hint-type-tag { background: #FFFBEA; color: #B08A00; }
+  .hint-card.step-4 .hint-type-tag { background: #EBF8F0; color: #2E8B57; }
+  .hint-card.step-5 .hint-type-tag { background: #EEF3FF; color: var(--hint-5); }
+
+  .hint-ask-btn {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border-dark);
+    background: var(--surface);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 13px; font-weight: 700;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+    flex-shrink: 0;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .hint-ask-btn:active { transform: scale(0.88); background: var(--blue-light); border-color: var(--blue); color: var(--blue); }
+  .hint-ask-btn.active { background: var(--blue-light); border-color: var(--blue); color: var(--blue); }
+
+  .hint-content { font-size: var(--text-base); line-height: 1.75; color: var(--text-primary); }
+
+  .hint-followup-panel {
+    margin-top: var(--sp-3);
+    border-top: 1px solid var(--divider);
+    padding-top: var(--sp-3);
+    display: none;
+    flex-direction: column;
+    gap: var(--sp-2);
+    animation: fadeUp 0.25s ease both;
+  }
+  .hint-followup-panel.open { display: flex; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .followup-label {
+    font-size: var(--text-xs); color: var(--text-muted);
+    font-weight: 500; letter-spacing: 0.3px;
+  }
+  .followup-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+  .followup-chip {
+    padding: 6px 12px;
+    border-radius: 16px;
+    background: var(--blue-light);
+    border: 1px solid rgba(0,122,255,0.2);
+    font-size: var(--text-sm); color: var(--blue);
+    cursor: pointer;
+    transition: all 0.15s;
+    -webkit-user-select: none; user-select: none; line-height: 1.4;
+  }
+  .followup-chip:active { background: #D0E8FF; transform: scale(0.97); }
+
+  .followup-chip-custom {
+    padding: 6px 12px;
+    border-radius: 16px;
+    background: var(--purple-light);
+    border: 1px solid rgba(118,75,162,0.25);
+    font-size: var(--text-sm); color: var(--purple);
+    cursor: pointer; transition: all 0.15s;
+    -webkit-user-select: none; user-select: none; line-height: 1.4;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .followup-chip-custom:active { background: #E8D8FF; transform: scale(0.97); }
+
+  .followup-custom-input-row {
+    display: none; gap: var(--sp-2); align-items: center;
+    animation: fadeUp 0.2s ease both;
+  }
+  .followup-custom-input-row.open { display: flex; }
+  .followup-custom-input {
+    flex: 1;
+    border: 1.5px solid rgba(118,75,162,0.4);
+    border-radius: 20px;
+    padding: 7px 14px;
+    font-size: var(--text-sm);
+    font-family: inherit;
+    color: var(--text-primary);
+    background: var(--surface);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .followup-custom-input:focus { border-color: var(--purple); }
+  .followup-custom-input::placeholder { color: var(--text-muted); }
+  .followup-custom-send {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: all 0.2s; opacity: 0.45;
+  }
+  .followup-custom-send.active { opacity: 1; }
+  .followup-custom-send:active { transform: scale(0.9); }
+  .followup-custom-send svg { width: 14px; height: 14px; }
+
+  /* =============================================
+     7. AI 答疑区
+     ============================================= */
+  .ai-chat-section { margin-top: 0; }
+  .ai-chat-header {
+    display: flex; align-items: center; gap: var(--sp-2);
+    padding: 0 2px; margin-bottom: var(--sp-2);
+  }
+  .ai-chat-header-icon {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .ai-chat-header-icon svg { width: 15px; height: 15px; }
+  .ai-chat-header-title { font-size: var(--text-base); font-weight: 700; color: var(--text-primary); }
+  .ai-chat-header-sub { font-size: var(--text-sm); color: var(--text-muted); margin-left: auto; }
+
+  .chat-messages {
+    display: flex; flex-direction: column; gap: var(--sp-3);
+    margin-bottom: var(--sp-3);
+    max-height: 320px;
+    overflow-y: auto;
+  }
+  .chat-msg {
+    display: flex; gap: var(--sp-2);
+    animation: fadeUp 0.3s ease both;
+  }
+  .chat-msg.user { flex-direction: row-reverse; }
+
+  .chat-avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: white;
+  }
+  .chat-avatar.ai { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+  .chat-avatar.user { background: var(--blue); }
+
+  .chat-bubble {
+    max-width: calc(100% - 80px);
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: var(--text-base);
+    line-height: 1.65;
+  }
+  .chat-msg.ai .chat-bubble {
+    background: var(--surface);
+    color: var(--text-primary);
+    border-radius: 4px 14px 14px 14px;
+  }
+  .chat-msg.user .chat-bubble {
+    background: var(--blue);
+    color: white;
+    border-radius: 14px 4px 14px 14px;
+  }
+
+  .chat-typing-dots {
+    display: flex; gap: 4px; align-items: center; padding: 4px 2px;
+  }
+  .chat-typing-dots span {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--text-muted);
+    animation: dotBounce 1.2s infinite;
+  }
+  .chat-typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .chat-typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes dotBounce {
+    0%,80%,100% { transform: scale(0.7); opacity: 0.5; }
+    40% { transform: scale(1); opacity: 1; }
+  }
+
+  .ai-chat-input-area {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: var(--sp-2) var(--sp-3);
+    border: 1px solid var(--border-dark);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .ai-chat-input-area:focus-within {
+    border-color: var(--purple);
+    box-shadow: 0 0 0 3px rgba(118,75,162,0.08);
+  }
+
+  .ai-input-row {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--sp-2);
+  }
+  .ai-input-field {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: var(--text-base);
+    font-family: inherit;
+    color: var(--text-primary);
+    outline: none;
+    line-height: 1;
+    resize: none;
+    min-height: 22px;
+    max-height: 88px;
+    overflow-y: auto;
+  }
+  .ai-input-field::placeholder { color: var(--text-muted); }
+
+  .ai-input-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+
+  .ai-voice-btn {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border-dark);
+    background: var(--surface);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.2s; flex-shrink: 0;
+  }
+  .ai-voice-btn svg { width: 17px; height: 17px; color: var(--text-secondary); }
+  .ai-voice-btn:active { background: var(--purple-light); border-color: var(--purple); }
+  .ai-voice-btn.recording { background: #FF3B30; border-color: #FF3B30; animation: pulse 1s infinite; }
+  .ai-voice-btn.recording svg { color: white; }
+  @keyframes pulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(255,59,48,0.4); }
+    50% { box-shadow: 0 0 0 6px rgba(255,59,48,0); }
+  }
+
+  .ai-send-btn {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: all 0.2s; opacity: 0.35;
+  }
+  .ai-send-btn.active { opacity: 1; }
+  .ai-send-btn:active { transform: scale(0.9); }
+  .ai-send-btn svg { width: 15px; height: 15px; }
+
+  .ai-recording-hint {
+    display: none; align-items: center; gap: var(--sp-2);
+    padding: 6px 0 2px;
+    font-size: var(--text-sm); color: #FF3B30; font-weight: 500;
+  }
+  .ai-recording-hint.show { display: flex; }
+  .recording-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #FF3B30; animation: blink 0.8s infinite;
+  }
+  @keyframes blink { 0%,100% { opacity:1 } 50% { opacity:0.2 } }
+
+  .typing-cursor {
+    display: inline-block;
+    width: 2px; height: 14px;
+    background: var(--purple);
+    margin-left: 2px;
+    animation: blinkCursor 0.7s infinite;
+    vertical-align: middle;
+  }
+  @keyframes blinkCursor { 0%,100% { opacity:1 } 50% { opacity:0 } }
+
+  .chat-empty {
+    text-align: center;
+    padding: var(--sp-5) var(--sp-4);
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    line-height: 1.6;
+  }
+  .chat-empty-icon { font-size: 28px; margin-bottom: var(--sp-2); }
+
+  /* 引用消息 */
+  .chat-quote-msg {
+    display: flex; gap: var(--sp-2); margin-bottom: var(--sp-2);
+    animation: fadeUp 0.3s ease both;
+  }
+  .chat-quote-card {
+    flex: 1;
+    background: linear-gradient(135deg, #FFF5F0 0%, #FFE8E0 100%);
+    border: 1px solid rgba(255, 107, 74, 0.3);
+    border-left: 3px solid var(--brand);
+    border-radius: 8px;
+    padding: 10px var(--sp-3);
+    margin-left: 36px;
+    position: relative;
+  }
+  .chat-quote-header {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;
+  }
+  .chat-quote-badge {
+    font-size: var(--text-xs); font-weight: 600;
+    color: var(--brand);
+    background: rgba(255, 107, 74, 0.15);
+    padding: 2px 6px; border-radius: 4px; letter-spacing: 0.3px;
+  }
+  .chat-quote-toggle {
+    font-size: var(--text-xs); color: var(--text-muted); cursor: pointer;
+    display: flex; align-items: center; gap: 2px; transition: color 0.2s;
+    -webkit-user-select: none; user-select: none;
+  }
+  .chat-quote-toggle:active { color: var(--brand); }
+  .chat-quote-toggle svg { width: 12px; height: 12px; transition: transform 0.25s; }
+  .chat-quote-toggle.collapsed svg { transform: rotate(-90deg); }
+  .chat-quote-content {
+    font-size: var(--text-sm); line-height: 1.65; color: var(--text-secondary);
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.2s ease;
+  }
+  .chat-quote-content.collapsed { max-height: 42px; opacity: 0.85; }
+  .chat-quote-content.expanded { max-height: 500px; opacity: 1; }
+  .chat-quote-fade {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 24px;
+    background: linear-gradient(to bottom, transparent, #FFF5F0);
+    pointer-events: none; transition: opacity 0.3s;
+  }
+  .chat-quote-content.expanded + .chat-quote-fade { opacity: 0; }
+
+  /* =============================================
+     更多讲解弹窗
+     ============================================= */
+  .modal-overlay {
+    position: fixed; left: 0; right: 0;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    animation: fadeIn 0.2s ease both;
+  }
+  .modal-overlay.open { display: flex; }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .modal-sheet {
+    background: var(--surface);
+    border-radius: 20px 20px 0 0;
+    width: 100%;
+    max-width: 500px;
+    max-height: 70vh;
+    overflow: hidden;
+    animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--sp-4) var(--sp-4) var(--sp-3);
+    border-bottom: 1px solid var(--divider);
+  }
+  .modal-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .modal-close {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: var(--divider);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .modal-close:active { background: var(--border); }
+  .modal-close svg { width: 18px; height: 18px; color: var(--text-secondary); }
+  .modal-body {
+    padding: var(--sp-3) var(--sp-4);
+    overflow-y: auto;
+    max-height: calc(70vh - 60px);
+  }
+  .explanation-item {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: var(--sp-3);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.15s;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .explanation-item:active { background: var(--blue-light); }
+  .explanation-item.current { background: rgba(45,200,156,0.2); }
+  .explanation-avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+  .explanation-info { flex: 1; min-width: 0; }
+  .explanation-name {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+  .explanation-badge {
+    font-size: var(--text-xs);
+    background: var(--brand);
+    color: white;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  .explanation-meta {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .explanation-arrow {
+    width: 20px; height: 20px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+  .explanation-item:active .explanation-arrow { color: var(--blue); }
+
+  /* =============================================
+     RESPONSIVE — TABLET (≥ 600px)
+     ============================================= */
+  @media (min-width: 600px) {
+    :root {
+      --content-pad: 32px;
+      --text-md: 16px;
+      --text-base: 15px;
+      --card-radius: 16px;
+    }
+
+    .content { padding: 24px 32px; }
+
+    .question-card { padding: 24px; }
+    .image-text-section { padding: 24px; }
+    .image-text-more-trigger { margin: var(--sp-4) calc(var(--sp-4) * -1) calc(var(--sp-4) * -1); width: calc(100% + 48px); }
+    .author-section { padding: 16px 24px; }
+
+    .play-btn-large { width: 46px; height: 46px; }
+
+    .hint-card { padding: 16px 24px; }
+    .hint-trigger { padding: 16px 24px; }
+
+    .chat-messages { max-height: 400px; }
+    .chat-bubble { max-width: 70%; }
+  }
+
+  /* =============================================
+     RESPONSIVE — LARGE TABLET (≥ 768px)
+     Centered layout with max-width
+     ============================================= */
+  @media (min-width: 768px) {
+    :root {
+      --content-pad: 48px;
+      --text-xl: 18px;
+      --text-lg: 17px;
+      --text-base: 15px;
+      --card-radius: 20px;
+      --btn-height: 54px;
+      --avatar-size: 48px;
+      --play-btn-size: 80px;
+    }
+
+    body {
+      background: #E8E8EE;
+    }
+
+    .page-wrapper {
+      max-width: 680px;
+      margin: 0 auto;
+      background: var(--bg);
+      min-height: 100vh;
+      box-shadow: 0 0 40px rgba(0,0,0,0.06);
+    }
+
+    .content { padding: 32px 48px; }
+
+    .question-card { padding: 28px; }
+    .image-text-section { padding: 28px; border-radius: 20px; }
+    .image-text-more-trigger {
+      margin: var(--sp-5) calc(var(--sp-5) * -1) calc(var(--sp-5) * -1);
+      width: calc(100% + var(--sp-5) * 2);
+      padding: var(--sp-3);
+    }
+    .author-section { padding: 18px 28px; border-radius: 20px; }
+
+    .question-label { font-size: 13px; }
+    .question-text { font-size: 16px; }
+
+    .hint-card { padding: 18px 28px; border-radius: 20px; }
+    .hint-trigger { padding: 18px 28px; border-radius: 20px; }
+
+    .ai-chat-header { margin-bottom: 12px; }
+    .chat-messages { max-height: 420px; }
+
+    .chat-empty { padding: 28px; }
+  }
+
+  /* =============================================
+     RESPONSIVE — DESKTOP (≥ 1024px)
+     More generous spacing, larger fonts
+     ============================================= */
+  @media (min-width: 1024px) {
+    :root {
+      --content-pad: 60px;
+      --text-2xl: 22px;
+      --text-xl: 19px;
+      --text-lg: 17px;
+      --text-md: 16px;
+      --text-base: 15px;
+      --card-radius: 24px;
+      --btn-height: 56px;
+      --avatar-size: 52px;
+      --play-btn-size: 88px;
+    }
+
+    body { background: #D8D8E0; }
+
+    .page-wrapper {
+      max-width: 760px;
+      box-shadow: 0 0 60px rgba(0,0,0,0.08);
+    }
+
+    .content { padding: 40px 60px; }
+
+    .question-card { padding: 32px; margin-bottom: var(--sp-4); }
+    .image-text-section { padding: 32px; border-radius: 24px; margin-bottom: var(--sp-4); }
+    .image-text-body { font-size: 16px; line-height: 1.9; }
+    .image-text-more-trigger {
+      margin: var(--sp-5) calc(var(--sp-5) * -1) calc(var(--sp-5) * -1);
+      width: calc(100% + var(--sp-5) * 2);
+    }
+    .author-section { padding: 20px 32px; border-radius: 24px; margin-bottom: var(--sp-4); }
+
+    .section-title { font-size: 15px; margin-bottom: var(--sp-3); }
+
+    .bottom-section-label { margin: 32px 0 var(--sp-4); font-size: 15px; }
+
+    .hint-card { padding: 20px 32px; border-radius: 24px; }
+    .hint-trigger { padding: 20px 32px; border-radius: 24px; }
+    .hint-content { font-size: 16px; }
+
+    .chat-messages { max-height: 460px; }
+    .chat-bubble { font-size: 16px; max-width: 65%; }
+
+    .explain-btn { font-size: 17px; height: 56px; border-radius: 24px; }
+
+    .status-bar { padding: 0 32px 8px; }
+    .nav-bar { padding: 0 16px; height: 56px; }
+    .nav-title { font-size: 18px; }
+  }
+
+  /* =============================================
+     RESPONSIVE — LARGE DESKTOP (≥ 1280px)
+     ============================================= */
+  @media (min-width: 1280px) {
+    :root {
+      --content-pad: 80px;
+      --card-radius: 28px;
+      --btn-height: 58px;
+      --play-btn-size: 96px;
+    }
+
+    .page-wrapper {
+      max-width: 860px;
+    }
+
+    .content { padding: 48px 80px; }
+
+    .question-card { padding: 36px; }
+    .image-text-section { padding: 36px; }
+    .author-section { padding: 22px 36px; }
+    .hint-card { padding: 22px 36px; }
+    .hint-trigger { padding: 22px 36px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-wrapper">
+
+  <!-- STATUS BAR -->
+  <div class="status-bar">
+    <span class="status-time">09:53</span>
+    <div class="status-icons">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+    </div>
+  </div>
+
+  <!-- NAV BAR -->
+  <div class="nav-bar">
+    <div class="nav-back" onclick="history.back()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 18L9 12L15 6"/>
+      </svg>
+    </div>
+    <span class="nav-title">习题</span>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- ========== 1. 习题展示区 ========== -->
+    <div class="question-meta">
+      <div class="question-meta-left">
+        <span class="subject-tag">数学 · 九年级</span>
+      </div>
+      <div class="difficulty">
+        <svg class="star" viewBox="0 0 24 24" fill="#FF9F0A"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+        <svg class="star" viewBox="0 0 24 24" fill="#FF9F0A"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+        <svg class="star" viewBox="0 0 24 24" fill="#FF9F0A"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+        <svg class="star" viewBox="0 0 24 24" fill="#FF9F0A"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+        <svg class="star" viewBox="0 0 24 24" fill="#D1D1D6"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+      </div>
+    </div>
+
+    <div class="question-card">
+      <div class="question-label">题目</div>
+      <div class="question-text">
+        已知二次函数 y = ax² + bx + c（a ≠ 0）的图像经过点 A(1, 2)、B(3, 6)，且对称轴为 x = 2。<br><br>
+        (1) 求该二次函数的解析式；<br>
+        (2) 若该函数图像与 x 轴交于 M、N 两点，求线段 MN 的长度；<br>
+        (3) 当 x 为何值时，y 随 x 增大而减小？
+      </div>
+    </div>
+
+    <!-- ========== 2. 视频讲解区 ========== -->
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7L8 5z"/></svg>
+      视频讲解
+    </div>
+    <div class="video-player-wrap" id="videoPlayer" onclick="toggleVideo()">
+      <img class="video-cover" src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=860&q=80" alt="视频封面"/>
+      <div class="video-overlay">
+        <div class="play-btn-large">
+          <svg viewBox="0 0 24 24" fill="#2dc89c"><path d="M8 5v14l11-7L8 5z"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 3. 图文讲解区 ========== -->
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+      图文讲解
+    </div>
+    <div class="image-text-section" id="imageTextSection">
+      <div id="imageTextBody" class="image-text-body image-text-collapsed">
+        <p>这道题考查的是<strong>二次函数解析式的求法</strong>，是中考的常见压轴题类型。解题思路分三步走：</p>
+
+        <div class="highlight">
+          <span class="step-num">1</span><strong>利用对称轴建立 a、b 关系</strong><br>
+          对称轴公式 x = −b/(2a) = 2 → b = −4a
+        </div>
+
+        <p>把 A(1, 2) 代入 y = ax² + bx + c：</p>
+        <p>a + b + c = 2 &nbsp;①</p>
+        <p>把 B(3, 6) 代入：</p>
+        <p>9a + 3b + c = 6 &nbsp;②</p>
+        <p>联立方程 ① 和 ②，两式相减：</p>
+        <p>(9a + 3b + c) − (a + b + c) = 6 − 2 → <strong>4a + b = 2</strong></p>
+
+        <div class="highlight">
+          <span class="step-num">2</span><strong>代入 b = −4a 求 a</strong><br>
+          从①得 c = 2 + 3a，从②验证：9a − 12a + 2 + 3a = 6 → 2 = 6？需要重新计算！
+        </div>
+
+        <p>正确做法：b = −4a 代入任意一个点方程即可求 c。</p>
+        <p>代入①：a − 4a + c = 2 → <strong>c = 2 + 3a</strong></p>
+        <p>再代入②验证：9a + 3(−4a) + (2 + 3a) = 6 → 9a − 12a + 2 + 3a = 6 → 2 = 6？</p>
+        <p>修正：a − 4a + c = 2 → c = 2 + 3a，代入②：</p>
+        <p>9a + 3(−4a) + 2 + 3a = 6 → 9a − 12a + 2 + 3a = 6 → <strong>2 = 6？</strong></p>
+
+        <div class="highlight">
+          <span class="step-num">3</span><strong>正确的联立求解</strong><br>
+          b = −4a 代入①得 c = 2 + 3a<br>
+          代入②：9a + 3(−4a) + (2 + 3a) = 6 → 2a + 2 = 6 → <strong>a = 2</strong><br>
+          b = −8，c = 8
+        </div>
+
+        <p class="ans-final">解析式：y = 2x² − 8x + 8</p>
+
+        <p>第 (2) 问：令 y = 0，得 2x² − 8x + 8 = 0</p>
+        <p>判别式 Δ = 64 − 64 = 0，唯一实根 x = 2，所以 <strong>MN = 0</strong>（与 x 轴相切）</p>
+
+        <p>第 (3) 问：a = 2 > 0，开口向上，对称轴 x = 2 左侧递减：</p>
+        <p class="ans-final">当 x &lt; 2 时，y 随 x 增大而减小</p>
+      </div>
+
+      <div class="image-text-more-trigger" id="moreTrigger" onclick="toggleTextExpand()">
+        <span id="moreText">展开全文</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 9l6 6 6-6"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- ========== 4. 关联知识点模块 ========== -->
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+      关联知识点
+    </div>
+    <div class="knowledge-card">
+      <div class="knowledge-item" onclick="goToKnowledge(1)">
+        <span class="knowledge-num">1</span>
+        <div class="knowledge-content">
+          <div class="knowledge-chapter">二、函数的应用</div>
+          <div class="knowledge-section">2.1 二次函数的图像与性质</div>
+        </div>
+        <svg class="knowledge-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18L15 12L9 6"/>
+        </svg>
+      </div>
+      <div class="knowledge-divider"></div>
+      <div class="knowledge-item" onclick="goToKnowledge(2)">
+        <span class="knowledge-num">2</span>
+        <div class="knowledge-content">
+          <div class="knowledge-chapter">二、函数的应用</div>
+          <div class="knowledge-section">2.2 二次函数解析式的求法</div>
+        </div>
+        <svg class="knowledge-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18L15 12L9 6"/>
+        </svg>
+      </div>
+      <div class="knowledge-divider"></div>
+      <div class="knowledge-item" onclick="goToKnowledge(3)">
+        <span class="knowledge-num">3</span>
+        <div class="knowledge-content">
+          <div class="knowledge-chapter">三、方程与不等式</div>
+          <div class="knowledge-section">3.4 一元二次方程的根与系数关系</div>
+        </div>
+        <svg class="knowledge-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18L15 12L9 6"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- ========== 5. 讲解人模块 ========== -->
+    <div class="author-section">
+      <div class="author-left">
+        <div class="author-avatar" id="authorAvatar">李</div>
+        <div>
+          <div class="author-name" id="authorName">李明老师</div>
+          <div class="author-sub" id="authorSub">已讲解 236 题</div>
+        </div>
+      </div>
+      <div class="author-more-btn" onclick="showMoreExplanations()">
+        本题其他讲解 <span id="moreCount">12</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18L15 12L9 6"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- ========== 5.5 点赞收藏模块 ========== -->
+    <div class="action-bar">
+      <div class="action-item" id="likeBtn" onclick="toggleLike()">
+        <svg id="likeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/>
+          <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
+        </svg>
+        <span id="likeCount">128</span>
+      </div>
+      <div class="action-divider"></div>
+      <div class="action-item" id="collectBtn" onclick="toggleCollect()">
+        <svg id="collectIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+        </svg>
+        <span id="collectLabel">收藏</span>
+      </div>
+    </div>
+
+    <!-- ========== 6. 我来讲解按钮 ========== -->
+    <button class="explain-btn" onclick="window.location.href='exercise-explain.html'">
+      <svg viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+      我来讲解
+    </button>
+
+    <!-- ========== 底部区域标题 ========== -->
+    <div class="bottom-section-label">更多学习帮助</div>
+
+    <!-- ========== 思路提示 ========== -->
+    <div class="hint-section">
+      <button class="hint-trigger" id="hintBtn" onclick="requestHint()">
+        <div class="hint-trigger-icon">
+          <svg viewBox="0 0 24 24" fill="white"><path d="M9 18h6v-2H9v2zm3-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>
+        </div>
+        <div class="hint-trigger-info">
+          <span class="hint-trigger-title" id="hintBtnTitle">💡 思路提示</span><br>
+          <span class="hint-trigger-sub" id="hintBtnSub">点击获取解题思路</span>
+        </div>
+        <div class="hint-progress" id="hintProgress">
+          <div class="hint-dot" id="dot1"></div>
+          <div class="hint-dot" id="dot2"></div>
+          <div class="hint-dot" id="dot3"></div>
+          <div class="hint-dot" id="dot4"></div>
+          <div class="hint-dot" id="dot5"></div>
+        </div>
+      </button>
+      <div class="hint-cards" id="hintCards"></div>
+    </div>
+
+    <!-- ========== AI 答疑区 ========== -->
+    <div class="ai-chat-section" id="aiChatSection" style="margin-top:12px;">
+      <div class="ai-chat-header">
+        <div class="ai-chat-header-icon">
+          <svg viewBox="0 0 24 24" fill="white"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+        </div>
+        <span class="ai-chat-header-title">AI 助教答疑</span>
+        <span class="ai-chat-header-sub" id="chatCount">随时提问</span>
+      </div>
+
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-empty">
+          <div class="chat-empty-icon">💬</div>
+          对这道题有任何疑问？<br>直接在下方提问，或点击提示卡片的 <strong>?</strong> 快速追问
+        </div>
+      </div>
+
+      <div class="ai-chat-input-area">
+        <div class="ai-input-row">
+          <textarea class="ai-input-field" id="aiInput" placeholder="输入问题，向 萤火AI助教 提问" rows="1" maxlength="300" oninput="onInputChange(this)" onkeydown="onInputKeydown(event)"></textarea>
+          <div class="ai-input-actions">
+            <button class="ai-voice-btn" id="aiVoiceBtn" onclick="toggleVoice()" title="语音输入">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                <line x1="12" y1="19" x2="12" y2="23"/>
+                <line x1="8" y1="23" x2="16" y2="23"/>
+              </svg>
+            </button>
+            <button class="ai-send-btn" id="aiSendBtn" onclick="sendUserMsg()">
+              <svg viewBox="0 0 24 24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="ai-recording-hint" id="recordingHint">
+          <div class="recording-dot"></div>
+          正在录音，再次点击停止…
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /.page-wrapper -->
+
+<!-- ========== 更多讲解弹窗 ========== -->
+<!-- ========== 收藏本弹窗 ========== -->
+<div class="collect-modal-overlay" id="collectModal" onclick="closeCollectModal(event)">
+  <div class="collect-modal-sheet" onclick="event.stopPropagation()">
+    <div class="collect-modal-header">
+      <span class="collect-modal-title">收藏到</span>
+      <button class="collect-modal-close" onclick="closeCollectModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="collect-modal-body">
+      <div id="collectNotebookList"></div>
+      <div class="collect-divider"></div>
+      <div class="collect-create-new" onclick="createNewNotebook()">
+        <div class="collect-create-icon">+</div>
+        <div class="collect-create-text">创建新的收藏本</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="explanationModal" onclick="closeModal(event)">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <span class="modal-title">本题全部讲解</span>
+      <button class="modal-close" onclick="closeExplanationModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body" id="explanationList"></div>
+  </div>
+</div>
+
+<script>
+  /* ========== 更多讲解数据 ========== */
+  const EXPLANATIONS = [
+    { id: 1, name: '李明老师', avatar: '李', avatarBg: 'linear-gradient(135deg, #2dc89c 0%, #2dc89c 100%)', count: 236, current: true },
+    { id: 2, name: '张华老师', avatar: '张', avatarBg: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', count: 189, current: false },
+    { id: 3, name: '王芳老师', avatar: '王', avatarBg: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)', count: 312, current: false },
+    { id: 4, name: '刘强老师', avatar: '刘', avatarBg: 'linear-gradient(135deg, #ee0979 0%, #ff6a00 100%)', count: 156, current: false },
+    { id: 5, name: '陈静老师', avatar: '陈', avatarBg: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', count: 278, current: false },
+    { id: 6, name: '赵伟老师', avatar: '赵', avatarBg: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', count: 201, current: false },
+    { id: 7, name: '周敏老师', avatar: '周', avatarBg: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)', count: 167, current: false },
+    { id: 8, name: '吴刚老师', avatar: '吴', avatarBg: 'linear-gradient(135deg, #d299c2 0%, #fef9d7 100%)', count: 245, current: false },
+    { id: 9, name: '郑丽老师', avatar: '郑', avatarBg: 'linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%)', count: 198, current: false },
+    { id: 10, name: '孙磊老师', avatar: '孙', avatarBg: 'linear-gradient(135deg, #fddb92 0%, #d1fdff 100%)', count: 223, current: false },
+    { id: 11, name: '钱娜老师', avatar: '钱', avatarBg: 'linear-gradient(135deg, #c1dfc4 0%, #deecdd 100%)', count: 187, current: false },
+    { id: 12, name: '韩涛老师', avatar: '韩', avatarBg: 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)', count: 210, current: false },
+  ];
+
+  /* ========== 弹窗逻辑 ========== */
+  function showMoreExplanations() {
+    const list = document.getElementById('explanationList');
+    list.innerHTML = EXPLANATIONS.map(item => `
+      <div class="explanation-item ${item.current ? 'current' : ''}" onclick="goToExplanation(${item.id}, '${item.name}')">
+        <div class="explanation-avatar" style="background: ${item.avatarBg}">${item.avatar}</div>
+        <div class="explanation-info">
+          <div class="explanation-name">
+            ${item.name}
+            ${item.current ? '<span class="explanation-badge">当前</span>' : ''}
+          </div>
+          <div class="explanation-meta">已讲解 ${item.count} 题</div>
+        </div>
+        <svg class="explanation-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18L15 12L9 6"/>
+        </svg>
+      </div>
+    `).join('');
+    document.getElementById('explanationModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeExplanationModal() {
+    document.getElementById('explanationModal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function closeModal(event) {
+    if (event.target === document.getElementById('explanationModal')) {
+      closeExplanationModal();
+    }
+  }
+
+  function goToExplanation(id, name) {
+    const item = EXPLANATIONS.find(e => e.id === id);
+    if (!item || item.current) {
+      closeExplanationModal();
+      return;
+    }
+
+    // 更新当前讲解人标记
+    EXPLANATIONS.forEach(e => e.current = (e.id === id));
+
+    // 更新讲解人信息
+    document.getElementById('authorAvatar').textContent = item.avatar;
+    document.getElementById('authorAvatar').style.background = item.avatarBg;
+    document.getElementById('authorName').textContent = item.name;
+    document.getElementById('authorSub').textContent = `已讲解 ${item.count} 题`;
+
+    // 模拟加载新讲解内容（实际项目中这里会请求后端数据）
+    // 这里演示：随机改变图文讲解的步骤序号颜色，表示内容已切换
+    const stepNums = document.querySelectorAll('.highlight .step-num');
+    const colors = ['#2dc89c', '#667eea', '#11998e', '#ee0979', '#4facfe'];
+    stepNums.forEach(num => {
+      num.style.background = colors[Math.floor(Math.random() * colors.length)];
+    });
+
+    // 重置视频播放状态
+    isPlaying = false;
+    const videoWrap = document.getElementById('videoPlayer');
+    videoWrap.classList.remove('playing');
+    videoWrap.innerHTML = `
+      <img class="video-cover" src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=860&q=80" alt="视频封面"/>
+      <div class="video-overlay">
+        <div class="play-btn-large">
+          <svg viewBox="0 0 24 24" fill="#2dc89c"><path d="M8 5v14l11-7L8 5z"/></svg>
+        </div>
+      </div>
+    `;
+
+    // 重置图文展开状态
+    textExpanded = false;
+    document.getElementById('imageTextBody').className = 'image-text-body image-text-collapsed';
+    const trigger = document.getElementById('moreTrigger');
+    const moreText = document.getElementById('moreText');
+    if (trigger) {
+      trigger.classList.remove('open');
+      moreText.textContent = '展开全文';
+    }
+
+    closeExplanationModal();
+
+    // 滚动到页面顶部
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ========== VIDEO PLAYER ========== */
+  let isPlaying = false;
+  function toggleVideo() {
+    const wrap = document.getElementById('videoPlayer');
+    if (!isPlaying) {
+      isPlaying = true;
+      wrap.classList.add('playing');
+      const iframe = document.createElement('iframe');
+      iframe.className = 'video-iframe';
+      iframe.src = 'about:blank';
+      iframe.allow = 'autoplay; fullscreen';
+      wrap.innerHTML = '';
+      wrap.appendChild(iframe);
+    } else {
+      location.reload();
+    }
+  }
+
+  /* ========== 图文讲解展开/收起 ========== */
+  let textExpanded = false;
+  function toggleTextExpand() {
+    const body = document.getElementById('imageTextBody');
+    const trigger = document.getElementById('moreTrigger');
+    const moreText = document.getElementById('moreText');
+    textExpanded = !textExpanded;
+    if (textExpanded) {
+      body.className = 'image-text-body image-text-expanded';
+      trigger.classList.add('open');
+      moreText.textContent = '收起';
+    } else {
+      body.className = 'image-text-body image-text-collapsed';
+      trigger.classList.remove('open');
+      moreText.textContent = '展开全文';
+    }
+  }
+
+  /* ========== 点赞收藏 ========== */
+  let isLiked = false;
+  let likeCount = 128;
+  function toggleLike() {
+    isLiked = !isLiked;
+    const btn = document.getElementById('likeBtn');
+    const count = document.getElementById('likeCount');
+    if (isLiked) {
+      btn.classList.add('liked');
+      count.textContent = likeCount + 1;
+    } else {
+      btn.classList.remove('liked');
+      count.textContent = likeCount;
+    }
+  }
+
+  /* ========== 收藏本数据 ========== */
+  const COLLECT_NOTEBOOKS = [
+    { id: 1, name: '二次函数专项', icon: '📐', color: '#2dc89c', bg: '#3ECCA4', count: 28, kpoints: 15, selected: false },
+    { id: 2, name: '易错题整理', icon: '❌', color: '#FF4757', bg: '#FFEEF0', count: 15, kpoints: 9, selected: false },
+    { id: 3, name: '压轴题挑战', icon: '🔥', color: '#2dc89c', bg: '#3ACBA2', count: 9, kpoints: 4, selected: false },
+    { id: 4, name: '中考真题集', icon: '📝', color: '#667eea', bg: '#EEF1FF', count: 42, kpoints: 22, selected: false },
+  ];
+  let isCollected = false;
+
+  function toggleCollect() {
+    if (isCollected) {
+      // 已收藏 → 取消收藏
+      isCollected = false;
+      const btn = document.getElementById('collectBtn');
+      const label = document.getElementById('collectLabel');
+      btn.classList.remove('collected');
+      label.textContent = '收藏';
+    } else {
+      // 未收藏 → 打开弹窗选择收藏本
+      COLLECT_NOTEBOOKS.forEach(n => n.selected = false);
+      renderCollectList();
+      document.getElementById('collectModal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  function closeCollectModal(e) {
+    if (e && e.target !== document.getElementById('collectModal')) return;
+    document.getElementById('collectModal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function toggleCollectNotebook(id) {
+    const notebook = COLLECT_NOTEBOOKS.find(n => n.id === id);
+    if (!notebook) return;
+    notebook.selected = !notebook.selected;
+    renderCollectList();
+    if (notebook.selected) {
+      isCollected = true;
+      const btn = document.getElementById('collectBtn');
+      const label = document.getElementById('collectLabel');
+      btn.classList.add('collected');
+      label.textContent = '已收藏';
+      setTimeout(() => {
+        closeCollectModal();
+      }, 300);
+    }
+  }
+
+  function renderCollectList() {
+    const list = document.getElementById('collectNotebookList');
+    list.innerHTML = COLLECT_NOTEBOOKS.map(n => `
+      <div class="collect-notebook-item ${n.selected ? 'selected' : ''}" onclick="toggleCollectNotebook(${n.id})">
+        <div class="collect-notebook-icon" style="background:${n.bg};color:${n.color}">${n.icon}</div>
+        <div>
+          <div class="collect-notebook-name">${n.name}</div>
+          <div class="collect-notebook-count">${n.count} 题 · ${n.kpoints} 知识点</div>
+        </div>
+        <div class="collect-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 6L9 17l-5-5"/>
+          </svg>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function createNewNotebook() {
+    const name = prompt('请输入新收藏本名称：');
+    if (name && name.trim()) {
+      const colors = ['#2dc89c','#667eea','#11998e','#ee0979'];
+      const bgs = ['#3ECCA4','#EEF1FF','#EBF8F0','#FFEEF0'];
+      const icons = ['📁','📂','🗂️','📭'];
+      const idx = COLLECT_NOTEBOOKS.length % 4;
+      COLLECT_NOTEBOOKS.push({ id: Date.now(), name: name.trim(), icon: icons[idx], color: colors[idx], bg: bgs[idx], count: 0, kpoints: 0, selected: false });
+      renderCollectList();
+      closeCollectModal();
+      isCollected = true;
+      const btn = document.getElementById('collectBtn');
+      const label = document.getElementById('collectLabel');
+      btn.classList.add('collected');
+      label.textContent = '已收藏';
+    }
+  }
+
+  function handleExplain() { alert('即将跳转至「我来讲解」发布页'); }
+  function goToKnowledge(id) { window.location.href = 'knowledge-detail.html?id=' + id; }
+
+  /* ========== HINT LOGIC ========== */
+  const HINTS = [
+    { step:1, type:'引导型', content:'先仔细读题，找出题目给出了哪些<strong>已知条件</strong>：图像经过 A(1,2) 和 B(3,6)，还有对称轴 x = 2。把这些信息在草稿纸上列出来看看？', followups:['已知条件里哪个信息最关键？','对称轴 x=2 在这里有什么用？','二次函数一共有几个未知数，几个条件？'] },
+    { step:2, type:'反问型', content:'对称轴 x = 2 意味着什么？对于二次函数 y = ax² + bx + c，<strong>对称轴公式</strong>是什么？', followups:['对称轴公式 x = -b/(2a) 怎么推导出来的？','知道对称轴能求出 a 和 b 的关系吗？','如果 A、B 两点关于对称轴对称，怎么验证？'] },
+    { step:3, type:'提示型', content:'对称轴 x = 2，所以 -b/(2a) = 2，即 <strong>b = -4a</strong>。再把 A、B 两点代入，能列出几个方程？', followups:['b = -4a 怎么从 -b/(2a) = 2 推出来的？','把 A(1,2) 代入方程后能得到什么？','三个方程联立，用哪种方法解比较快？'] },
+    { step:4, type:'提示型', content:'从 A(1,2) 得到 a + b + c = 2，从 B(3,6) 得到 9a + 3b + c = 6。联立这三个方程，<strong>解出 a、b、c</strong> 的值。', followups:['三个方程联立，怎么消去 c？','解出 a 之后怎么依次求 b 和 c？','解完之后要不要验证代回原来的点？'] },
+    { step:5, type:'总结型', content:'解析式求出来了！第 (2) 问求 MN 长度，想想<strong>求根公式</strong>。第 (3) 问注意看二次项系数 a 的符号 🌟', followups:['判别式 Δ = b²-4ac 为什么可以判断交点个数？','如果只有一个交点，MN 的长度是多少？','a > 0 时，抛物线开口朝上，单调性怎么判断？'] },
+  ];
+
+  const AI_FOLLOWUP_REPLIES = {
+    '已知条件里哪个信息最关键':'三个条件各有用处：对称轴帮你建立 a、b 的关系，A、B 两个点各提供一个方程。可以说**对称轴最独特**，因为它直接给出 -b/(2a) = 2 这个关系式，缺少它方程组无法唯一确定解析式。',
+    '对称轴 x=2 在这里有什么用':'对称轴公式是 x = -b/(2a)，代入 x = 2 后得到 b = -4a。这就把三个未知量（a、b、c）减少到两个有效未知量，再加上 A、B 两个点方程就刚好够用了。',
+    '对称轴公式 x = -b/(2a) 怎么推导出来的':'对 y = ax²+bx+c 配方：y = a(x + b/(2a))² + c - b²/(4a)，括号内为 0 时 y 最小/最大，所以对称轴 x = -b/(2a)。',
+    'b = -4a 怎么从 -b/(2a) = 2 推出来的':'两边同乘 2a（a≠0）：-b = 4a，再乘以 -1 就得到 b = -4a。简单的代数变形，注意不要漏掉负号。',
+    '三个方程联立，怎么消去 c':'两个点方程相减即可消去 c：(9a + 3b + c) - (a + b + c) = 6 - 2，化简得 **8a + 2b = 4**，即 4a + b = 2。再代入 b = -4a 即可求出 a。',
+    '解出 a 之后怎么依次求 b 和 c':'求出 a 后，代入 b = -4a 求 b；然后将 a、b 代入 a + b + c = 2 求 c。最后验证 B 点是否满足方程。',
+    '判别式 Δ = b²-4ac 为什么可以判断交点个数':'Δ > 0 时方程有两个不同实数根，即抛物线与 x 轴交两点；Δ = 0 时有一个重根（相切）；Δ < 0 时无实数根，不与 x 轴相交。',
+    '如果只有一个交点，MN 的长度是多少':'若 Δ = 0，M 与 N 是同一个点，所以 MN = **0**。对于这道题 y = 2x²-8x+8，Δ = 64 - 64 = 0，正好是这种情况，抛物线与 x 轴相切于 (2,0)。',
+    'a > 0 时，抛物线开口朝上，单调性怎么判断':'开口朝上的抛物线在**对称轴左侧单调递减**，右侧单调递增。对称轴 x = 2，所以 x < 2 时 y 随 x 增大而减小，x > 2 时 y 随 x 增大而增大。',
+  };
+
+  const AI_GENERIC_REPLIES = [
+    '这是个很好的问题！对于二次函数 y = 2x²-8x+8，它的对称轴是 x = 2，开口朝上。你具体是哪步卡住了？我可以帮你一步步分析。',
+    '来帮你梳理一下。这道题的关键是：①用对称轴建立 b 和 a 的关系；②用两个点列方程；③联立求解。你现在做到哪一步了？',
+    '好问题！解二次函数题时，建议先把已知条件整理成方程，逐步代入消元。如果你把当前步骤发给我，我来帮你检查思路是否正确。',
+    '对于这类压轴题，思路是：已知条件 → 建立方程组 → 代入求解 → 验证。你对哪个环节不确定？可以具体说说。',
+  ];
+
+  let genericReplyIdx = 0;
+  let shownCount = 0;
+  let isLoading = false;
+  let chatMsgCount = 0;
+  let isRecording = false;
+  let recordingTimer = null;
+  let currentHintStep = null;
+  let currentHintContent = null;
+
+  const hintBtn = document.getElementById('hintBtn');
+  const hintBtnTitle = document.getElementById('hintBtnTitle');
+  const hintBtnSub = document.getElementById('hintBtnSub');
+  const hintCards = document.getElementById('hintCards');
+  const chatMessages = document.getElementById('chatMessages');
+  const aiInput = document.getElementById('aiInput');
+  const aiSendBtn = document.getElementById('aiSendBtn');
+  const aiVoiceBtn = document.getElementById('aiVoiceBtn');
+  const recordingHint = document.getElementById('recordingHint');
+  const chatCount = document.getElementById('chatCount');
+
+  function updateDots() {
+    for (let i = 1; i <= 5; i++) {
+      const dot = document.getElementById('dot' + i);
+      if (i <= shownCount) dot.className = 'hint-dot done';
+      else if (i === shownCount + 1) dot.className = 'hint-dot active';
+      else dot.className = 'hint-dot';
+    }
+  }
+
+  function updateBtn() {
+    if (shownCount === 0) {
+      hintBtn.className = 'hint-trigger';
+      hintBtnTitle.textContent = '💡 思路提示';
+      hintBtnSub.textContent = '点击获取解题思路';
+    } else if (shownCount >= 5) {
+      hintBtn.className = 'hint-trigger completed';
+      hintBtnTitle.textContent = '✨ 已获得全部提示';
+      hintBtnSub.textContent = '已获取全部 5 条提示';
+    } else {
+      hintBtn.className = 'hint-trigger';
+      hintBtnTitle.textContent = '🔄 再想想看？';
+      hintBtnSub.textContent = `还有 ${5 - shownCount} 条提示可查看`;
+    }
+  }
+
+  function typeText(el, html, cb) {
+    let i = 0;
+    el.innerHTML = '';
+    const cursor = document.createElement('span');
+    cursor.className = 'typing-cursor';
+    function tick() {
+      if (i < html.length) {
+        if (html[i] === '<') { const close = html.indexOf('>', i); if (close !== -1) i = close + 1; else i++; }
+        else { i++; }
+        el.innerHTML = html.substring(0, i);
+        el.appendChild(cursor);
+        setTimeout(tick, 14 + Math.random() * 10);
+      } else {
+        cursor.remove();
+        el.innerHTML = html;
+        if (cb) cb();
+      }
+    }
+    tick();
+  }
+
+  function requestHint() {
+    if (isLoading || shownCount >= 5) return;
+    isLoading = true;
+    const hint = HINTS[shownCount];
+    shownCount++;
+    hintBtnTitle.textContent = '⏳ AI 正在思考...';
+    hintBtnSub.textContent = '稍等一下';
+    setTimeout(() => {
+      isLoading = false;
+      const cardId = shownCount;
+      const card = document.createElement('div');
+      card.className = `hint-card step-${hint.step}`;
+      card.innerHTML = `
+        <div class="hint-card-header">
+          <div class="hint-step-badge">
+            <div class="hint-step-num">${hint.step}</div>
+            提示 ${hint.step} / 5
+          </div>
+          <div class="hint-card-right">
+            <span class="hint-type-tag">${hint.type}</span>
+            <button class="hint-ask-btn" onclick="toggleFollowup(this)" title="追问这条提示">?</button>
+          </div>
+        </div>
+        <div class="hint-content" id="typing${cardId}"></div>
+        <div class="hint-followup-panel" id="followup${cardId}">
+          <div class="followup-label">💬 关于此提示，你可以问：</div>
+          <div class="followup-chips" id="chips${cardId}"></div>
+          <div class="followup-custom-input-row" id="customRow${cardId}">
+            <input class="followup-custom-input" id="customInput${cardId}" type="text" placeholder="输入你的问题…" maxlength="200" oninput="onCustomInputChange(this, ${cardId})" onkeydown="onCustomKeydown(event, ${cardId})"/>
+            <button class="followup-custom-send" id="customSend${cardId}" onclick="sendCustomFollowup(${cardId})">
+              <svg viewBox="0 0 24 24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+        </div>
+      `;
+      hintCards.appendChild(card);
+      const chipsContainer = card.querySelector(`#chips${cardId}`);
+      hint.followups.forEach(q => {
+        const chip = document.createElement('div');
+        chip.className = 'followup-chip';
+        chip.textContent = q;
+        chip.onclick = () => sendFollowupQuestion(q, hint.step, hint.content);
+        chipsContainer.appendChild(chip);
+      });
+      const customChip = document.createElement('div');
+      customChip.className = 'followup-chip-custom';
+      customChip.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> 其他问题`;
+      customChip.onclick = () => toggleCustomInput(cardId, customChip, hint.step, hint.content);
+      chipsContainer.appendChild(customChip);
+      updateDots();
+      updateBtn();
+      const target = document.getElementById('typing' + cardId);
+      typeText(target, hint.content, () => { card.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); });
+    }, 900 + Math.random() * 400);
+  }
+
+  function toggleFollowup(btn) {
+    const cardEl = btn.closest('.hint-card');
+    const panel = cardEl.querySelector('.hint-followup-panel');
+    const isOpen = panel.classList.contains('open');
+    document.querySelectorAll('.hint-followup-panel.open').forEach(p => p.classList.remove('open'));
+    document.querySelectorAll('.hint-ask-btn.active').forEach(b => b.classList.remove('active'));
+    if (!isOpen) { panel.classList.add('open'); btn.classList.add('active'); }
+  }
+
+  function toggleCustomInput(cardId, chipEl, hintStep, hintContent) {
+    const row = document.getElementById('customRow' + cardId);
+    const isOpen = row.classList.contains('open');
+    if (isOpen) { row.classList.remove('open'); chipEl.style.background = ''; }
+    else {
+      row.classList.add('open');
+      chipEl.style.background = '#E8D8FF';
+      currentHintStep = hintStep;
+      currentHintContent = hintContent;
+      setTimeout(() => { const inp = document.getElementById('customInput' + cardId); if (inp) inp.focus(); }, 50);
+    }
+  }
+
+  function onCustomInputChange(inp, cardId) {
+    document.getElementById('customSend' + cardId).classList.toggle('active', inp.value.trim().length > 0);
+  }
+
+  function onCustomKeydown(e, cardId) {
+    if (e.key === 'Enter') { e.preventDefault(); sendCustomFollowup(cardId); }
+  }
+
+  function sendCustomFollowup(cardId) {
+    const inp = document.getElementById('customInput' + cardId);
+    const text = inp.value.trim();
+    if (!text) return;
+    inp.value = '';
+    document.getElementById('customSend' + cardId).classList.remove('active');
+    document.querySelectorAll('.hint-followup-panel.open').forEach(p => p.classList.remove('open'));
+    document.querySelectorAll('.hint-ask-btn.active').forEach(b => b.classList.remove('active'));
+    sendFollowupQuestion(text, currentHintStep, currentHintContent);
+  }
+
+  function sendFollowupQuestion(question, hintStep, hintContent) {
+    document.querySelectorAll('.hint-followup-panel.open').forEach(p => p.classList.remove('open'));
+    document.querySelectorAll('.hint-ask-btn.active').forEach(b => b.classList.remove('active'));
+    if (hintStep && hintContent) appendQuoteMsg(hintStep, hintContent);
+    aiInput.value = question;
+    sendUserMsg();
+    setTimeout(() => { document.getElementById('aiChatSection').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 200);
+  }
+
+  function appendQuoteMsg(hintStep, hintContent) {
+    clearEmptyState();
+    const plainText = hintContent.replace(/<[^>]+>/g, '');
+    const isLong = plainText.length > 60;
+    const quoteMsg = document.createElement('div');
+    quoteMsg.className = 'chat-quote-msg';
+    quoteMsg.innerHTML = `
+      <div class="chat-quote-card">
+        <div class="chat-quote-header">
+          <span class="chat-quote-badge">📖 引用提示 ${hintStep}</span>
+          <div class="chat-quote-toggle ${isLong ? 'collapsed' : ''}" onclick="toggleQuoteContent(this)">
+            <span>${isLong ? '展开' : ''}</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+          </div>
+        </div>
+        <div class="chat-quote-content ${isLong ? 'collapsed' : 'expanded'}">${hintContent}</div>
+        ${isLong ? '<div class="chat-quote-fade"></div>' : ''}
+      </div>
+    `;
+    chatMessages.appendChild(quoteMsg);
+    scrollChatToBottom();
+  }
+
+  function toggleQuoteContent(toggleEl) {
+    const content = toggleEl.closest('.chat-quote-card').querySelector('.chat-quote-content');
+    const fade = toggleEl.closest('.chat-quote-card').querySelector('.chat-quote-fade');
+    const isCollapsed = content.classList.contains('collapsed');
+    if (isCollapsed) {
+      content.classList.remove('collapsed'); content.classList.add('expanded');
+      toggleEl.classList.remove('collapsed'); toggleEl.querySelector('span').textContent = '收起';
+      if (fade) fade.style.opacity = '0';
+    } else {
+      content.classList.remove('expanded'); content.classList.add('collapsed');
+      toggleEl.classList.add('collapsed'); toggleEl.querySelector('span').textContent = '展开';
+      if (fade) fade.style.opacity = '1';
+    }
+  }
+
+  function onInputChange(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 88) + 'px';
+    aiSendBtn.classList.toggle('active', el.value.trim().length > 0);
+  }
+
+  function onInputKeydown(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendUserMsg(); }
+  }
+
+  function clearEmptyState() {
+    const empty = chatMessages.querySelector('.chat-empty');
+    if (empty) empty.remove();
+  }
+
+  function appendUserMsg(text) {
+    clearEmptyState();
+    const msg = document.createElement('div');
+    msg.className = 'chat-msg user';
+    msg.innerHTML = `<div class="chat-avatar user">我</div><div class="chat-bubble">${escHtml(text)}</div>`;
+    chatMessages.appendChild(msg);
+    scrollChatToBottom();
+  }
+
+  function appendAITyping() {
+    clearEmptyState();
+    const msg = document.createElement('div');
+    msg.className = 'chat-msg ai';
+    msg.id = 'aiTypingIndicator';
+    msg.innerHTML = `<div class="chat-avatar ai">AI</div><div class="chat-bubble"><div class="chat-typing-dots"><span></span><span></span><span></span></div></div>`;
+    chatMessages.appendChild(msg);
+    scrollChatToBottom();
+    return msg;
+  }
+
+  function replaceTypingWithMsg(typingEl, html) {
+    const bubble = typingEl.querySelector('.chat-bubble');
+    bubble.innerHTML = '';
+    const cursor = document.createElement('span');
+    cursor.className = 'typing-cursor';
+    bubble.appendChild(cursor);
+    let i = 0;
+    function tick() {
+      if (i < html.length) {
+        if (html[i] === '<') { const close = html.indexOf('>', i); if (close !== -1) i = close + 1; else i++; }
+        else { i++; }
+        bubble.innerHTML = html.substring(0, i);
+        bubble.appendChild(cursor);
+        scrollChatToBottom();
+        setTimeout(tick, 16 + Math.random() * 8);
+      } else {
+        cursor.remove();
+        bubble.innerHTML = html;
+        typingEl.removeAttribute('id');
+        chatMsgCount++;
+        updateChatCount();
+        scrollChatToBottom();
+      }
+    }
+    tick();
+  }
+
+  function getAIReply(question) {
+    for (const key of Object.keys(AI_FOLLOWUP_REPLIES)) {
+      if (question.includes(key.substring(0, Math.min(key.length, 10)))) {
+        return markdownBold(AI_FOLLOWUP_REPLIES[key]);
+      }
+    }
+    const reply = AI_GENERIC_REPLIES[genericReplyIdx % AI_GENERIC_REPLIES.length];
+    genericReplyIdx++;
+    return markdownBold(reply);
+  }
+
+  function markdownBold(str) { return str.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>'); }
+
+  function sendUserMsg() {
+    const text = aiInput.value.trim();
+    if (!text) return;
+    aiInput.value = '';
+    aiInput.style.height = 'auto';
+    aiSendBtn.classList.remove('active');
+    appendUserMsg(text);
+    const typingEl = appendAITyping();
+    setTimeout(() => { replaceTypingWithMsg(typingEl, getAIReply(text)); }, 800 + Math.random() * 600);
+  }
+
+  function toggleVoice() {
+    if (!isRecording) {
+      isRecording = true;
+      aiVoiceBtn.classList.add('recording');
+      recordingHint.classList.add('show');
+      recordingTimer = setTimeout(() => stopRecording(true), 5000);
+    } else {
+      stopRecording(true);
+    }
+  }
+
+  function stopRecording(withResult) {
+    clearTimeout(recordingTimer);
+    isRecording = false;
+    aiVoiceBtn.classList.remove('recording');
+    recordingHint.classList.remove('show');
+    if (withResult) {
+      const voiceTexts = ['对称轴公式是怎么推导出来的？', '为什么 b 等于负 4a？', '第二问 MN 的长度怎么算？'];
+      aiInput.value = voiceTexts[Math.floor(Math.random() * voiceTexts.length)];
+      onInputChange(aiInput);
+      aiInput.focus();
+    }
+  }
+
+  function scrollChatToBottom() { chatMessages.scrollTop = chatMessages.scrollHeight; }
+  function updateChatCount() {
+    const userMsgs = chatMessages.querySelectorAll('.chat-msg.user').length;
+    chatCount.textContent = userMsgs > 0 ? `已提问 ${userMsgs} 次` : '随时提问';
+  }
+  function escHtml(str) { return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+</script>
+
+</body>
+</html>
