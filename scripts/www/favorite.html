@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>收藏</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F2F2F7;
+    --surface: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #6E6E73;
+    --text-muted: #AEAEB2;
+    --border: #E5E5EA;
+    --border-dark: #D1D1D6;
+    --blue: #007AFF;
+    --primary: #007AFF;
+    --brand: #2dc89c;
+    --brand-light: rgba(45,200,156,0.12);
+    --orange: #FF9500;
+    --red: #FF3B30;
+    --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px;
+    --sp-5: 20px; --sp-6: 24px; --sp-8: 32px;
+    --text-xs: 11px; --text-sm: 12px; --text-base: 14px;
+    --text-md: 15px; --text-lg: 16px; --text-xl: 17px;
+    --text-2xl: 20px; --text-3xl: 24px;
+    --card-radius: 12px;
+    --tab-bg: rgba(255,255,255,0.88);
+    --tab-radius: 28px; --tab-height: 68px;
+    --tab-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html { font-size:14px; scroll-behavior:smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans SC', 'Helvetica Neue', sans-serif;
+    background: var(--bg); color: var(--text-primary);
+    min-height:100vh; max-width:100%; margin:0 auto;
+    position:relative; overflow-x:hidden;
+  }
+  .page-wrapper { width:100%; }
+  .content { padding: 0; padding-top: 110px; padding-bottom: calc(120px + var(--tab-height)); }
+
+  /* Status Bar */
+  .status-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10000;
+
+    background:var(--surface); height:44px;
+    display:flex; align-items:flex-end; justify-content:space-between;
+    padding:0 24px 8px;
+  }
+  .status-time { font-size:var(--text-md); font-weight:600; color:var(--text-primary); }
+  .status-icons { display:flex; align-items:center; gap:5px; }
+  .status-icons svg { width:17px; height:17px; }
+
+  /* Toolbar */
+  .toolbar {
+    background:var(--surface); padding:var(--sp-3) var(--sp-4);
+    display:flex; align-items:center; gap:var(--sp-2);
+	margin-top: 40px;
+	margin-bottom: -50px;
+	position: fixed; left: 0; right: 0;
+	z-index: 100;
+  }
+  .search-btn {
+    width:72px; height:36px; border-radius:10px; border:none;
+    background:var(--bg); display:flex; align-items:center; justify-content:center;
+    cursor:pointer; flex-shrink:0;
+  }
+  .search-btn svg { width:18px; height:18px; color:var(--text-secondary); }
+  .toolbar-info { flex:1; font-size:var(--text-sm); color:var(--text-secondary); }
+  .toolbar-actions { display:flex; gap:var(--sp-2); }
+  .toolbar-btn {
+    display:flex; align-items:center; gap:4px;
+    padding:6px 12px; border-radius:16px; background:var(--bg);
+    border:none; font-size:var(--text-xs); color:var(--text-secondary);
+    cursor:pointer; font-family:inherit;
+  }
+  .toolbar-btn svg { width:14px; height:14px; }
+  .toolbar-btn.primary { background:var(--brand); color:white; }
+
+  /* Search Overlay */
+  .search-overlay {
+    background:var(--surface); padding:var(--sp-3) var(--sp-4);
+    border-bottom:1px solid var(--border); display:none;
+  }
+  .search-overlay.show { display:block; }
+  .search-bar {
+    display:flex; align-items:center; gap:var(--sp-2);
+    background:var(--bg); border-radius:10px; padding:10px var(--sp-3);
+  }
+  .search-bar svg { width:18px; height:18px; color:var(--text-muted); flex-shrink:0; }
+  .search-bar input {
+    flex:1; border:none; background:transparent;
+    font-size:var(--text-base); color:var(--text-primary); outline:none;
+  }
+  .search-bar input::placeholder { color:var(--text-muted); }
+  .search-cancel {
+    font-size:var(--text-sm); color:var(--blue);
+    background:none; border:none; cursor:pointer; padding:4px 8px; font-family:inherit;
+  }
+
+  /* ===== Group Card ===== */
+  .group-card {
+    margin:var(--sp-3) var(--sp-4);
+    background:var(--surface);
+    border-radius:var(--card-radius);
+    box-shadow:0 1px 4px rgba(0,0,0,0.06);
+    overflow:hidden;
+  }
+  .group-header {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:var(--sp-4) var(--sp-4) var(--sp-1) var(--sp-4);
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .group-header-left {
+    display:flex; align-items:center; gap:var(--sp-2);
+    flex:1; min-width:0;
+  }
+  .group-folder-icon {
+    width:22px; height:22px; color:var(--brand); flex-shrink:0;
+    transition:transform 0.25s ease;
+  }
+  .group-folder-icon.collapsed { transform:rotate(-90deg); }
+  .group-name {
+    font-size:var(--text-md); font-weight:600; color:var(--text-primary);
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .group-count {
+    font-size:var(--text-xs); color:var(--text-muted);
+    background:var(--bg); border-radius:10px;
+    padding:2px 8px; margin-left:var(--sp-2); flex-shrink:0;
+  }
+  .group-more-btn {
+    width:28px; height:28px; border-radius:50%;
+    background:transparent; border:none; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+    transition:background 0.15s;
+  }
+  .group-more-btn:active { background:var(--bg); }
+  .group-more-btn svg { width:18px; height:18px; color:var(--text-secondary); }
+
+  /* Ungrouped header (special) */
+  .ungrouped-header {
+    padding:var(--sp-3) var(--sp-4);
+    background:var(--surface);
+    display:flex; align-items:center; gap:var(--sp-2);
+  }
+  .ungrouped-icon { width:18px; height:18px; color:var(--text-muted); }
+  .ungrouped-label { font-size:var(--text-sm); color:var(--text-muted); }
+
+  /* Collection Grid inside group */
+  .group-grid-wrap {
+    overflow:hidden;
+    transition:max-height 0.3s ease, opacity 0.25s ease;
+  }
+  .group-grid-wrap.collapsed { max-height:0 !important; opacity:0; }
+  .collection-grid {
+    display:grid; grid-template-columns:repeat(3, 1fr);
+    gap:var(--sp-6) var(--sp-5); padding:var(--sp-4);
+  }
+
+  /* ===== Collection Book ===== */
+  .collection-book { display:flex; flex-direction:column; cursor:pointer; }
+  .book-cover-wrap {
+    position:relative; aspect-ratio:3/4; border-radius:6px;
+    overflow:hidden;
+    box-shadow:2px 4px 12px rgba(0,0,0,0.18), -1px 0 2px rgba(0,0,0,0.1);
+  }
+  .book-cover-wrap::before {
+    content:''; position:absolute; left:0; top:0; bottom:0; width:5px;
+    background:rgba(255,255,255,0.45); z-index:1;
+    box-shadow:1px 0 3px rgba(0,0,0,0.08);
+  }
+  .book-cover {
+    width:100%; height:100%; display:flex; flex-direction:column;
+    align-items:center; justify-content:flex-start;
+    padding:12px 8px 14px; position:relative;
+  }
+  .book-cover.cover-1 { background:linear-gradient(140deg,#C4A4A4,#D4BABA); }
+  .book-cover.cover-2 { background:linear-gradient(140deg,#B8A898,#CFC4B8); }
+  .book-cover.cover-3 { background:linear-gradient(140deg,#9AADA0,#B5C4B5); }
+  .book-cover.cover-4 { background:linear-gradient(140deg,#A498B0,#BDB0C8); }
+  .book-cover.cover-5 { background:linear-gradient(140deg,#98ADB8,#B0C4CB); }
+  .book-cover.cover-6 { background:linear-gradient(140deg,#C4C0A4,#D8D4B8); }
+  .book-cover.cover-7 { background:linear-gradient(140deg,#B0A898,#C8BEB5); }
+  .book-cover.cover-8 { background:linear-gradient(140deg,#A0ADA4,#B8C4B8); }
+
+  .book-spine {
+    position:absolute; left:6px; top:8px; bottom:8px; width:3px;
+    background:rgba(255,255,255,0.08); border-radius:1px;
+  }
+  .book-decor-bottom {
+    width:24px; height:4px; background:rgba(255,255,255,0.2);
+    border-radius:2px; margin-top:6px;
+  }
+  .book-subject {
+    font-size:18px; font-weight:800; color:rgba(255,255,255,0.92);
+    text-align:center; letter-spacing:2px;
+    text-shadow:0 1px 4px rgba(0,0,0,0.25);
+    position:relative; z-index:2; margin:0 4px;
+    margin-top:9px;
+  }
+  .cover-1 .book-subject { color:#fff5f5; text-shadow:0 1px 6px rgba(120,60,60,0.35); }
+  .cover-2 .book-subject { color:#fff8f0; text-shadow:0 1px 6px rgba(120,90,50,0.35); }
+  .cover-3 .book-subject { color:#f0fff5; text-shadow:0 1px 6px rgba(40,90,60,0.35); }
+  .cover-4 .book-subject { color:#f8f0ff; text-shadow:0 1px 6px rgba(80,50,120,0.35); }
+  .cover-5 .book-subject { color:#f0f8ff; text-shadow:0 1px 6px rgba(40,70,120,0.35); }
+  .cover-6 .book-subject { color:#fffff0; text-shadow:0 1px 6px rgba(110,100,40,0.35); }
+  .cover-7 .book-subject { color:#fff8f2; text-shadow:0 1px 6px rgba(100,70,40,0.35); }
+  .cover-8 .book-subject { color:#f2fff5; text-shadow:0 1px 6px rgba(50,80,50,0.35); }
+
+  .book-menu-btn {
+    position:absolute; top:6px; right:6px; width:26px; height:26px;
+    border-radius:50%; background:rgba(255,255,255,0.35);
+    border:none; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; z-index:3; backdrop-filter:blur(6px);
+  }
+  .book-menu-btn svg { width:13px; height:13px; color:rgba(0,0,0,0.55); }
+  .book-meta { margin-top:8px; }
+  .book-name {
+    font-size:15px; font-weight:600; color:var(--text-primary);
+    text-align:center; line-height:1.35; overflow:hidden;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+  }
+  .book-stats {
+    display:flex; justify-content:center; gap:8px;
+    font-size:10px; color:var(--text-muted);
+  }
+  .book-stat { display:flex; align-items:center; gap:2px; }
+  .book-stat svg { width:10px; height:10px; }
+
+  /* Stats on cover */
+  .cover-stats {
+    position:absolute; bottom:20px; left:0; right:0;
+    display:flex; flex-direction:column; align-items:center; gap:3px;
+    z-index:2;
+  }
+  .cover-stat-line {
+    display:flex; align-items:center; gap:3px;
+    font-size:9px; font-weight:500; color:rgba(255,255,255,0.75);
+    letter-spacing:0.3px;
+  }
+  .cover-stat-line svg { width:9px; height:9px; opacity:0.75; }
+
+  .empty-state {
+    grid-column:1/-1; text-align:center;
+    padding:var(--sp-8) var(--sp-4); color:var(--text-muted);
+  }
+  .empty-state svg { width:64px; height:64px; margin-bottom:var(--sp-3); opacity:0.5; }
+  .empty-text { font-size:var(--text-base); margin-bottom:var(--sp-2); }
+  .empty-hint { font-size:var(--text-sm); }
+
+  /* ===== Context Menu ===== */
+  .context-menu {
+    position:fixed; background:var(--surface); border-radius:12px;
+    box-shadow:0 8px 32px rgba(0,0,0,0.18); padding:6px;
+    min-width:160px; z-index:100000; display:none;
+  }
+  .context-menu.show { display:block; }
+  .context-menu-item {
+    display:flex; align-items:center; gap:var(--sp-2);
+    padding:10px var(--sp-3); border-radius:8px;
+    font-size:var(--text-base); color:var(--text-primary);
+    cursor:pointer; transition:background 0.15s;
+  }
+  .context-menu-item:active { background:var(--bg); }
+  .context-menu-item svg { width:18px; height:18px; color:var(--text-secondary); }
+  .context-menu-item.danger { color:var(--red); }
+  .context-menu-item.danger svg { color:var(--red); }
+
+  /* ===== Modals ===== */
+  .modal-overlay {
+    position:fixed; inset:0; background:rgba(0,0,0,0.4);
+    z-index:99999; display:none; align-items:flex-end; justify-content:center;
+  }
+  .modal-overlay.show { display:flex; }
+  .modal-sheet {
+    background:var(--surface); border-radius:20px 20px 0 0;
+    width:100%; max-width:500px; max-height:85vh;
+    overflow-y:auto; animation:slideUp 0.3s ease;
+  }
+  @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+  .modal-header {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:var(--sp-4); border-bottom:1px solid var(--border);
+    position:sticky; top:0; background:var(--surface);
+  }
+  .modal-title { font-size:var(--text-lg); font-weight:600; }
+  .modal-close {
+    width:32px; height:32px; border-radius:50%; border:none;
+    background:var(--bg); display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .modal-close svg { width:18px; height:18px; color:var(--text-secondary); }
+  .modal-body { padding:var(--sp-4); }
+  .modal-footer {
+    padding:var(--sp-3) var(--sp-4) calc(var(--sp-4) + env(safe-area-inset-bottom,0px));
+    display:flex; gap:var(--sp-3);
+  }
+  .modal-btn {
+    flex:1; height:48px; border-radius:12px; border:none;
+    font-size:var(--text-base); font-weight:600; cursor:pointer; font-family:inherit;
+  }
+  .modal-btn.cancel { background:var(--bg); color:var(--text-primary); }
+  .modal-btn.confirm { background:var(--brand); color:white; }
+
+  .form-group { margin-bottom:var(--sp-4); }
+  .form-group:last-child { margin-bottom:0; }
+  .form-label {
+    display:block; font-size:var(--text-sm); color:var(--text-secondary);
+    margin-bottom:var(--sp-2);
+  }
+  .form-input {
+    width:100%; height:48px; padding:0 var(--sp-3);
+    border:1px solid var(--border); border-radius:10px;
+    font-size:var(--text-base); font-family:inherit; outline:none;
+    background:var(--surface);
+  }
+  .form-input:focus { border-color:var(--brand); }
+
+  /* Cover selector */
+  .cover-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:var(--sp-2); }
+  .cover-option {
+    aspect-ratio:3/4; border-radius:6px; cursor:pointer;
+    position:relative; border:2px solid transparent;
+    transition:border-color 0.2s, transform 0.15s;
+    overflow:hidden; box-shadow:1px 2px 6px rgba(0,0,0,0.15);
+  }
+  .cover-option:active { transform:scale(0.96); }
+  .cover-option.selected { border-color:var(--brand); }
+  .cover-option.selected::after {
+    content:'✓'; position:absolute; bottom:4px; right:4px;
+    width:20px; height:20px; background:var(--brand); color:white;
+    border-radius:50%; font-size:11px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .cover-option.cover-1 { background:linear-gradient(140deg,#C4A4A4,#D4BABA); }
+  .cover-option.cover-2 { background:linear-gradient(140deg,#B8A898,#CFC4B8); }
+  .cover-option.cover-3 { background:linear-gradient(140deg,#9AADA0,#B5C4B5); }
+  .cover-option.cover-4 { background:linear-gradient(140deg,#A498B0,#BDB0C8); }
+  .cover-option.cover-5 { background:linear-gradient(140deg,#98ADB8,#B0C4CB); }
+  .cover-option.cover-6 { background:linear-gradient(140deg,#C4C0A4,#D8D4B8); }
+  .cover-option.cover-7 { background:linear-gradient(140deg,#B0A898,#C8BEB5); }
+  .cover-option.cover-8 { background:linear-gradient(140deg,#A0ADA4,#B8C4B8); }
+  .cover-option.custom-cover {
+    background:var(--bg); border:2px dashed var(--border-dark);
+    display:flex; flex-direction:column; align-items:center;
+    justify-content:center; gap:4px;
+  }
+  .cover-option.custom-cover svg { width:24px; height:24px; color:var(--text-muted); }
+  .cover-option.custom-cover span { font-size:10px; color:var(--text-muted); }
+
+  .custom-cover-preview { display:none; margin-top:var(--sp-2); }
+  .custom-cover-preview.show { display:block; }
+  .custom-cover-img {
+    width:60px; height:80px; object-fit:cover;
+    border-radius:6px; box-shadow:1px 2px 6px rgba(0,0,0,0.15);
+  }
+  .custom-cover-remove {
+    font-size:var(--text-xs); color:var(--red); background:none;
+    border:none; cursor:pointer; margin-top:4px; font-family:inherit;
+  }
+  .custom-cover-hint { font-size:var(--text-xs); color:var(--text-muted); margin-top:4px; }
+
+  /* Group select in create modal */
+  .group-select-wrap {
+    position:relative;
+  }
+  .group-select-wrap::after {
+    content:'';
+    position:absolute; right:14px; top:50%; transform:translateY(-50%);
+    width:0; height:0;
+    border-left:5px solid transparent;
+    border-right:5px solid transparent;
+    border-top:6px solid var(--text-secondary);
+    pointer-events:none;
+  }
+  .form-select {
+    width:100%; height:48px; padding:0 36px 0 var(--sp-3);
+    border:1px solid var(--border); border-radius:10px;
+    font-size:var(--text-base); font-family:inherit; outline:none;
+    background:var(--surface); color:var(--text-primary);
+    appearance:none; -webkit-appearance:none;
+    cursor:pointer;
+  }
+  .form-select:focus { border-color:var(--brand); }
+  .sort-columns {
+    display:flex; gap:var(--sp-4);
+  }
+  .sort-column {
+    flex:1; min-width:0;
+  }
+  .sort-column-title {
+    font-size:var(--text-sm); color:var(--text-muted); font-weight:500;
+    margin-bottom:var(--sp-2);
+    text-align:center;
+    letter-spacing:0.5px;
+  }
+  .sort-list { display:flex; flex-direction:column; gap:var(--sp-2); }
+  .sort-item {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:var(--sp-3); background:var(--bg);
+    border-radius:10px; cursor:pointer; transition:background 0.15s;
+  }
+  .sort-item:active { background:var(--border); }
+  .sort-item.selected { background:var(--brand-light); }
+  .sort-item-text { font-size:var(--text-sm); }
+  .sort-item-check { width:18px; height:18px; color:var(--brand); }
+
+  /* Create type selector */
+  .create-type-selector {
+    display:flex; gap:var(--sp-2); margin-bottom:var(--sp-4);
+  }
+  .create-type-btn {
+    flex:1; display:flex; flex-direction:column; align-items:center;
+    gap:var(--sp-2); padding:var(--sp-4) var(--sp-3);
+    border-radius:12px; border:2px solid var(--border);
+    background:var(--surface); cursor:pointer;
+    transition:all 0.2s; font-family:inherit;
+  }
+  .create-type-btn:active { transform:scale(0.97); }
+  .create-type-btn.selected {
+    border-color:var(--brand); background:var(--brand-light);
+  }
+  .create-type-btn svg { width:28px; height:28px; color:var(--text-secondary); }
+  .create-type-btn.selected svg { color:var(--brand); }
+  .create-type-label { font-size:var(--text-sm); font-weight:500; color:var(--text-secondary); }
+  .create-type-btn.selected .create-type-label { color:var(--brand); font-weight:600; }
+
+  /* Move-to-group list */
+  .move-list { display:flex; flex-direction:column; gap:var(--sp-2); }
+  .move-item {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:var(--sp-3) var(--sp-4); background:var(--bg);
+    border-radius:10px; cursor:pointer; transition:background 0.15s;
+  }
+  .move-item:active { background:var(--border); }
+  .move-item.current { background:var(--brand-light); }
+  .move-item-name { font-size:var(--text-base); display:flex; align-items:center; gap:var(--sp-2); }
+  .move-item-name svg { width:16px; height:16px; color:var(--brand); }
+  .move-item-check { width:20px; height:20px; color:var(--brand); }
+
+  /* ===== Floating Tab Bar ===== */
+  .floating-tab-bar {
+    position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+    width:calc(100% - 40px); max-width:390px; height:68px;
+    background:rgba(255,255,255,0.88);
+    backdrop-filter:blur(20px) saturate(180%);
+    -webkit-backdrop-filter:blur(20px) saturate(180%);
+    border-radius:28px;
+    box-shadow:0 8px 32px rgba(0,0,0,0.12),0 2px 8px rgba(0,0,0,0.06);
+    display:flex; align-items:center; padding:0 6px;
+    z-index:9999; border-top:0.5px solid rgba(255,255,255,0.6);
+  }
+  .tab-item {
+    flex:1; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; gap:2px; height:56px; border-radius:20px;
+    cursor:pointer; transition:background 0.2s, transform 0.15s;
+    position:relative; -webkit-tap-highlight-color:transparent;
+  }
+  .tab-item:active { transform:scale(0.93); }
+  .tab-item svg { width:23px; height:23px; transition:all 0.2s; }
+  .tab-item .tab-label { font-size:10px; font-weight:500; letter-spacing:0.2px; transition:all 0.2s; }
+  .tab-item.inactive svg { color:var(--text-muted); }
+  .tab-item.inactive .tab-label { color:var(--text-muted); }
+  .tab-item.active svg { color:var(--brand); }
+  .tab-item.active .tab-label { color:var(--brand); font-weight:600; }
+  .tab-item.active::before {
+    content:''; position:absolute; inset:4px 10px;
+    background:rgba(45,200,156,0.12); border-radius:16px; z-index:-1;
+  }
+  .tab-item.center-tab { position:relative; }
+  .tab-item.center-tab .icon-wrap {
+    width:46px; height:46px; border-radius:50%; background:var(--brand);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 4px 16px rgba(45,200,156,0.45);
+    margin-top:-10px; transition:all 0.2s;
+  }
+  .tab-item.center-tab .icon-wrap svg { color:white; width:22px; height:22px; }
+  .tab-item.center-tab.active::before { display:none; }
+  .tab-item.center-tab.active .icon-wrap {
+    box-shadow:0 6px 20px rgba(45,200,156,0.55); transform:scale(1.08);
+  }
+  .tab-item.center-tab .tab-label { color:var(--brand); font-weight:600; margin-top:2px; font-size:10px; }
+  @media (prefers-color-scheme:dark) {
+    .floating-tab-bar { background:rgba(44,44,46,0.88); border-top-color:rgba(255,255,255,0.1); }
+  }
+  @supports (padding-bottom:env(safe-area-inset-bottom)) {
+    .floating-tab-bar { bottom:calc(20px + env(safe-area-inset-bottom)); }
+    .content { padding-bottom:calc(120px + env(safe-area-inset-bottom)); }
+  }
+</style>
+</head>
+<body>
+<div class="page-wrapper">
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <div class="status-time">9:41</div>
+    <div class="status-icons">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <button class="search-btn" id="searchToggleBtn" onclick="toggleSearch()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    </button>
+    <div class="toolbar-info">共 <span id="collectionCount">0</span> 个收藏本</div>
+    <div class="toolbar-actions">
+      <button class="toolbar-btn" onclick="showSortModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 16 4 4 4-4"/><path d="M7 20V4"/><path d="m21 8-4-4-4 4"/><path d="M17 4v16"/></svg>
+        排序
+      </button>
+      <button class="toolbar-btn primary" onclick="showCreateModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        新建
+      </button>
+    </div>
+  </div>
+
+  <!-- Search Overlay -->
+  <div class="search-overlay" id="searchOverlay">
+    <div class="search-bar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="searchInput" placeholder="搜索收藏本或分组" oninput="handleSearch()" autofocus>
+      <button class="search-cancel" onclick="toggleSearch()">取消</button>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content" id="contentArea">
+    <!-- Rendered by JS -->
+  </div>
+
+  <!-- ====== Floating Tab Bar ====== -->
+  <nav class="floating-tab-bar">
+    <div class="tab-item inactive" id="tab-teach" onclick="switchTab('teach')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      <span class="tab-label">教学</span>
+    </div>
+    <div class="tab-item inactive" id="tab-class" onclick="switchTab('class')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span class="tab-label">班级</span>
+    </div>
+    <div class="tab-item inactive center-tab" id="tab-task" onclick="switchTab('task')">
+      <div class="icon-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 8 5 10 9 6"/><line x1="13" y1="8" x2="21" y2="8"/><polyline points="3 16 5 18 9 14"/><line x1="13" y1="16" x2="19" y2="16"/></svg>
+      </div>
+      <span class="tab-label">任务</span>
+    </div>
+    <div class="tab-item active" id="tab-star" onclick="switchTab('star')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+      <span class="tab-label">收藏</span>
+    </div>
+    <div class="tab-item inactive" id="tab-me" onclick="switchTab('me')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span class="tab-label">我的</span>
+    </div>
+  </nav>
+
+  <!-- Group Context Menu -->
+  <div class="context-menu" id="groupContextMenu">
+    <div class="context-menu-item" onclick="renameGroupFromMenu()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      重命名
+    </div>
+    <div class="context-menu-item danger" onclick="deleteGroupFromMenu()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      删除分组
+    </div>
+  </div>
+
+  <!-- Context Menu (for collection books) -->
+  <div class="context-menu" id="contextMenu">
+    <div class="context-menu-item" onclick="renameCollection()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      重命名
+    </div>
+    <div class="context-menu-item" onclick="changeCover()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      更换封面
+    </div>
+    <div class="context-menu-item" onclick="moveToGroup()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      移动到分组
+    </div>
+    <div class="context-menu-item danger" onclick="deleteCollection()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      删除
+    </div>
+  </div>
+
+  <!-- Create Modal (with type selector) -->
+  <div class="modal-overlay" id="createModal" onclick="closeModal(event,'createModal')">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div class="modal-title">新建</div>
+        <button class="modal-close" onclick="hideModal('createModal')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="create-type-selector">
+          <button class="create-type-btn selected" id="createTypeBook" onclick="setCreateType('book')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            <span class="create-type-label">收藏本</span>
+          </button>
+          <button class="create-type-btn" id="createTypeGroup" onclick="setCreateType('group')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            <span class="create-type-label">分组</span>
+          </button>
+        </div>
+
+        <!-- Book fields -->
+        <div id="createBookFields">
+          <div class="form-group">
+            <label class="form-label">收藏本名称</label>
+            <input type="text" class="form-input" id="newCollectionName" placeholder="请输入名称">
+          </div>
+          <div class="form-group">
+            <label class="form-label">所属分组</label>
+            <div class="group-select-wrap">
+              <select class="form-select" id="newCollectionGroup">
+                <option value="">未分组</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">选择封面</label>
+            <div class="cover-grid" id="createCoverGrid"></div>
+            <div class="custom-cover-preview" id="createCustomPreview">
+              <img class="custom-cover-img" id="createCustomImg" src="">
+              <button class="custom-cover-remove" onclick="removeCustomCover('create')">移除图片</button>
+            </div>
+            <div class="custom-cover-hint" id="createCoverHint"></div>
+          </div>
+        </div>
+
+        <!-- Group fields -->
+        <div id="createGroupFields" style="display:none">
+          <div class="form-group">
+            <label class="form-label">分组名称</label>
+            <input type="text" class="form-input" id="newGroupName" placeholder="请输入分组名称">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn cancel" onclick="hideModal('createModal')">取消</button>
+        <button class="modal-btn confirm" onclick="confirmCreate()">创建</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rename Modal (works for both books and groups) -->
+  <div class="modal-overlay" id="renameModal" onclick="closeModal(event,'renameModal')">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div class="modal-title" id="renameModalTitle">重命名</div>
+        <button class="modal-close" onclick="hideModal('renameModal')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" id="renameLabel">名称</label>
+          <input type="text" class="form-input" id="renameInput">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn cancel" onclick="hideModal('renameModal')">取消</button>
+        <button class="modal-btn confirm" onclick="confirmRename()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cover Modal -->
+  <div class="modal-overlay" id="coverModal" onclick="closeModal(event,'coverModal')">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div class="modal-title">更换封面</div>
+        <button class="modal-close" onclick="hideModal('coverModal')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="cover-grid" id="changeCoverGrid"></div>
+        <div class="custom-cover-preview" id="changeCustomPreview">
+          <img class="custom-cover-img" id="changeCustomImg" src="">
+          <button class="custom-cover-remove" onclick="removeCustomCover('change')">移除图片</button>
+        </div>
+        <div class="custom-cover-hint" id="changeCoverHint"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn cancel" onclick="hideModal('coverModal')">取消</button>
+        <button class="modal-btn confirm" onclick="confirmChangeCover()">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sort Modal (dual columns) -->
+  <div class="modal-overlay" id="sortModal" onclick="closeModal(event,'sortModal')">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div class="modal-title">排序方式</div>
+        <button class="modal-close" onclick="hideModal('sortModal')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="sort-columns">
+          <div class="sort-column">
+            <div class="sort-column-title">分组排序</div>
+            <div class="sort-list">
+              <div class="sort-item selected" data-sort="group-newest" onclick="selectSort('group-newest')">
+                <span class="sort-item-text">创建时间</span>
+                <svg class="sort-item-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="sort-item" data-sort="group-updated" onclick="selectSort('group-updated')">
+                <span class="sort-item-text">更新时间</span>
+                <svg class="sort-item-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="opacity:0"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="sort-item" data-sort="group-name" onclick="selectSort('group-name')">
+                <span class="sort-item-text">名称</span>
+                <svg class="sort-item-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="opacity:0"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="sort-column">
+            <div class="sort-column-title">收藏本排序</div>
+            <div class="sort-list">
+              <div class="sort-item selected" data-sort="book-newest" onclick="selectSort('book-newest')">
+                <span class="sort-item-text">创建时间</span>
+                <svg class="sort-item-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="sort-item" data-sort="book-updated" onclick="selectSort('book-updated')">
+                <span class="sort-item-text">更新时间</span>
+                <svg class="sort-item-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="opacity:0"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="sort-item" data-sort="book-name" onclick="selectSort('book-name')">
+                <span class="sort-item-text">名称</span>
+                <svg class="sort-item-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="opacity:0"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Move to Group Modal -->
+  <div class="modal-overlay" id="moveModal" onclick="closeModal(event,'moveModal')">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div class="modal-title">移动到分组</div>
+        <button class="modal-close" onclick="hideModal('moveModal')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="move-list" id="moveGroupList">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="coverFileInput" accept="image/*" style="display:none" onchange="handleCoverFile(this)">
+
+<script>
+// ========== DATA ==========
+let groups = [
+  { id: 'g1', name: '数学专项', created: Date.now() - 86400000, updated: Date.now() },
+  { id: 'g2', name: '期末备考', created: Date.now() - 172800000, updated: Date.now() - 86400000 },
+];
+
+let collections = [
+  { id: 1, name: '二次函数专项', subject: '数学', cover: 1, coverImg: null, knowledge: 12, exercises: 8, created: Date.now(), updated: Date.now(), groupId: 'g1' },
+  { id: 2, name: '易错题集锦', subject: '数学', cover: 2, coverImg: null, knowledge: 5, exercises: 23, created: Date.now() - 86400000, updated: Date.now() - 3600000, groupId: 'g1' },
+  { id: 3, name: '期末复习', subject: '综合', cover: 3, coverImg: null, knowledge: 45, exercises: 32, created: Date.now() - 172800000, updated: Date.now() - 7200000, groupId: 'g2' },
+  { id: 4, name: '几何辅助线技巧', subject: '数学', cover: 4, coverImg: null, knowledge: 18, exercises: 15, created: Date.now() - 259200000, updated: Date.now() - 259200000, groupId: null },
+  { id: 5, name: '物理实验专题', subject: '物理', cover: 5, coverImg: null, knowledge: 9, exercises: 14, created: Date.now() - 345600000, updated: Date.now() - 345600000, groupId: null },
+  { id: 6, name: '函数压轴题', subject: '数学', cover: 6, coverImg: null, knowledge: 8, exercises: 11, created: Date.now() - 432000000, updated: Date.now() - 86400000, groupId: 'g2' },
+  { id: 7, name: '各类压轴题总结', subject: '综合', cover: 3, coverImg: null, knowledge: 200, exercises: 39, created: Date.now() - 172800000, updated: Date.now() - 7200000, groupId: 'g2' },
+  
+];
+
+const coverClasses = ['cover-1','cover-2','cover-3','cover-4','cover-5','cover-6','cover-7','cover-8'];
+let groupSortType = 'group-newest';
+let bookSortType = 'book-newest';
+let selectedCollectionId = null;
+let selectedCoverId = 1;
+let selectedCoverImg = null;
+let currentCoverContext = null;
+let contextMenuTargetId = null;
+let groupContextMenuTargetId = null;
+let createType = 'book'; // 'book' or 'group'
+let renameTarget = null; // { type: 'collection'|'group', id: ... }
+let collapsedGroups = new Set();
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderAll();
+  renderCoverGrids();
+});
+
+// ========== RENDER ==========
+function renderAll() {
+  const container = document.getElementById('contentArea');
+  const totalBooks = collections.length;
+  document.getElementById('collectionCount').textContent = totalBooks;
+
+  if (totalBooks === 0 && groups.length === 0) {
+    container.innerHTML = `
+      <div class="collection-grid">
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          </svg>
+          <div class="empty-text">暂无收藏本</div>
+          <div class="empty-hint">点击右上角"新建"创建收藏本或分组</div>
+        </div>
+      </div>`;
+    return;
+  }
+
+  const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+  const sortedGroups = getSortedGroups();
+  const ungrouped = getSortedUngroupedBooks(searchTerm);
+
+  let html = '';
+
+  // Render each group as a card
+  sortedGroups.forEach(g => {
+    const books = getFilteredAndSortedBooks(g.id, searchTerm);
+    const isCollapsed = collapsedGroups.has(g.id);
+    html += `
+      <div class="group-card" data-group="${g.id}">
+        <div class="group-header" onclick="toggleGroup('${g.id}')">
+          <div class="group-header-left">
+            <svg class="group-folder-icon ${isCollapsed ? 'collapsed' : ''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            <span class="group-name">${escapeHtml(g.name)}</span>
+            <span class="group-count">${books.length}</span>
+          </div>
+          <button class="group-more-btn" onclick="event.stopPropagation();showGroupContextMenu(event,'${g.id}')">
+            <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="6" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="18" r="2"/></svg>
+          </button>
+        </div>
+        <div class="group-grid-wrap ${isCollapsed ? 'collapsed' : ''}" id="gridWrap-${g.id}">
+          ${books.length > 0 ? `<div class="collection-grid">${renderBookCards(books)}</div>` : `<div style="padding:var(--sp-4);text-align:center;color:var(--text-muted);font-size:var(--text-sm);">暂无收藏本</div>`}
+        </div>
+      </div>`;
+  });
+
+  // Ungrouped books
+  if (ungrouped.length > 0) {
+    if (sortedGroups.length > 0) {
+      html += `<div style="padding:var(--sp-3) var(--sp-4) 0;"><span style="font-size:var(--text-sm);color:var(--text-muted);">未分组 · ${ungrouped.length}</span></div>`;
+    }
+    html += `<div class="collection-grid">${renderBookCards(ungrouped)}</div>`;
+  }
+
+  container.innerHTML = html;
+
+  // Set max-height for non-collapsed groups for animation
+  sortedGroups.forEach(g => {
+    if (!collapsedGroups.has(g.id)) {
+      const wrap = document.getElementById('gridWrap-' + g.id);
+      if (wrap) wrap.style.maxHeight = wrap.scrollHeight + 'px';
+    }
+  });
+}
+
+function renderBookCards(books) {
+  return books.map(c => {
+    const coverClass = c.coverImg ? '' : (coverClasses[(c.cover - 1) % coverClasses.length] || 'cover-1');
+    const coverStyle = c.coverImg ? `background:url(${c.coverImg}) center/cover no-repeat;` : '';
+    const coverInner = c.coverImg ? '' : `
+      <div class="book-spine"></div>
+      <div class="book-subject">${escapeHtml(c.subject || '')}</div>
+      <div class="book-decor-bottom"></div>
+      <div class="cover-stats">
+        <div class="cover-stat-line">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          知识点 ${c.knowledge}
+        </div>
+        <div class="cover-stat-line">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          习题 ${c.exercises}
+        </div>
+      </div>`;
+    return `
+      <div class="collection-book" onclick="openCollection(${c.id})">
+        <div class="book-cover-wrap">
+          <div class="book-cover ${coverClass}" style="${coverStyle}">${coverInner}</div>
+          <button class="book-menu-btn" onclick="event.stopPropagation();showContextMenu(event,${c.id})">
+            <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="6" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="18" r="2"/></svg>
+          </button>
+        </div>
+        <div class="book-meta">
+          <div class="book-name">${escapeHtml(c.name)}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ========== SORTING ==========
+function getSortedGroups() {
+  const sorted = [...groups];
+  switch (groupSortType) {
+    case 'group-newest':  sorted.sort((a,b) => b.created - a.created); break;
+    case 'group-updated': sorted.sort((a,b) => b.updated - a.updated); break;
+    case 'group-name':    sorted.sort((a,b) => a.name.localeCompare(b.name,'zh-CN')); break;
+  }
+  return sorted;
+}
+
+function getFilteredAndSortedBooks(groupId, searchTerm) {
+  let result = collections.filter(c => c.groupId === groupId);
+  if (searchTerm) {
+    result = result.filter(c => c.name.toLowerCase().includes(searchTerm));
+  }
+  sortBooks(result);
+  return result;
+}
+
+function getSortedUngroupedBooks(searchTerm) {
+  let result = collections.filter(c => !c.groupId);
+  if (searchTerm) {
+    result = result.filter(c => c.name.toLowerCase().includes(searchTerm));
+  }
+  sortBooks(result);
+  return result;
+}
+
+function sortBooks(arr) {
+  switch (bookSortType) {
+    case 'book-newest':  arr.sort((a,b) => b.created - a.created); break;
+    case 'book-updated': arr.sort((a,b) => b.updated - a.updated); break;
+    case 'book-name':    arr.sort((a,b) => a.name.localeCompare(b.name,'zh-CN')); break;
+  }
+}
+
+// ========== SEARCH ==========
+function toggleSearch() {
+  const overlay = document.getElementById('searchOverlay');
+  overlay.classList.toggle('show');
+  if (overlay.classList.contains('show')) {
+    document.getElementById('searchInput').focus();
+  } else {
+    document.getElementById('searchInput').value = '';
+    renderAll();
+  }
+}
+function handleSearch() { renderAll(); }
+
+// ========== GROUP TOGGLE ==========
+function toggleGroup(gId) {
+  if (collapsedGroups.has(gId)) {
+    collapsedGroups.delete(gId);
+  } else {
+    collapsedGroups.add(gId);
+  }
+  renderAll();
+}
+
+// ========== CONTEXT MENU ==========
+function showContextMenu(event, id) {
+  event.stopPropagation();
+  contextMenuTargetId = id;
+  const menu = document.getElementById('contextMenu');
+  const rect = event.target.closest('.book-menu-btn').getBoundingClientRect();
+  // Clamp to screen right edge
+  const menuWidth = 160;
+  let left = rect.left;
+  if (left + menuWidth > window.innerWidth - 8) left = window.innerWidth - menuWidth - 8;
+  if (left < 8) left = 8;
+  menu.style.left = left + 'px';
+  menu.style.top = (rect.bottom + 4) + 'px';
+  menu.classList.add('show');
+}
+function hideContextMenu() {
+  document.getElementById('contextMenu').classList.remove('show');
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.context-menu') && !e.target.closest('.book-menu-btn')) hideContextMenu();
+  if (!e.target.closest('#groupContextMenu') && !e.target.closest('.group-more-btn')) hideGroupContextMenu();
+});
+
+// ========== COLLECTION ACTIONS ==========
+function renameCollection() {
+  hideContextMenu();
+  const c = collections.find(x => x.id === contextMenuTargetId);
+  if (!c) return;
+  renameTarget = { type: 'collection', id: c.id };
+  document.getElementById('renameModalTitle').textContent = '重命名收藏本';
+  document.getElementById('renameLabel').textContent = '收藏本名称';
+  document.getElementById('renameInput').value = c.name;
+  showModal('renameModal');
+}
+
+function changeCover() {
+  hideContextMenu();
+  const c = collections.find(x => x.id === contextMenuTargetId);
+  if (!c) return;
+  selectedCollectionId = c.id;
+  selectedCoverId = c.cover;
+  selectedCoverImg = c.coverImg;
+  currentCoverContext = 'change';
+  renderCoverGrid('changeCoverGrid', selectedCoverId, selectedCoverImg);
+  updateCoverPreview('change', selectedCoverImg);
+  showModal('coverModal');
+}
+
+function moveToGroup() {
+  hideContextMenu();
+  const c = collections.find(x => x.id === contextMenuTargetId);
+  if (!c) return;
+  selectedCollectionId = c.id;
+  renderMoveGroupList();
+  showModal('moveModal');
+}
+
+function deleteCollection() {
+  hideContextMenu();
+  if (confirm('确定要删除这个收藏本吗？')) {
+    collections = collections.filter(x => x.id !== contextMenuTargetId);
+    renderAll();
+  }
+}
+
+function openCollection(id) {
+  alert('打开收藏本: ' + id);
+}
+
+// ========== RENAME (shared for book & group) ==========
+function confirmRename() {
+  const newName = document.getElementById('renameInput').value.trim();
+  if (!newName) return;
+  if (renameTarget.type === 'collection') {
+    const c = collections.find(x => x.id === renameTarget.id);
+    if (c) { c.name = newName; c.updated = Date.now(); }
+  } else if (renameTarget.type === 'group') {
+    const g = groups.find(x => x.id === renameTarget.id);
+    if (g) { g.name = newName; g.updated = Date.now(); }
+  }
+  hideModal('renameModal');
+  renderAll();
+}
+
+// ========== GROUP ACTIONS ==========
+function showGroupContextMenu(event, gId) {
+  event.stopPropagation();
+  groupContextMenuTargetId = gId;
+  const menu = document.getElementById('groupContextMenu');
+  const rect = event.target.closest('.group-more-btn').getBoundingClientRect();
+  // Clamp to screen right edge
+  const menuWidth = 160;
+  let left = rect.left;
+  if (left + menuWidth > window.innerWidth - 8) left = window.innerWidth - menuWidth - 8;
+  if (left < 8) left = 8;
+  menu.style.left = left + 'px';
+  menu.style.top = (rect.bottom + 4) + 'px';
+  menu.classList.add('show');
+}
+function hideGroupContextMenu() {
+  document.getElementById('groupContextMenu').classList.remove('show');
+}
+
+function renameGroupFromMenu() {
+  hideGroupContextMenu();
+  renameGroup(groupContextMenuTargetId);
+}
+function deleteGroupFromMenu() {
+  hideGroupContextMenu();
+  deleteGroup(groupContextMenuTargetId);
+}
+
+function renameGroup(gId) {
+  const g = groups.find(x => x.id === gId);
+  if (!g) return;
+  renameTarget = { type: 'group', id: g.id };
+  document.getElementById('renameModalTitle').textContent = '重命名分组';
+  document.getElementById('renameLabel').textContent = '分组名称';
+  document.getElementById('renameInput').value = g.name;
+  showModal('renameModal');
+}
+
+function deleteGroup(gId) {
+  const g = groups.find(x => x.id === gId);
+  if (!g) return;
+  const bookCount = collections.filter(c => c.groupId === gId).length;
+  const msg = bookCount > 0
+    ? `分组"${g.name}"中有 ${bookCount} 个收藏本，删除后收藏本将移至"未分组"。确定删除？`
+    : `确定要删除分组"${g.name}"吗？`;
+  if (confirm(msg)) {
+    // Move books to ungrouped
+    collections.forEach(c => { if (c.groupId === gId) c.groupId = null; });
+    groups = groups.filter(x => x.id !== gId);
+    renderAll();
+  }
+}
+
+// ========== MOVE TO GROUP ==========
+function renderMoveGroupList() {
+  const c = collections.find(x => x.id === selectedCollectionId);
+  if (!c) return;
+  const list = document.getElementById('moveGroupList');
+
+  // "Ungrouped" option
+  const isUngrouped = !c.groupId;
+  let html = `
+    <div class="move-item ${isUngrouped ? 'current' : ''}" onclick="confirmMove(null)">
+      <span class="move-item-name">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        未分组
+      </span>
+      ${isUngrouped ? '<svg class="move-item-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+    </div>`;
+
+  groups.forEach(g => {
+    const isCurrent = c.groupId === g.id;
+    html += `
+      <div class="move-item ${isCurrent ? 'current' : ''}" onclick="confirmMove('${g.id}')">
+        <span class="move-item-name">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          ${escapeHtml(g.name)}
+        </span>
+        ${isCurrent ? '<svg class="move-item-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+      </div>`;
+  });
+
+  list.innerHTML = html;
+}
+
+function confirmMove(newGroupId) {
+  const c = collections.find(x => x.id === selectedCollectionId);
+  if (c) {
+    c.groupId = newGroupId;
+    c.updated = Date.now();
+    // Update group's updated time
+    if (newGroupId) {
+      const g = groups.find(x => x.id === newGroupId);
+      if (g) g.updated = Date.now();
+    }
+  }
+  hideModal('moveModal');
+  renderAll();
+}
+
+// ========== CREATE ==========
+function showCreateModal() {
+  createType = 'book';
+  document.getElementById('newCollectionName').value = '';
+  document.getElementById('newGroupName').value = '';
+  selectedCoverId = 1;
+  selectedCoverImg = null;
+  currentCoverContext = 'create';
+  // Populate group dropdown
+  const groupSelect = document.getElementById('newCollectionGroup');
+  groupSelect.innerHTML = '<option value="">未分组</option>';
+  groups.forEach(g => {
+    groupSelect.innerHTML += `<option value="${g.id}">${escapeHtml(g.name)}</option>`;
+  });
+  updateCreateTypeUI();
+  renderCoverGrid('createCoverGrid', 1, null);
+  updateCoverPreview('create', null);
+  showModal('createModal');
+}
+
+function setCreateType(type) {
+  createType = type;
+  updateCreateTypeUI();
+}
+
+function updateCreateTypeUI() {
+  const bookBtn = document.getElementById('createTypeBook');
+  const groupBtn = document.getElementById('createTypeGroup');
+  const bookFields = document.getElementById('createBookFields');
+  const groupFields = document.getElementById('createGroupFields');
+  bookBtn.classList.toggle('selected', createType === 'book');
+  groupBtn.classList.toggle('selected', createType === 'group');
+  bookFields.style.display = createType === 'book' ? '' : 'none';
+  groupFields.style.display = createType === 'group' ? '' : 'none';
+}
+
+function confirmCreate() {
+  if (createType === 'book') {
+    const name = document.getElementById('newCollectionName').value.trim();
+    if (!name) { alert('请输入收藏本名称'); return; }
+    const groupId = document.getElementById('newCollectionGroup').value || null;
+    collections.unshift({
+      id: Date.now(),
+      name,
+      subject: '',
+      cover: selectedCoverId,
+      coverImg: selectedCoverImg,
+      knowledge: 0,
+      exercises: 0,
+      created: Date.now(),
+      updated: Date.now(),
+      groupId: groupId
+    });
+  } else {
+    const name = document.getElementById('newGroupName').value.trim();
+    if (!name) { alert('请输入分组名称'); return; }
+    groups.push({
+      id: 'g' + Date.now(),
+      name,
+      created: Date.now(),
+      updated: Date.now()
+    });
+  }
+  hideModal('createModal');
+  renderAll();
+}
+
+// ========== COVER ==========
+function renderCoverGrids() {
+  renderCoverGrid('createCoverGrid', 1, null);
+}
+
+function renderCoverGrid(gridId, selectedId, selectedImg) {
+  const container = document.getElementById(gridId);
+  if (!container) return;
+  const grid = coverClasses.map((cls, i) => {
+    const id = i + 1;
+    const isSelected = selectedId === id && !selectedImg;
+    return `<div class="cover-option ${cls} ${isSelected ? 'selected' : ''}" onclick="selectCover(${id},null,'${gridId}')"></div>`;
+  }).join('');
+  const isCustomSelected = !!selectedImg;
+  container.innerHTML = grid + `
+    <div class="cover-option custom-cover ${isCustomSelected ? 'selected' : ''}" onclick="pickCustomCover()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      <span>自定义</span>
+    </div>`;
+}
+
+function selectCover(coverId, coverImg, gridId) {
+  selectedCoverId = coverId;
+  selectedCoverImg = coverImg;
+  renderCoverGrid(gridId, coverId, coverImg);
+  updateCoverPreview(currentCoverContext, coverImg);
+}
+
+function pickCustomCover() { document.getElementById('coverFileInput').click(); }
+
+function handleCoverFile(input) {
+  const file = input.files[0];
+  if (!file || !file.type.startsWith('image/')) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const dataUrl = e.target.result;
+    selectedCoverId = 0;
+    selectedCoverImg = dataUrl;
+    const gridId = currentCoverContext === 'create' ? 'createCoverGrid' : 'changeCoverGrid';
+    renderCoverGrid(gridId, 0, dataUrl);
+    updateCoverPreview(currentCoverContext, dataUrl);
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+
+function removeCustomCover(context) {
+  selectedCoverImg = null;
+  selectedCoverId = 1;
+  const gridId = context === 'create' ? 'createCoverGrid' : 'changeCoverGrid';
+  renderCoverGrid(gridId, 1, null);
+  updateCoverPreview(context, null);
+}
+
+function updateCoverPreview(context, imgUrl) {
+  const previewEl = document.getElementById(context + 'CustomPreview');
+  const imgEl = document.getElementById(context + 'CustomImg');
+  const hintEl = document.getElementById(context + 'CoverHint');
+  if (imgUrl) {
+    imgEl.src = imgUrl;
+    previewEl.classList.add('show');
+    hintEl.textContent = '已选择自定义图片';
+  } else {
+    previewEl.classList.remove('show');
+    hintEl.textContent = '可选择自定义图片作为封面';
+  }
+}
+
+function confirmChangeCover() {
+  const c = collections.find(x => x.id === selectedCollectionId);
+  if (c) {
+    c.cover = selectedCoverId;
+    c.coverImg = selectedCoverImg;
+    c.updated = Date.now();
+  }
+  hideModal('coverModal');
+  renderAll();
+}
+
+// ========== SORT MODAL ==========
+function showSortModal() {
+  // Sync UI with current sort state
+  document.querySelectorAll('.sort-item').forEach(item => {
+    const isGroupItem = item.dataset.sort.startsWith('group-');
+    const isBookItem = item.dataset.sort.startsWith('book-');
+    let isSelected = false;
+    if (isGroupItem) isSelected = item.dataset.sort === groupSortType;
+    if (isBookItem) isSelected = item.dataset.sort === bookSortType;
+    item.classList.toggle('selected', isSelected);
+    const check = item.querySelector('.sort-item-check');
+    if (check) check.style.opacity = isSelected ? '1' : '0';
+  });
+  showModal('sortModal');
+}
+
+function selectSort(sortType) {
+  if (sortType.startsWith('group-')) {
+    groupSortType = sortType;
+  } else {
+    bookSortType = sortType;
+  }
+  // Update UI in sort modal — update only the relevant column
+  document.querySelectorAll('.sort-item').forEach(item => {
+    const isGroupItem = item.dataset.sort.startsWith('group-');
+    const isBookItem = item.dataset.sort.startsWith('book-');
+    let isSelected = false;
+    if (isGroupItem) isSelected = item.dataset.sort === groupSortType;
+    if (isBookItem) isSelected = item.dataset.sort === bookSortType;
+    item.classList.toggle('selected', isSelected);
+    const check = item.querySelector('.sort-item-check');
+    if (check) check.style.opacity = isSelected ? '1' : '0';
+  });
+  renderAll();
+  // Don't close modal — let user pick both columns
+}
+
+// ========== MODAL HELPERS ==========
+function showModal(id) { document.getElementById(id).classList.add('show'); }
+function hideModal(id) { document.getElementById(id).classList.remove('show'); }
+function closeModal(event, id) { if (event.target.id === id) hideModal(id); }
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// ========== TAB NAVIGATION ==========
+const tabPages = {
+  'teach': 'teach.html',
+  'class': 'class.html',
+  'task': 'task.html',
+  'star': 'favorite.html',
+  'me': 'me.html'
+};
+function switchTab(name) { window.location.href = tabPages[name]; }
+</script>
+</body>
+</html>
