@@ -1,11 +1,2945 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>PakePlus</title>
-    </head>
-    <body>
-        PakePlus
-    </body>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>教学</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* =============================================
+     CSS VARIABLES
+     ============================================= */
+  :root {
+    --bg: #F2F2F7;
+    --surface: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #6E6E73;
+    --text-muted: #AEAEB2;
+    --border: #E5E5EA;
+    --border-dark: #D1D1D6;
+    --blue: #007AFF;
+    --blue-light: #E8F4FF;
+    --primary: #007AFF;
+    --brand: #2dc89c;
+    --brand-light: #3ECCA4;
+    --orange: #FF9500;
+    --orange-light: rgba(255,149,0,0.1);
+    --purple: #764ba2;
+    --purple-light: #F3EEFF;
+
+    --sp-1: 4px;   --sp-2: 8px;   --sp-3: 12px;  --sp-4: 16px;
+    --sp-5: 20px;  --sp-6: 24px;  --sp-8: 32px;
+
+    --content-pad: var(--sp-4);
+
+    --text-xs: 11px;  --text-sm: 12px;  --text-base: 14px;
+    --text-md: 15px;  --text-lg: 16px;  --text-xl: 17px;
+    --text-2xl: 20px; --text-3xl: 24px;
+
+    --card-radius: 12px;
+    --btn-height: 50px;
+    --avatar-size: 40px;
+  }
+
+  /* =============================================
+     BASE RESET
+     ============================================= */
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html { font-size: 14px; scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans SC', 'Helvetica Neue', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    max-width: 100%;
+    margin: 0 auto;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  .page-wrapper { width: 100%; }
+  .content { padding: 0 var(--sp-4) 100px; padding-top: 140px; }
+
+  /* =============================================
+     STATUS BAR
+     ============================================= */
+  .status-bar {
+    z-index: 10000;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    height: 44px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 0 24px 8px;
+  }
+  .status-time   { font-size: var(--text-md); font-weight: 600; color: var(--text-primary); }
+  .status-icons  { display: flex; align-items: center; gap: 5px; }
+  .status-icons svg { width: 17px; height: 17px; }
+
+  /* =============================================
+     搜索栏
+     ============================================= */
+  .search-bar {
+    display: flex;
+    align-items: center;
+    background: var(--surface);
+    border-radius: 12px;
+    padding: var(--sp-3) var(--sp-4);
+    gap: var(--sp-2);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    margin-bottom: var(--sp-3);
+  }
+  .search-bar svg { width: 18px; height: 18px; color: var(--text-muted); flex-shrink: 0; }
+  .search-bar input {
+    flex: 1; border: none; outline: none;
+    font-size: var(--text-base); color: var(--text-primary);
+    background: transparent;
+  }
+  .search-bar input::placeholder { color: var(--text-muted); }
+  .ai-btn {
+    display: flex; align-items: center; gap: 4px;
+    padding: 6px 12px;
+    background: rgba(45,200,156,0.12);
+    border-radius: 20px;
+    font-size: var(--text-sm); font-weight: 600;
+    color: var(--brand);
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .ai-btn:active { background: var(--brand); color: white; transform: scale(0.96); }
+  .ai-btn svg { width: 14px; height: 14px; color: currentColor; }
+  .ai-btn img { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; vertical-align: middle; border: 1.5px solid currentColor; }
+
+  /* =============================================
+     筛选器（年级+学科，两行）+ AI搜索按钮
+     ============================================= */
+  /* 筛选器+AI行容器：撑满屏幕宽度，负上边距消除content顶部间距 */
+  .filter-ai-row {
+    position: fixed;
+    top: 44px;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    display: flex;
+    gap: var(--sp-3);
+    align-items: stretch;
+    padding: var(--sp-3) var(--sp-4);
+    background: #fff;
+    border-bottom: 1px solid #e8ecf0;
+  }
+  .filter-group {
+    flex: 1;
+    min-width: 0;
+  }
+  .filter-scroll {
+    display: flex;
+    gap: var(--sp-2);
+    overflow-x: auto;
+    padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .filter-scroll::-webkit-scrollbar { display: none; }
+  .filter-chip {
+    display: flex; align-items: center; gap: 4px;
+    padding: 7px 14px;
+    background: var(--surface);
+    border-radius: 20px;
+    font-size: var(--text-base); font-weight: 500;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .filter-chip:active { transform: scale(0.96); opacity: 0.8; }
+  .filter-chip.active {
+    background: var(--brand);
+    color: white;
+    border-color: var(--brand);
+  }
+  .filter-chip svg { width: 13px; height: 13px; transition: transform 0.2s; }
+  .filter-chip.open svg { transform: rotate(180deg); }
+
+  /* AI搜问按钮（透明底+头像中心扩散涟漪） */
+  .ai-search-btn {
+    position: relative;
+    width: 30%;
+    min-width: 50px;
+    border-radius: 50px;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 0 14px;
+    background: transparent;
+    overflow: visible;
+    transition: transform 0.2s;
+  }
+  .ai-search-btn:active { transform: scale(0.96); }
+
+  .ai-search-avatar {
+    width: 38px; height: 38px;
+    object-fit: cover; position: relative; z-index: 1; flex-shrink: 0;
+    border-radius: 10px;
+  }
+  .ai-search-text {
+    font-size: 16px; font-weight: 700; letter-spacing: 1px;
+    background: linear-gradient(90deg, #40916c, #52b788, #2dc89c, #00d4ff, #7b2cbf, #40916c);
+    background-size: 200% 100%;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: textGradientFlow 3s linear infinite;
+    position: relative; z-index: 1;
+    white-space: nowrap;
+  }
+  @keyframes textGradientFlow {
+    0%   { background-position: 0% 0%; }
+    100% { background-position: 200% 0%; }
+  }
+
+  /* =============================================
+     SECTION TITLE
+     ============================================= */
+  .section-title {
+    font-size: var(--text-base); font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: var(--sp-3);
+    display: flex; align-items: center; gap: var(--sp-2);
+	margin-top: 30px;
+  }
+  .section-title svg { width: 16px; height: 16px; color: var(--brand); }
+
+  /* =============================================
+     知识点模块 — 整张卡片设计
+     ============================================= */
+  .knowledge-card {
+    background: var(--surface);
+    border-radius: var(--card-radius);
+    box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+    overflow: hidden;
+    display: flex;
+    min-height: 400px;
+  }
+
+  /* 左侧章列表 */
+  .knowledge-card-left {
+    width: 88px;
+    flex-shrink: 0;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    border-right: 1px solid var(--border-light);
+  }
+  .knowledge-card-left::-webkit-scrollbar { display: none; }
+
+  .chapter-btn {
+    padding: 18px 6px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--brand);
+    cursor: pointer;
+    transition: all 0.2s;
+    border-bottom: 1px solid rgba(45,200,156,0.12);
+    border-left: 4px solid transparent;
+    position: relative;
+    background: var(--surface);
+  }
+  .chapter-btn:active { opacity: 0.7; }
+  .chapter-btn.active {
+    background: var(--brand);
+    color: white;
+    border-left-color: transparent;
+    font-weight: 700;
+  }
+  .chapter-btn.active::after {
+    display: none;
+  }
+
+  /* 右侧内容区 */
+  .knowledge-card-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .chapter-header {
+    padding: var(--sp-4) var(--sp-5) var(--sp-3);
+    border-bottom: 1px solid var(--border-light);
+  }
+  .chapter-header-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .chapter-sections {
+    padding: var(--sp-2) var(--sp-5);
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+
+  /* 知识点列表 */
+  .knowledge-card-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--sp-2) var(--sp-5) var(--sp-4);
+    -webkit-overflow-scrolling: touch;
+	margin-top: -20px;
+  }
+  .knowledge-card-list::-webkit-scrollbar { display: none; }
+  .knowledge-row {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border-light);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .knowledge-row:last-child { border-bottom: none; }
+  .knowledge-row:active { opacity: 0.6; }
+  .knowledge-row-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .knowledge-row-icon svg {
+    width: 16px;
+    height: 16px;
+    color: var(--brand);
+  }
+  .knowledge-row-info { flex: 1; min-width: 0; }
+  .knowledge-row-name {
+    font-size: var(--text-base);
+    font-weight: 500;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+  .knowledge-row-meta {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .knowledge-row-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+    color: white;
+    border-radius: 4px;
+    letter-spacing: 0.3px;
+    flex-shrink: 0;
+  }
+  .knowledge-row-arrow {
+    color: var(--text-muted);
+    flex-shrink: 0;
+    margin-left: var(--sp-2);
+  }
+  .knowledge-row-arrow svg { width: 16px; height: 16px; }
+  .knowledge-item:active { opacity: 0.6; }
+  .knowledge-icon {
+    width: 1em; height: 1em;
+    flex-shrink: 0;
+    color: var(--brand);
+    vertical-align: middle;
+  }
+  .knowledge-item .name {
+    flex: 1; font-size: var(--text-base); font-weight: 500;
+    color: var(--text-primary);
+  }
+  .knowledge-item .tag-important {
+    font-size: 10px; font-weight: 600; padding: 2px 7px;
+    border-radius: 4px;
+    background: rgba(255,149,0,0.12); color: var(--orange);
+    margin-right: var(--sp-2); white-space: nowrap;
+  }
+  .knowledge-arrow {
+    width: 16px; height: 16px; color: var(--text-muted);
+    flex-shrink: 0; transition: color 0.15s;
+  }
+  .knowledge-item:active .knowledge-arrow { color: var(--brand); }
+
+  /* 响应式：窄屏时侧边栏缩窄 */
+  @media (max-width: 600px) {
+    .chapter-sidebar { width: 56px; }
+    .chapter-tab { font-size: 11px; padding: 10px 2px; }
+  }
+
+  /* =============================================
+     订阅专栏
+     ============================================= */
+  .section-arrow {
+    margin-left: auto;
+    width: 18px; height: 18px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .section-arrow:active { transform: scale(0.85); }
+
+  .subscribe-card {
+    background: var(--surface);
+    border-radius: var(--card-radius);
+    padding: var(--sp-5) var(--sp-4);
+    margin-bottom: var(--sp-4);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .subscribe-header {
+    display: flex; align-items: center;
+    gap: var(--sp-3); margin-bottom: var(--sp-4);
+  }
+  .subscribe-header-right {
+    margin-left: auto;
+    font-size: var(--text-xs); color: var(--text-muted);
+    white-space: nowrap;
+  }
+  .teacher-avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%; object-fit: cover;
+    background: linear-gradient(135deg, var(--brand), var(--brand-light));
+    flex-shrink: 0;
+  }
+  .teacher-info { flex: 1; min-width: 0; }
+  .teacher-name-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .teacher-name { font-size: var(--text-base); font-weight: 600; color: var(--text-primary); }
+  .teacher-role {
+    font-size: 10px; font-weight: 600; padding: 2px 8px;
+    border-radius: 10px; display: inline-block; white-space: nowrap;
+  }
+  .teacher-role.teacher {
+    background: rgba(45,200,156,0.15); color: var(--brand);
+  }
+  .teacher-school {
+    font-size: 11px; color: var(--text-muted); margin-top: 2px;
+    line-height: 1.3;
+  }
+
+  /* 更新列表：无背景无分割线，大间距 */
+  .update-list { display: flex; flex-direction: column; }
+  .update-item {
+    display: flex; align-items: center;
+    gap: var(--sp-3);
+    padding: var(--sp-4) 0;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .update-item:first-child { padding-top: 0; }
+  .update-item:last-child { padding-bottom: 0; }
+  .update-item:active { opacity: 0.7; }
+
+  .update-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .update-icon.knowledge { background: var(--blue-light); color: var(--blue); }
+  .update-icon.exercise  { background: var(--orange-light); color: var(--orange); }
+  .update-icon svg { width: 18px; height: 18px; }
+  .update-info { flex: 1; min-width: 0; }
+  .update-title {
+    font-size: var(--text-base); color: var(--text-primary);
+    font-weight: 600; margin-bottom: 2px;
+    line-height: 1.4;
+  }
+  .update-chapter {
+    font-size: var(--text-xs); color: var(--text-muted);
+    font-weight: 400; margin-bottom: 2px;
+    line-height: 1.3;
+  }
+  .update-meta { font-size: var(--text-xs); color: var(--text-muted); display: flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap; }
+  .update-date { display: none; /* 时间已移到订阅人同一行 */ }
+  .update-arrow {
+    color: var(--text-muted); flex-shrink: 0; margin-left: var(--sp-1);
+  }
+  .update-arrow svg { width: 16px; height: 16px; }
+
+  /* 星星难度标识（5级） */
+  .exercise-stars {
+    display: inline-flex; align-items: center; gap: 0px; font-size: 10px;
+  }
+  .exercise-stars .star { color: var(--border); transition: color 0.2s; }
+  .exercise-stars .star.filled { }
+  .exercise-stars.level1 .star.filled { color: #34c7bd; }  /* 基础 */
+  .exercise-stars.level2 .star.filled { color: #5bc8e0; }  /* 入门 */
+  .exercise-stars.level3 .star.filled { color: #ffaa00; }  /* 中等 */
+  .exercise-stars.level4 .star.filled { color: #ff7a45; }  /* 较难 */
+  .exercise-stars.level5 .star.filled { color: #ff453a; }  /* 困难 */
+  .exercise-tag-label { font-size: 10px; color: var(--text-muted); }
+
+  /* =============================================
+     底部弹窗（年级/教材版本选择）
+     ============================================= */
+  .bottom-sheet-overlay {
+    position: fixed; inset: 0; z-index: 99999;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    align-items: flex-end;
+  }
+  .bottom-sheet-overlay.show { display: flex; }
+  .bottom-sheet {
+    width: 100%;
+    background: var(--surface);
+    border-radius: 20px 20px 0 0;
+    padding: var(--sp-4);
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
+    max-height: 70vh;
+    overflow-y: auto;
+    animation: sheetUp 0.25s ease;
+  }
+  @keyframes sheetUp {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+  }
+  .sheet-handle {
+    width: 40px; height: 4px; border-radius: 2px;
+    background: var(--border-dark);
+    margin: 0 auto var(--sp-4);
+  }
+  .sheet-title {
+    font-size: var(--text-lg); font-weight: 600;
+    color: var(--text-primary);
+    text-align: center; margin-bottom: var(--sp-4);
+  }
+  .sheet-section { margin-bottom: var(--sp-4); }
+  .sheet-section-label {
+    font-size: var(--text-xs); font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.5px;
+    margin-bottom: var(--sp-2);
+  }
+  .sheet-options { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+  .sheet-option {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: var(--text-base); font-weight: 500;
+    color: var(--text-secondary);
+    background: var(--bg);
+    cursor: pointer;
+    transition: all 0.15s;
+    border: 1px solid var(--border);
+  }
+  .sheet-option:active { transform: scale(0.95); }
+  .sheet-option.selected {
+    background: var(--brand); color: white; border-color: var(--brand);
+  }
+  .sheet-confirm {
+    width: 100%; padding: 14px;
+    background: var(--brand); color: white;
+    border: none; border-radius: 12px;
+    font-size: var(--text-lg); font-weight: 600;
+    cursor: pointer; margin-top: var(--sp-3);
+    transition: opacity 0.2s;
+  }
+  .sheet-confirm:active { opacity: 0.8; }
+
+  /* =============================================
+     AI 搜问全屏弹窗
+     ============================================= */
+  /* ============================================================
+     AI 搜问全屏弹窗 — 浅色极简风格
+     ============================================================ */
+
+  /* 渐入动画 */
+  @keyframes aiPanelIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes aiPanelSlideUp {
+    from { transform: translateY(12px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  /* 打字动画 */
+  @keyframes typingDot {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-5px); opacity: 1; }
+  }
+  /* AI头像左右晃动 */
+  @keyframes subtleBob {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+
+  /* ---- Overlay ---- */
+  .ai-chat-overlay {
+    position: fixed; inset: 0; z-index: 99999;
+    background: #fff;
+    display: none; flex-direction: column;
+    animation: aiPanelIn 0.2s ease;
+  }
+  .ai-chat-overlay.show { display: flex; }
+
+  /* ---- 主面板 ---- */
+  .ai-chat-panel {
+    width: 100%; height: 100dvh;
+    background: #fff;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* ---- 顶部栏 ---- */
+  .ai-chat-top {
+    display: flex; flex-direction: column;
+    align-items: center;
+    padding: 24px 36px 16px;
+    background: #fff;
+    flex-shrink: 0;
+    position: relative; z-index: 2;
+  }
+
+  /* 顶部右侧按钮组(绝对定位右上) */
+  .ai-top-right-btns {
+    position: absolute; right: 16px; top: 16px;
+    display: flex; gap: 8px;
+  }
+  .ai-top-btn {
+    width: 34px; height: 34px; border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.08);
+    background: rgba(255,255,255,0.8);
+    color: #888;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; padding: 0;
+  }
+  .ai-top-btn svg { width: 16px; height: 16px; }
+  .ai-top-btn:hover {
+    background: #fff;
+    color: #007aff;
+    border-color: rgba(0,122,255,0.25);
+  }
+  .ai-top-btn:active { transform: scale(0.9); }
+  .ai-top-btn.active {
+    background: rgba(0,122,255,0.08);
+    color: #007aff;
+    border-color: rgba(0,122,255,0.3);
+  }
+
+  /* 头像区：大头像无圆底 */
+  .ai-chat-hero-avatar {
+    width: 88px; height: 88px;
+    cursor: pointer;
+    animation: subtleBob 2.8s ease-in-out infinite;
+    position: relative;
+    transition: transform 0.2s;
+  }
+  .ai-chat-hero-avatar:hover { transform: scale(1.06) translateX(-2px); }
+  .ai-chat-hero-avatar:active { transform: scale(0.96); }
+  .ai-chat-hero-avatar img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 4px;
+    filter: drop-shadow(0 4px 12px rgba(0,122,255,0.18));
+    transform-origin: center;
+  }
+  .ai-hero-avatar-hint {
+    position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%);
+    font-size: 10px; color: #007aff;
+    white-space: nowrap; opacity: 0;
+    transition: opacity 0.2s; pointer-events: none;
+  }
+  .ai-chat-hero-avatar:hover .ai-hero-avatar-hint { opacity: 1; }
+
+  /* 开场语 */
+  .ai-chat-greeting-line {
+    margin-top: 14px;
+    font-size: 15px; color: #333;
+    text-align: center; line-height: 1.6;
+    animation: aiPanelSlideUp 0.35s ease;
+  }
+  .ai-chat-greeting-line .greeting-name {
+    font-weight: 700; color: #1a1a2e;
+  }
+  .ai-chat-greeting-line .greeting-sub {
+    display: block; font-size: 13px; color: #999; margin-top: 3px;
+  }
+  .ai-chat-tabs { display: none; }
+
+  /* ---- 历史对话列表 ---- */
+  .ai-chat-history {
+    flex: 1; overflow-y: auto;
+    padding: 16px 36px;
+    max-width: 680px; margin: 0 auto; width: 100%; box-sizing: border-box;
+  }
+  .ai-chat-history::-webkit-scrollbar { width: 3px; }
+  .ai-chat-history::-webkit-scrollbar-track { background: transparent; }
+  .ai-chat-history::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.1); border-radius: 2px;
+  }
+  .ai-history-list { display: flex; flex-direction: column; gap: 8px; }
+  .ai-history-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px;
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .ai-history-item:hover {
+    background: rgba(0,122,255,0.03);
+    border-color: rgba(0,122,255,0.12);
+  }
+  .ai-history-item:active { background: rgba(0,122,255,0.06); }
+  .ai-history-avatar {
+    width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+    overflow: hidden;
+  }
+  .ai-history-avatar img {
+    width: 36px; height: 36px; border-radius: 50%;
+    object-fit: cover; background: #f0f4ff;
+  }
+  .ai-history-left { flex: 1; min-width: 0; }
+  .ai-history-title {
+    font-size: 14px; font-weight: 500;
+    color: #1a1a2e;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .ai-history-preview {
+    font-size: 12px; color: #999;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    margin-top: 2px;
+  }
+  .ai-history-right {
+    display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+    flex-shrink: 0;
+  }
+  .ai-history-time { font-size: 11px; color: #bbb; }
+  .ai-history-delete {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: transparent; border: none;
+    color: #ccc; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: all 0.2s;
+  }
+  .ai-history-delete:hover { background: rgba(255,59,48,0.08); color: #ff3b30; }
+  .ai-history-delete svg { width: 14px; height: 14px; }
+
+  /* ---- 中间内容 ---- */
+  .ai-chat-middle {
+    flex: 1; overflow-y: auto;
+    padding: 12px 36px 16px;
+    display: flex; flex-direction: column; gap: 6px;
+    max-width: 680px; margin: 0 auto;
+    width: 100%; box-sizing: border-box;
+  }
+  .ai-chat-middle::-webkit-scrollbar { width: 3px; }
+  .ai-chat-middle::-webkit-scrollbar-track { background: transparent; }
+  .ai-chat-middle::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.08); border-radius: 2px;
+  }
+
+  /* 推荐问题标签(保留在欢迎态) */
+  .ai-chat-recommends {
+    margin-top: 12px;
+    animation: aiPanelSlideUp 0.35s ease 0.08s both;
+  }
+  .ai-recommend-title {
+    font-size: 10px; font-weight: 600;
+    color: rgba(0,0,0,0.3);
+    text-transform: uppercase; letter-spacing: 1px;
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .ai-recommend-title::before {
+    content: '';
+    display: inline-block; width: 12px; height: 1px;
+    background: rgba(0,0,0,0.2);
+  }
+  .ai-recommend-list {
+    display: flex; flex-direction: row; flex-wrap: wrap; gap: 8px;
+  }
+  .ai-recommend-item {
+    background: rgba(0,122,255,0.05);
+    border: 1px solid rgba(0,122,255,0.14);
+    border-radius: 20px;
+    padding: 7px 13px;
+    font-size: 13px; line-height: 1.4;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .ai-recommend-item:hover {
+    background: rgba(0,122,255,0.1);
+    border-color: rgba(0,122,255,0.35);
+    color: #007aff;
+  }
+  .ai-recommend-item:active {
+    background: rgba(0,122,255,0.15);
+  }
+
+  /* ---- 消息区域 ---- */
+  .ai-messages-area {
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  /* 用户消息：右侧，头像在右 */
+  /* 用户消息：右侧，头像在右下方，时间在气泡下方右对齐 */
+  .ai-msg-user {
+    display: flex; flex-direction: column; align-items: flex-end;
+    margin-bottom: 18px;
+  }
+  .ai-msg-user .ai-msg-row {
+    display: flex; justify-content: flex-end; align-items: flex-start; gap: 8px;
+  }
+  .ai-msg-user .ai-msg-avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    overflow: hidden; flex-shrink: 0;
+    border: 1.5px solid rgba(0,122,255,0.25);
+  }
+  .ai-msg-user .ai-msg-avatar img {
+    width: 30px; height: 30px; border-radius: 50%;
+    object-fit: cover; background: #f0f4ff;
+  }
+  .ai-msg-user .ai-msg-bubble {
+    max-width: 72%;
+    background: linear-gradient(135deg, #007aff, #5856d6);
+    color: #fff;
+    border-radius: 18px 4px 18px 18px;
+    padding: 10px 15px;
+    font-size: 15px; line-height: 1.7;
+    box-shadow: 0 2px 10px rgba(0,122,255,0.2);
+  }
+  .ai-msg-user .ai-msg-time {
+    font-size: 10px; color: #bbb; margin-top: 4px; padding-right: 4px;
+    align-self: flex-end;
+  }
+  /* AI消息：左侧，头像在左 */
+  .ai-msg-ai {
+    display: flex; justify-content: flex-start; align-items: flex-start; gap: 8px;
+    margin-bottom: 18px;
+  }
+  .ai-msg-ai .ai-msg-avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    overflow: hidden; flex-shrink: 0;
+    border: 1.5px solid rgba(0,122,255,0.2);
+  }
+  .ai-msg-ai .ai-msg-avatar img {
+    width: 30px; height: 30px; border-radius: 50%;
+    object-fit: cover; background: #f0f4ff;
+  }
+  .ai-msg-ai .ai-msg-bubble {
+    max-width: 72%;
+    background: #fff;
+    color: #333;
+    border: 1px solid rgba(0,0,0,0.07);
+    border-radius: 4px 18px 18px 18px;
+    padding: 10px 15px;
+    font-size: 15px; line-height: 1.7;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+  }
+  .ai-msg-text { white-space: pre-wrap; }
+
+  /* AI头像+姓名块 */
+  .ai-msg-avatar-block {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    flex-shrink: 0;
+  }
+  .ai-msg-avatar-name {
+    font-size: 10px; color: #999; white-space: nowrap;
+    text-align: center; line-height: 1;
+  }
+
+  /* 打字指示器 */
+  .ai-typing-dots {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 0;
+  }
+  .ai-typing-dots span {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #bbb;
+    animation: typingDot 1.3s infinite;
+  }
+  .ai-typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .ai-typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+  /* ---- 底部输入区 ---- */
+  .ai-chat-bottom {
+    padding: 16px 20px 20px;
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
+    background: #fff;
+    flex-shrink: 0;
+    position: relative; z-index: 2;
+    display: flex; flex-direction: column; align-items: center;
+  }
+
+  /* 语音模式：键盘图标 + 胶囊按钮 */
+  .ai-voice-mode {
+    display: flex; align-items: center;
+    gap: 12px;
+  }
+  .ai-mode-toggle-btn {
+    width: 44px; height: 44px; border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.1);
+    background: rgba(255,255,255,0.9);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    padding: 0; flex-shrink: 0;
+  }
+  .ai-mode-toggle-btn svg { width: 20px; height: 20px; color: #666; }
+  .ai-mode-toggle-btn:hover {
+    background: #fff;
+    border-color: rgba(0,122,255,0.25);
+  }
+  .ai-mode-toggle-btn:hover svg { color: #007aff; }
+  .ai-mode-toggle-btn:active { transform: scale(0.9); }
+  .ai-voice-pill {
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px;
+    padding: 0 28px;
+    height: 52px;
+    border-radius: 26px;
+    border: none;
+    background: linear-gradient(135deg, #007aff, #5856d6);
+    color: #fff;
+    font-size: 15px; font-weight: 600;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 18px rgba(0,122,255,0.3);
+    user-select: none;
+    -webkit-user-select: none;
+    min-width: 160px;
+  }
+  .ai-voice-pill svg { width: 20px; height: 20px; flex-shrink: 0; }
+  .ai-voice-pill:active {
+    transform: scale(0.96);
+    box-shadow: 0 2px 10px rgba(0,122,255,0.25);
+  }
+  .ai-voice-pill.recording {
+    background: linear-gradient(135deg, #ff3b30, #ff6b6b);
+    box-shadow: 0 4px 20px rgba(255,59,48,0.4);
+    animation: pillRecordPulse 1s ease-in-out infinite;
+  }
+  @keyframes pillRecordPulse {
+    0%, 100% { box-shadow: 0 4px 20px rgba(255,59,48,0.4), 0 0 0 0 rgba(255,59,48,0.15); }
+    50% { box-shadow: 0 4px 20px rgba(255,59,48,0.5), 0 0 0 10px rgba(255,59,48,0.08); }
+  }
+  .ai-voice-hint {
+    font-size: 12px; color: #999; font-weight: 500;
+  }
+
+  /* 文字模式：输入框+发送 */
+  .ai-text-mode {
+    width: 100%; max-width: 680px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .ai-text-kbd-toggle {
+    width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+    border: 1px solid rgba(0,0,0,0.08);
+    background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.2s; padding: 0;
+  }
+  .ai-text-kbd-toggle svg { width: 18px; height: 18px; color: #888; }
+  .ai-text-kbd-toggle:hover {
+    color: #007aff; border-color: rgba(0,122,255,0.25);
+  }
+  .ai-text-input-wrap {
+    flex: 1; min-width: 0;
+    display: flex; align-items: center;
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 22px;
+    padding: 0 6px 0 16px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .ai-text-input-wrap:focus-within {
+    border-color: rgba(0,122,255,0.4);
+    box-shadow: 0 0 0 3px rgba(0,122,255,0.08);
+  }
+  .ai-text-input {
+    flex: 1; min-width: 0;
+    background: transparent; border: none; outline: none;
+    color: #1a1a2e; font-size: 15px;
+    padding: 12px 8px;
+    caret-color: #007aff;
+  }
+  .ai-text-input::placeholder { color: #bbb; }
+  .ai-send-btn {
+    width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, #007aff, #5856d6);
+    border: none;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 10px rgba(0,122,255,0.25);
+  }
+  .ai-send-btn svg { width: 16px; height: 16px; color: #fff; }
+  .ai-send-btn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 4px 16px rgba(0,122,255,0.35);
+  }
+  .ai-send-btn:active { transform: scale(0.92); }
+
+  /* =============================================
+     AI 头像切换浮层
+     ============================================= */
+  .ai-avatar-picker-overlay {
+    position: fixed; inset: 0; z-index: 999999;
+    background: rgba(240,244,255,0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    display: none; align-items: flex-end; justify-content: center;
+    animation: aiPanelIn 0.2s ease;
+  }
+  .ai-avatar-picker-overlay.show { display: flex; }
+  .ai-avatar-picker-sheet {
+    width: 100%; max-width: 680px;
+    background: #fff;
+    border-radius: 24px 24px 0 0;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-bottom: none;
+    padding: 20px 20px 32px;
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 32px);
+    box-shadow: 0 -4px 40px rgba(0,0,0,0.1);
+  }
+  .ai-picker-handle {
+    width: 40px; height: 4px; border-radius: 2px;
+    background: rgba(0,0,0,0.12); margin: 0 auto 20px;
+  }
+  .ai-picker-title {
+    font-size: 18px; font-weight: 700;
+    color: #1a1a2e; text-align: center; margin-bottom: 20px;
+  }
+  .ai-picker-confirm-btn {
+    width: 100%; margin-top: 16px;
+    padding: 14px;
+    background: linear-gradient(135deg, #007aff, #5856d6);
+    color: #fff; border: none; border-radius: 14px;
+    font-size: 15px; font-weight: 600;
+    cursor: pointer; letter-spacing: 0.5px;
+    transition: all 0.2s;
+    box-shadow: 0 4px 16px rgba(0,122,255,0.25);
+  }
+  .ai-picker-confirm-btn:hover {
+    box-shadow: 0 6px 24px rgba(0,122,255,0.35);
+    transform: translateY(-1px);
+  }
+  .ai-picker-confirm-btn:active { opacity: 0.85; transform: none; }
+  .ai-picker-section { margin-bottom: 20px; }
+  .ai-picker-section-title {
+    font-size: 11px; font-weight: 600;
+    color: rgba(0,0,0,0.35); text-transform: uppercase; letter-spacing: 1px;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .ai-picker-section-title::before {
+    content: ''; display: inline-block;
+    width: 14px; height: 1px;
+    background: rgba(0,0,0,0.2);
+  }
+
+  /* 复用的头像行/项样式（picker 也用） */
+  .ai-avatar-row {
+    display: flex; gap: 14px;
+    overflow-x: auto; padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .ai-avatar-row::-webkit-scrollbar { display: none; }
+  .ai-avatar-item {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 7px;
+    cursor: pointer; flex-shrink: 0;
+    transition: transform 0.15s;
+  }
+  .ai-avatar-item:active { transform: scale(0.95); }
+  .ai-avatar-img {
+    width: 56px; height: 56px; border-radius: 50%;
+    object-fit: cover; border: 2px solid transparent;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: #f0f4ff;
+  }
+  .ai-avatar-item.selected .ai-avatar-img {
+    border-color: #007aff;
+    box-shadow: 0 0 0 3px rgba(0,122,255,0.2);
+  }
+  .ai-avatar-name {
+    font-size: 11px; color: #999;
+    text-align: center; max-width: 56px;
+    display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .ai-avatar-item.selected .ai-avatar-name { color: #007aff; font-weight: 600; }
+
+  /* AI人物信息卡片（复用） */
+  .ai-info-card {
+    background: rgba(0,122,255,0.04);
+    border: 1px solid rgba(0,122,255,0.12);
+    border-radius: 16px; padding: 16px;
+    display: flex; animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .ai-info-avatar {
+    width: 60px; height: 60px; border-radius: 50%; object-fit: cover;
+    flex-shrink: 0;
+    border: 2px solid rgba(0,122,255,0.25);
+    margin-right: 14px;
+    background: #f0f4ff;
+  }
+  .ai-info-content { flex: 1; min-width: 0; }
+  .ai-info-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .ai-info-name { font-size: 16px; font-weight: 700; color: #1a1a2e; }
+  .ai-info-badge {
+    font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 10px;
+    background: rgba(0,122,255,0.1); color: #007aff;
+  }
+  .ai-info-title { font-size: 12px; color: #999; margin-bottom: 6px; }
+  .ai-info-desc { font-size: 13px; color: #666; line-height: 1.5; margin-bottom: 8px; }
+  .ai-info-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .ai-info-tag {
+    font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: 8px;
+    background: rgba(88,86,214,0.1); color: #5856d6;
+  }
+  .ai-start-btn {
+    width: 100%; padding: 14px;
+    background: linear-gradient(135deg, #007aff, #5856d6);
+    color: white; border: none; border-radius: 14px;
+    font-size: 16px; font-weight: 600;
+    cursor: pointer; margin-top: 12px;
+    transition: all 0.2s;
+    box-shadow: 0 4px 16px rgba(0,122,255,0.25);
+  }
+  .ai-start-btn:hover {
+    box-shadow: 0 6px 24px rgba(0,122,255,0.35);
+    transform: translateY(-1px);
+  }
+  .ai-start-btn:active { opacity: 0.85; transform: none; }
+
+
+  /* =============================================
+     悬浮岛底部Tab栏
+     ============================================= */
+  .floating-tab-bar {
+    position: fixed;
+    bottom: var(--tab-inset-bottom);
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 40px);
+    max-width: 390px;
+    height: var(--tab-height);
+    background: var(--tab-bg);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-radius: var(--tab-radius);
+    box-shadow: var(--tab-shadow);
+    display: flex;
+    align-items: center;
+    padding: 0 6px;
+    will-change: transform;
+    z-index: 9999;
+    border-top: 0.5px solid rgba(255,255,255,0.6);
+  }
+
+  /* Tab 每一项 */
+  .tab-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    height: 56px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .tab-item:active { transform: scale(0.93); }
+
+  /* 图标 */
+  .tab-item svg {
+    width: 23px;
+    height: 23px;
+    transition: all 0.2s;
+  }
+
+  /* 文字 */
+  .tab-item .tab-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    transition: all 0.2s;
+  }
+
+  /* 未选中 */
+  .tab-item.inactive svg { color: var(--text-muted); }
+  .tab-item.inactive .tab-label { color: var(--text-muted); }
+
+  /* 选中态 */
+  .tab-item.active svg { color: var(--brand); }
+  .tab-item.active .tab-label { color: var(--brand); font-weight: 600; }
+
+  /* 选中态背景高亮 */
+  .tab-item.active::before {
+    content: '';
+    position: absolute;
+    inset: 4px 10px;
+    background: var(--brand-light);
+    border-radius: 16px;
+    z-index: -1;
+  }
+
+  /* 中间 Tab — 任务/发布按钮 */
+  .tab-item.center-tab { position: relative; }
+
+  .tab-item.center-tab .icon-wrap {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: var(--brand);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(45,200,156,0.45);
+    margin-top: -10px;
+    transition: all 0.2s;
+  }
+
+  .tab-item.center-tab .icon-wrap svg { color: white; width: 22px; height: 22px; }
+
+  .tab-item.center-tab.active::before { display: none; }
+  .tab-item.center-tab.active .icon-wrap {
+    box-shadow: 0 6px 20px rgba(45,200,156,0.55);
+    transform: scale(1.08);
+  }
+
+  .tab-item.center-tab .tab-label {
+    color: var(--brand);
+    font-weight: 600;
+    margin-top: 2px;
+    font-size: 10px;
+  }
+
+  /* 深色模式 */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1C1C1E;
+      --surface: #2C2C2E;
+      --text-primary: #FFFFFF;
+      --text-secondary: #ABABAB;
+      --text-muted: #636366;
+      --border: #3A3A3C;
+      --tab-bg: rgba(44,44,46,0.88);
+      --brand-light: rgba(45,200,156,0.18);
+    }
+    .info-card, .tip-card { box-shadow: 0 1px 6px rgba(0,0,0,0.3); }
+    .floating-tab-bar { border-top-color: rgba(255,255,255,0.1); }
+    .tip-card { color: #6FE3B4; }
+  }
+
+  @media (min-width: 500px) {
+    body { border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
+  }
+
+  /* =============================================
+     悬浮岛底部Tab栏
+     ============================================= */
+  .floating-tab-bar {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 40px);
+    max-width: 390px;
+    height: 68px;
+    background: rgba(255,255,255,0.88);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-radius: 28px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+    display: flex;
+    align-items: center;
+    padding: 0 6px;
+    z-index: 9999;
+    border-top: 0.5px solid rgba(255,255,255,0.6);
+  }
+
+  .tab-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    height: 56px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .tab-item:active { transform: scale(0.93); }
+
+  .tab-item svg {
+    width: 23px;
+    height: 23px;
+    transition: all 0.2s;
+  }
+
+  .tab-item .tab-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    transition: all 0.2s;
+  }
+
+  .tab-item.inactive svg { color: var(--text-muted); }
+  .tab-item.inactive .tab-label { color: var(--text-muted); }
+
+  .tab-item.active svg { color: var(--brand); }
+  .tab-item.active .tab-label { color: var(--brand); font-weight: 600; }
+
+  .tab-item.active::before {
+    content: '';
+    position: absolute;
+    inset: 4px 10px;
+    background: rgba(45,200,156,0.12);
+    border-radius: 16px;
+    z-index: -1;
+  }
+
+  .tab-item.center-tab { position: relative; }
+
+  .tab-item.center-tab .icon-wrap {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: var(--brand);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(45,200,156,0.45);
+    margin-top: -10px;
+    transition: all 0.2s;
+  }
+
+  .tab-item.center-tab .icon-wrap svg { color: white; width: 22px; height: 22px; }
+
+  .tab-item.center-tab.active::before { display: none; }
+  .tab-item.center-tab.active .icon-wrap {
+    box-shadow: 0 6px 20px rgba(45,200,156,0.55);
+    transform: scale(1.08);
+  }
+
+  .tab-item.center-tab .tab-label {
+    color: var(--brand);
+    font-weight: 600;
+    margin-top: 2px;
+    font-size: 10px;
+  }
+
+  @supports (padding-bottom: env(safe-area-inset-bottom)) {
+    .floating-tab-bar { bottom: calc(20px + env(safe-area-inset-bottom)); }
+    .content { padding-bottom: calc(120px + env(safe-area-inset-bottom)); }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-wrapper">
+
+  <!-- 状态栏 -->
+  <div class="status-bar">
+    <span class="status-time" id="statusTime">9:41</span>
+    <div class="status-icons">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 17h2v4H2zM7 15h2v6H7zM12 13h2v8h-2zM17 15h2v6h-2zM22 17h2v4h-2z"/></svg>
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C7.46 3 3.34 4.78.29 7.67c-.18.18-.29.43-.29.71 0 .28.11.53.29.71l2.48 2.48c.18.18.43.29.71.29.27 0 .52-.11.7-.28.79-.74 1.69-1.36 2.66-1.85.33-.16.56-.5.56-.9v-3.1c1.45-.48 3-.73 4.6-.73s3.15.25 4.6.72v3.1c0 .39.23.74.56.9.98.49 1.87 1.12 2.67 1.85.18.18.43.28.7.28.28 0 .53-.11.71-.29l2.48-2.48c.18-.18.29-.43.29-.71 0-.28-.11-.53-.29-.71C20.66 4.78 16.54 3 12 3z"/><circle cx="12" cy="18" r="3"/></svg>
+      <svg viewBox="0 0 27 13" fill="currentColor"><rect x="0" y="0" width="27" height="13" rx="3" ry="3" fill="none" stroke="currentColor" stroke-width="1"/><rect x="2" y="2" width="18" height="9" rx="1" ry="1" fill="currentColor"/><path d="M24 5.5a2 2 0 1 1-2 2 2 2 0 0 1 2-2z"/></svg>
+    </div>
+  </div>
+
+  <!-- 内容区 -->
+  <div class="content">
+
+    <!-- 筛选器（年级 + 学科，两行）+ AI搜索 -->
+    <div class="filter-ai-row">
+      <!-- 左侧：年级 + 学科 -->
+      <div class="filter-group">
+        <div class="filter-scroll" style="margin-bottom: var(--sp-2);">
+          <div class="filter-chip" id="gradeFilter" onclick="showGradeSheet()">
+            <span id="gradeFilterLabel">八年级 上册 · 人教版</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </div>
+        </div>
+        <div class="filter-scroll">
+          <div class="filter-chip active" data-subject="math" onclick="selectSubject(this)">数学</div>
+          <div class="filter-chip" data-subject="chinese" onclick="selectSubject(this)">语文</div>
+          <div class="filter-chip" data-subject="english" onclick="selectSubject(this)">英语</div>
+        </div>
+      </div>
+      <!-- 右侧：AI搜问按钮 -->
+      <div class="ai-search-btn" onclick="showAIChatPanel()">
+        <img class="ai-search-avatar" id="aiSearchBtnAvatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Gauss459" alt="AI">
+        <div class="ai-search-text">AI搜问</div>
+      </div>
+    </div>
+
+    <!-- 知识点模块 -->
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+      </svg>
+      知识点
+    </div>
+
+    <!-- 知识点卡片 -->
+    <div class="knowledge-card">
+      <!-- 左侧章列表 -->
+      <div class="knowledge-card-left" id="chapterSidebar">
+        <div class="chapter-btn active" data-chapter="1" onclick="switchChapter(1)">第一章</div>
+        <div class="chapter-btn" data-chapter="2" onclick="switchChapter(2)">第二章</div>
+        <div class="chapter-btn" data-chapter="3" onclick="switchChapter(3)">第三章</div>
+        <div class="chapter-btn" data-chapter="4" onclick="switchChapter(4)">第四章</div>
+        <div class="chapter-btn" data-chapter="5" onclick="switchChapter(5)">第五章</div>
+        <div class="chapter-btn" data-chapter="6" onclick="switchChapter(6)">第六章</div>
+        <div class="chapter-btn" data-chapter="7" onclick="switchChapter(7)">第七章</div>
+      </div>
+
+      <!-- 右侧内容区 -->
+      <div class="knowledge-card-right">
+        <div class="chapter-header">
+          <div class="chapter-header-title" id="chapterTitle">二次根式</div>
+          <div class="chapter-sections" id="chapterSections">共5节 · 3个重点</div>
+        </div>
+        <div class="knowledge-card-list" id="knowledgeList">
+        </div>
+      </div>
+    </div>
+
+    <!-- 订阅专栏 -->
+    <div class="section-title" style="margin-top: var(--sp-5);">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+      </svg>
+      订阅专栏
+      <svg class="section-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" onclick="location.href='subscribe.html'">
+        <path d="M9 18l6-6-6-6"/>
+      </svg>
+    </div>
+
+    <!-- 张老师 -->
+    <div class="subscribe-card">
+      <div class="subscribe-header">
+        <img class="teacher-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=teacher-zhang&backgroundColor=b6e3f4" alt="张明远">
+        <div class="teacher-info">
+          <div class="teacher-name-row">
+            <span class="teacher-name">张明远</span>
+            <span class="teacher-role teacher">数学老师</span>
+          </div>
+          <div class="teacher-school">华师一附中 · 八年级3班</div>
+        </div>
+        <div class="subscribe-header-right">今天</div>
+      </div>
+      <div class="update-list">
+        <div class="update-item" onclick="location.href='knowledge-detail.html'">
+          <div class="update-icon knowledge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+            </svg>
+          </div>
+          <div class="update-info">
+            <div class="update-chapter">第一章 · 二次根式</div>
+            <div class="update-title">二次根式化简的常用技巧</div>
+          </div>
+          <div class="update-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        </div>
+        <div class="update-item" onclick="location.href='exercise-detail.html'">
+          <div class="update-icon exercise">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+          </div>
+          <div class="update-info">
+            <div class="update-chapter">第一章 · 二次根式</div>
+            <div class="update-title">二次根式计算专项练习题讲解：
+(1) √12·√3 (2) √8÷√2 (3) 化简(√5+√3)(√5-√3)</div>
+            <div class="update-meta">
+              <span class="exercise-stars level3">
+                <span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span><span class="star">★</span><span class="star">★</span>
+              </span>
+              <span class="exercise-tag-label">综合运用</span>
+            </div>
+          </div>
+          <div class="update-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 李老师 -->
+    <div class="subscribe-card">
+      <div class="subscribe-header">
+        <img class="teacher-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=teacher-li&backgroundColor=c0aede" alt="李芳">
+        <div class="teacher-info">
+          <div class="teacher-name-row">
+            <span class="teacher-name">李芳</span>
+            <span class="teacher-role teacher">语文老师</span>
+          </div>
+          <div class="teacher-school">华师一附中</div>
+        </div>
+        <div class="subscribe-header-right">昨天</div>
+      </div>
+      <div class="update-list">
+        <div class="update-item" onclick="location.href='exercise-detail.html'">
+          <div class="update-icon exercise">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+          </div>
+          <div class="update-info">
+            <div class="update-chapter">第二章 · 一元二次方程</div>
+            <div class="update-title">一元二次方程典型错题分析：
+x²-5x=0 用公式法时，你注意到判别式了吗？</div>
+            <div class="update-meta">
+              <span class="exercise-stars level1">
+                <span class="star filled">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+              </span>
+              <span class="exercise-tag-label">易错题</span>
+            </div>
+          </div>
+          <div class="update-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 王同学（学生，不标角色） -->
+    <div class="subscribe-card">
+      <div class="subscribe-header">
+        <img class="teacher-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=student-wang&backgroundColor=ffd5dc" alt="王小明">
+        <div class="teacher-info">
+          <div class="teacher-name-row">
+            <span class="teacher-name">王小明</span>
+          </div>
+          <div class="teacher-school">武汉二中 · 七年级5班</div>
+        </div>
+        <div class="subscribe-header-right">1周前</div>
+      </div>
+      <div class="update-list">
+        <div class="update-item" onclick="location.href='knowledge-detail.html'">
+          <div class="update-icon knowledge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+            </svg>
+          </div>
+          <div class="update-info">
+            <div class="update-chapter">第二章 · 一元二次方程</div>
+            <div class="update-title">我是如何理解配方法的</div>
+          </div>
+          <div class="update-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- 陈老师 -->
+    <div class="subscribe-card">
+      <div class="subscribe-header">
+        <img class="teacher-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=teacher-chen&backgroundColor=ffdfbf" alt="陈建华">
+        <div class="teacher-info">
+          <div class="teacher-name-row">
+            <span class="teacher-name">陈建华</span>
+            <span class="teacher-role teacher">物理老师</span>
+          </div>
+          <div class="teacher-school">武汉外国语学校 · 九年级2班</div>
+        </div>
+        <div class="subscribe-header-right">2天前</div>
+      </div>
+      <div class="update-list">
+        <div class="update-item" onclick="location.href='knowledge-detail.html'">
+          <div class="update-icon knowledge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+            </svg>
+          </div>
+          <div class="update-info">
+            <div class="update-chapter">第三章 · 电学基础</div>
+            <div class="update-title">欧姆定律的三种表达方式及应用场景</div>
+          </div>
+          <div class="update-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        </div>
+        <div class="update-item" onclick="location.href='exercise-detail.html'">
+          <div class="update-icon exercise">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+          </div>
+          <div class="update-info">
+            <div class="update-chapter">第三章 · 电学基础</div>
+            <div class="update-title">串联电路计算专项：已知R1=10Ω，R2=20Ω，电源电压12V，求总电流</div>
+            <div class="update-meta">
+              <span class="exercise-stars level2">
+                <span class="star filled">★</span><span class="star filled">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+              </span>
+              <span class="exercise-tag-label">基础训练</span>
+            </div>
+          </div>
+          <div class="update-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 刘老师 -->
+    <div class="subscribe-card">
+      <div class="subscribe-header">
+        <img class="teacher-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=teacher-liu&backgroundColor=d1f4e0" alt="刘美玲">
+        <div class="teacher-info">
+          <div class="teacher-name-row">
+            <span class="teacher-name">刘美玲</span>
+            <span class="teacher-role teacher">英语老师</span>
+          </div>
+          <div class="teacher-school">武汉二中 · 八年级7班</div>
+        </div>
+        <div class="subscribe-header-right">3天前</div>
+      </div>
+      <div class="update-list">
+        <div class="update-item" onclick="location.href='knowledge-detail.html'">
+          <div class="update-icon knowledge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+            </svg>
+          </div>
+          <div class="update-info">
+            <div class="update-chapter">Unit 5 · 现在完成时</div>
+            <div class="update-title">现在完成时 vs 一般过去时的区别与用法</div>
+          </div>
+          <div class="update-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 赵同学 -->
+    <div class="subscribe-card">
+      <div class="subscribe-header">
+        <img class="teacher-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=student-zhao&backgroundColor=c0aede" alt="赵雨萱">
+        <div class="teacher-info">
+          <div class="teacher-name-row">
+            <span class="teacher-name">赵雨萱</span>
+          </div>
+          <div class="teacher-school">华师一附中 · 八年级1班</div>
+        </div>
+        <div class="subscribe-header-right">4天前</div>
+      </div>
+      <div class="update-list">
+        <div class="update-item" onclick="location.href='exercise-detail.html'">
+          <div class="update-icon exercise">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+          </div>
+          <div class="update-info">
+            <div class="update-chapter">第一章 · 整式的乘除</div>
+            <div class="update-title">幂的运算易错题解析：(-a²)³ 与 -a⁶ 的区别</div>
+            <div class="update-meta">
+              <span class="exercise-stars level1">
+                <span class="star filled">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+              </span>
+              <span class="exercise-tag-label">易错题</span>
+            </div>
+          </div>
+          <div class="update-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 周老师 -->
+    <div class="subscribe-card">
+      <div class="subscribe-header">
+        <img class="teacher-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=teacher-zhou&backgroundColor=b6e3f4" alt="周志强">
+        <div class="teacher-info">
+          <div class="teacher-name-row">
+            <span class="teacher-name">周志强</span>
+            <span class="teacher-role teacher">化学老师</span>
+          </div>
+          <div class="teacher-school">武汉外国语学校</div>
+        </div>
+        <div class="subscribe-header-right">5天前</div>
+      </div>
+      <div class="update-list">
+        <div class="update-item" onclick="location.href='knowledge-detail.html'">
+          <div class="update-icon knowledge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+            </svg>
+          </div>
+          <div class="update-info">
+            <div class="update-chapter">第四章 · 酸碱盐</div>
+            <div class="update-title">酸碱指示剂的变色规律总结</div>
+          </div>
+          <div class="update-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        </div>
+        <div class="update-item" onclick="location.href='exercise-detail.html'">
+          <div class="update-icon exercise">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+          </div>
+          <div class="update-info">
+            <div class="update-chapter">第四章 · 酸碱盐</div>
+            <div class="update-title">化学方程式配平技巧：观察法与最小公倍数法</div>
+            <div class="update-meta">
+              <span class="exercise-stars level3">
+                <span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span><span class="star">★</span><span class="star">★</span>
+              </span>
+              <span class="exercise-tag-label">综合运用</span>
+            </div>
+          </div>
+          <div class="update-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 孙同学 -->
+    <div class="subscribe-card">
+      <div class="subscribe-header">
+        <img class="teacher-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=student-sun&backgroundColor=ffd5dc" alt="孙浩然">
+        <div class="teacher-info">
+          <div class="teacher-name-row">
+            <span class="teacher-name">孙浩然</span>
+          </div>
+          <div class="teacher-school">武汉二中 · 九年级3班</div>
+        </div>
+        <div class="subscribe-header-right">1周前</div>
+      </div>
+      <div class="update-list">
+        <div class="update-item" onclick="location.href='knowledge-detail.html'">
+          <div class="update-icon knowledge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3-332.477-4.5 1.253"/>
+            </svg>
+          </div>
+          <div class="update-info">
+            <div class="update-chapter">第二章 · 圆</div>
+            <div class="update-title">圆的切线证明思路分享：连接半径+垂直判定</div>
+          </div>
+          <div class="update-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 吴老师 -->
+    <div class="subscribe-card">
+      <div class="subscribe-header">
+        <img class="teacher-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=teacher-wu&backgroundColor=ffdfbf" alt="吴文静">
+        <div class="teacher-info">
+          <div class="teacher-name-row">
+            <span class="teacher-name">吴文静</span>
+            <span class="teacher-role teacher">历史老师</span>
+          </div>
+          <div class="teacher-school">华师一附中 · 七年级5班</div>
+        </div>
+        <div class="subscribe-header-right">1周前</div>
+      </div>
+      <div class="update-list">
+        <div class="update-item" onclick="location.href='knowledge-detail.html'">
+          <div class="update-icon knowledge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+            </svg>
+          </div>
+          <div class="update-info">
+            <div class="update-chapter">第三单元 · 秦汉时期</div>
+            <div class="update-title">秦始皇巩固统一的措施思维导图</div>
+          </div>
+          <div class="update-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 郑同学 -->
+    <div class="subscribe-card">
+      <div class="subscribe-header">
+        <img class="teacher-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=student-zheng&backgroundColor=b6e3f4" alt="郑思琪">
+        <div class="teacher-info">
+          <div class="teacher-name-row">
+            <span class="teacher-name">郑思琪</span>
+          </div>
+          <div class="teacher-school">武汉外国语学校 · 七年级2班</div>
+        </div>
+        <div class="subscribe-header-right">1周前</div>
+      </div>
+      <div class="update-list">
+        <div class="update-item" onclick="location.href='exercise-detail.html'">
+          <div class="update-icon exercise">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+          </div>
+          <div class="update-info">
+            <div class="update-chapter">第一章 · 有理数</div>
+            <div class="update-title">绝对值化简技巧：分类讨论法的应用</div>
+            <div class="update-meta">
+              <span class="exercise-stars level2">
+                <span class="star filled">★</span><span class="star filled">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+              </span>
+              <span class="exercise-tag-label">方法技巧</span>
+            </div>
+          </div>
+          <div class="update-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 钱老师 -->
+    <div class="subscribe-card">
+      <div class="subscribe-header">
+        <img class="teacher-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=teacher-qian&backgroundColor=d1f4e0" alt="钱伟民">
+        <div class="teacher-info">
+          <div class="teacher-name-row">
+            <span class="teacher-name">钱伟民</span>
+            <span class="teacher-role teacher">生物老师</span>
+          </div>
+          <div class="teacher-school">武汉二中</div>
+        </div>
+        <div class="subscribe-header-right">2周前</div>
+      </div>
+      <div class="update-list">
+        <div class="update-item" onclick="location.href='knowledge-detail.html'">
+          <div class="update-icon knowledge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+            </svg>
+          </div>
+          <div class="update-info">
+            <div class="update-chapter">第二章 · 细胞</div>
+            <div class="update-title">动植物细胞结构对比表格（附记忆口诀）</div>
+          </div>
+          <div class="update-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 冯同学 -->
+    <div class="subscribe-card">
+      <div class="subscribe-header">
+        <img class="teacher-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=student-feng&backgroundColor=c0aede" alt="冯子轩">
+        <div class="teacher-info">
+          <div class="teacher-name-row">
+            <span class="teacher-name">冯子轩</span>
+          </div>
+          <div class="teacher-school">华师一附中 · 九年级6班</div>
+        </div>
+        <div class="subscribe-header-right">2周前</div>
+      </div>
+      <div class="update-list">
+        <div class="update-item" onclick="location.href='exercise-detail.html'">
+          <div class="update-icon exercise">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+          </div>
+          <div class="update-info">
+            <div class="update-chapter">第三章 · 函数</div>
+            <div class="update-title">一次函数与反比例函数综合题：求交点坐标</div>
+            <div class="update-meta">
+              <span class="exercise-stars level4">
+                <span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span><span class="star">★</span>
+              </span>
+              <span class="exercise-tag-label">压轴题</span>
+            </div>
+          </div>
+          <div class="update-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 杨老师 -->
+    <div class="subscribe-card">
+      <div class="subscribe-header">
+        <img class="teacher-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=teacher-yang&backgroundColor=ffd5dc" alt="杨丽华">
+        <div class="teacher-info">
+          <div class="teacher-name-row">
+            <span class="teacher-name">杨丽华</span>
+            <span class="teacher-role teacher">地理老师</span>
+          </div>
+          <div class="teacher-school">武汉外国语学校 · 七年级4班</div>
+        </div>
+        <div class="subscribe-header-right">2周前</div>
+      </div>
+      <div class="update-list">
+        <div class="update-item" onclick="location.href='knowledge-detail.html'">
+          <div class="update-icon knowledge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+            </svg>
+          </div>
+          <div class="update-info">
+            <div class="update-chapter">第一章 · 地球和地图</div>
+            <div class="update-title">经纬度判读技巧：东增东经，西增西经</div>
+          </div>
+          <div class="update-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        </div>
+        <div class="update-item" onclick="location.href='exercise-detail.html'">
+          <div class="update-icon exercise">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+          </div>
+          <div class="update-info">
+            <div class="update-chapter">第一章 · 地球和地图</div>
+            <div class="update-title">等高线地形图判读：山谷、山脊、鞍部识别方法</div>
+            <div class="update-meta">
+              <span class="exercise-stars level3">
+                <span class="star filled">★</span><span class="star filled">★</span><span class="star filled">★</span><span class="star">★</span><span class="star">★</span>
+              </span>
+              <span class="exercise-tag-label">读图训练</span>
+            </div>
+          </div>
+          <div class="update-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end .content -->
+
+</div><!-- end .page-wrapper -->
+
+<!-- 年级/教材版本选择弹窗 -->
+<div class="bottom-sheet-overlay" id="gradeSheet">
+  <div class="bottom-sheet" onclick="event.stopPropagation()">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">选择年级和教材版本</div>
+
+    <div class="sheet-section">
+      <div class="sheet-section-label">年级</div>
+      <div class="sheet-options">
+        <div class="sheet-option" data-grade="七年级" onclick="toggleSheetOption(this, 'grade')">七年级</div>
+        <div class="sheet-option selected" data-grade="八年级" onclick="toggleSheetOption(this, 'grade')">八年级</div>
+        <div class="sheet-option" data-grade="九年级" onclick="toggleSheetOption(this, 'grade')">九年级</div>
+      </div>
+    </div>
+
+    <div class="sheet-section">
+      <div class="sheet-section-label">册别</div>
+      <div class="sheet-options">
+        <div class="sheet-option selected" data-book="上册" onclick="toggleSheetOption(this, 'book')">上册</div>
+        <div class="sheet-option" data-book="下册" onclick="toggleSheetOption(this, 'book')">下册</div>
+      </div>
+    </div>
+
+    <div class="sheet-section">
+      <div class="sheet-section-label">教材版本</div>
+      <div class="sheet-options">
+        <div class="sheet-option selected" data-version="人教版" onclick="toggleSheetOption(this, 'version')">人教版</div>
+        <div class="sheet-option" data-version="北师大版" onclick="toggleSheetOption(this, 'version')">北师大版</div>
+        <div class="sheet-option" data-version="苏教版" onclick="toggleSheetOption(this, 'version')">苏教版</div>
+        <div class="sheet-option" data-version="沪科版" onclick="toggleSheetOption(this, 'version')">沪科版</div>
+        <div class="sheet-option" data-version="浙教版" onclick="toggleSheetOption(this, 'version')">浙教版</div>
+        <div class="sheet-option" data-version="湘教版" onclick="toggleSheetOption(this, 'version')">湘教版</div>
+      </div>
+    </div>
+
+    <button class="sheet-confirm" onclick="confirmGrade()">确定</button>
+  </div>
+</div>
+
+<!-- =============================================
+     AI 搜问全屏弹窗
+     ============================================= -->
+<div class="ai-chat-overlay" id="aiChatPanel">
+  <div class="ai-chat-panel">
+
+    <!-- 顶部：大头像 + 开场语 + 右侧按钮 -->
+    <div class="ai-chat-top">
+      <div class="ai-top-right-btns">
+        <button class="ai-top-btn" id="aiTabHistory" onclick="switchAITab('history')" title="历史对话">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
+        </button>
+        <button class="ai-top-btn" id="aiTabNew" onclick="switchAITab('new')" title="新建对话">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <button class="ai-top-btn" onclick="hideAIChatPanel()" title="收起">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+        </button>
+      </div>
+      <div class="ai-chat-hero-avatar" onclick="showAIAvatarPicker()">
+        <img id="aiChatHeroAvatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Gauss459" alt="AI">
+        <div class="ai-hero-avatar-hint">点击切换</div>
+      </div>
+      <div class="ai-chat-greeting-line" id="aiGreetingLine">
+        <span class="greeting-name" id="aiGreetingName">你好，我是牛顿</span>
+        <span class="greeting-sub" id="aiGreetingSub">有什么问题尽管问我，也可以搜点东西~</span>
+      </div>
+    </div>
+
+    <!-- 中间：对话区 -->
+    <div class="ai-chat-middle" id="aiChatMiddle">
+      <!-- 欢迎界面：推荐问题 -->
+      <div id="aiWelcomeSection">
+        <div class="ai-chat-recommends">
+          <div class="ai-recommend-title">试试这样问我</div>
+          <div class="ai-recommend-list" id="aiRecommendList">
+            <div class="ai-recommend-item" onclick="askRecommend(this)">二次函数图像开口方向怎么判断？</div>
+            <div class="ai-recommend-item" onclick="askRecommend(this)">勾股定理的证明方法有哪些？</div>
+            <div class="ai-recommend-item" onclick="askRecommend(this)">一元二次方程怎么快速求根？</div>
+          </div>
+        </div>
+      </div>
+      <!-- 消息区域 -->
+      <div class="ai-messages-area" id="aiMessagesArea"></div>
+    </div>
+
+    <!-- 中间：历史对话列表 -->
+    <div class="ai-chat-history" id="aiChatHistory" style="display:none;">
+      <div class="ai-history-list" id="aiHistoryList"></div>
+    </div>
+
+    <!-- 底部：输入区 -->
+    <div class="ai-chat-bottom">
+      <!-- 语音模式：键盘图标 + 胶囊按钮 -->
+      <div class="ai-voice-mode" id="aiVoiceMode">
+        <button class="ai-mode-toggle-btn" onclick="switchToTextMode()" title="切换文字输入">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="14" rx="2"/><line x1="6" y1="8" x2="18" y2="8"/><line x1="6" y1="11" x2="14" y2="11"/></svg>
+        </button>
+        <button class="ai-voice-pill" id="aiVoicePill"
+          onmousedown="startVoice()" onmouseup="stopVoice()" ontouchstart="startVoice()" ontouchend="stopVoice()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
+          <span id="aiVoiceLabel">按住说话</span>
+        </button>
+      </div>
+      <!-- 文字模式 -->
+      <div class="ai-text-mode" id="aiTextMode" style="display:none;">
+        <button class="ai-text-kbd-toggle" onclick="switchToVoiceMode()" title="切换语音">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
+        </button>
+        <div class="ai-text-input-wrap">
+          <input class="ai-text-input" id="aiTextInput" type="text" placeholder="向AI助教提问..." onkeydown="if(event.key==='Enter')sendAIMessage()">
+          <button class="ai-send-btn" onclick="sendAIMessage()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =============================================
+     AI 头像切换浮层（点击头像弹出）
+     ============================================= -->
+<div class="ai-avatar-picker-overlay" id="aiAvatarPicker" onclick="if(event.target===this)hideAIAvatarPicker()">
+  <div class="ai-avatar-picker-sheet">
+    <div class="ai-picker-handle"></div>
+    <div class="ai-picker-title">选择AI助教</div>
+    <div class="ai-picker-section">
+      <div class="ai-picker-section-title" id="pickerMastersTitle">数学大师</div>
+      <div class="ai-avatar-row" id="pickerMastersRow"></div>
+    </div>
+    <div class="ai-picker-section">
+      <div class="ai-picker-section-title">我的老师</div>
+      <div class="ai-avatar-row" id="pickerTeachersRow"></div>
+    </div>
+    <div class="ai-picker-section">
+      <div class="ai-picker-section-title">我的订阅人</div>
+      <div class="ai-avatar-row" id="pickerSubscribedRow"></div>
+    </div>
+    <div class="ai-info-card" id="pickerInfoCard" style="margin-top:12px">
+      <img class="ai-info-avatar" id="pickerInfoAvatar" src="" alt="">
+      <div class="ai-info-content">
+        <div class="ai-info-header">
+          <span class="ai-info-name" id="pickerInfoName"></span>
+          <span class="ai-info-badge" id="pickerInfoBadge"></span>
+        </div>
+        <div class="ai-info-title" id="pickerInfoTitle"></div>
+        <div class="ai-info-desc" id="pickerInfoDesc"></div>
+        <div class="ai-info-tags" id="pickerInfoTags"></div>
+      </div>
+    </div>
+    <button class="confirm-btn ai-picker-confirm-btn" onclick="hideAIAvatarPicker()">确定切换</button>
+  </div>
+</div>
+
+<!-- 悬浮岛底部Tab栏 -->
+<nav class="floating-tab-bar">
+
+  <!-- 教学 -->
+  <div class="tab-item active" id="tab-teach" onclick="switchTab('teach')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+    </svg>
+    <span class="tab-label">教学</span>
+  </div>
+
+  <!-- 班级 -->
+  <div class="tab-item inactive" id="tab-class" onclick="switchTab('class')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+    </svg>
+    <span class="tab-label">班级</span>
+  </div>
+
+  <!-- 任务（中间凸起按钮） -->
+  <div class="tab-item inactive center-tab" id="tab-task" onclick="switchTab('task')">
+    <div class="icon-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="3 8 5 10 9 6"/><line x1="13" y1="8" x2="21" y2="8"/>
+        <polyline points="3 16 5 18 9 14"/><line x1="13" y1="16" x2="19" y2="16"/>
+      </svg>
+    </div>
+    <span class="tab-label">任务</span>
+  </div>
+
+  <!-- 收藏 -->
+  <div class="tab-item inactive" id="tab-star" onclick="switchTab('star')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+    </svg>
+    <span class="tab-label">收藏</span>
+  </div>
+
+  <!-- 我的 -->
+  <div class="tab-item inactive" id="tab-me" onclick="switchTab('me')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+    </svg>
+    <span class="tab-label">我的</span>
+  </div>
+
+</nav>
+<script>
+const tabs = ['teach', 'class', 'task', 'star', 'me'];
+function switchTab(name) {
+  tabs.forEach(t => {
+    const el = document.getElementById('tab-' + t);
+    if (!el) return;
+    if (t === name) {
+      el.classList.remove('inactive');
+      el.classList.add('active');
+    } else {
+      el.classList.remove('active');
+      el.classList.add('inactive');
+    }
+  });
+}
+</script>
+
+<script>
+  /* 章节知识点数据 */
+  var CHAPTERS = {
+    1: { name: '二次根式', items: [
+      { name: '1.1 二次根式的概念', important: false },
+      { name: '1.2 二次根式的性质', important: true },
+      { name: '1.3 二次根式的乘除', important: false },
+      { name: '1.4 二次根式的加减', important: false }
+    ]},
+    2: { name: '一元二次方程', items: [
+      { name: '2.1 一元二次方程的概念', important: false },
+      { name: '2.2 配方法', important: true },
+      { name: '2.3 公式法', important: true },
+      { name: '2.4 因式分解法', important: false },
+      { name: '2.5 根的判别式', important: false }
+    ]},
+    3: { name: '旋转', items: [
+      { name: '3.1 图形的旋转', important: false },
+      { name: '3.2 中心对称', important: true },
+      { name: '3.3 中心对称图形', important: false }
+    ]},
+    4: { name: '圆', items: [
+      { name: '4.1 圆的有关性质', important: true },
+      { name: '4.2 点和圆的位置关系', important: false },
+      { name: '4.3 直线和圆的位置关系', important: true },
+      { name: '4.4 弧长和扇形面积', important: false }
+    ]},
+    5: { name: '概率初步', items: [
+      { name: '5.1 随机事件与概率', important: false },
+      { name: '5.2 用列举法求概率', important: true },
+      { name: '5.3 用频率估计概率', important: false }
+    ]},
+    6: { name: '反比例函数', items: [
+      { name: '6.1 反比例函数的概念', important: false },
+      { name: '6.2 反比例函数的图象和性质', important: true },
+      { name: '6.3 实际问题与反比例函数', important: false }
+    ]},
+    7: { name: '相似', items: [
+      { name: '7.1 图形的相似', important: false },
+      { name: '7.2 相似三角形', important: true },
+      { name: '7.3 相似三角形的性质', important: true },
+      { name: '7.4 位似', important: false }
+    ]}
+  };
+
+  function switchChapter(ch) {
+    // 更新侧边栏高亮
+    var tabs = document.querySelectorAll('.chapter-btn');
+    for (var i = 0; i < tabs.length; i++) {
+      tabs[i].classList.toggle('active', parseInt(tabs[i].dataset.chapter) === ch);
+    }
+    // 更新右侧内容
+    var data = CHAPTERS[ch];
+    if (!data) return;
+    // 更新标题区
+    document.getElementById('chapterTitle').textContent = data.name;
+    // 计算重点数
+    var impCount = data.items.filter(function(i){ return i.important; }).length;
+    document.getElementById('chapterSections').textContent = '共' + data.items.length + '节 · ' + impCount + '个重点';
+    // 更新知识点列表
+    var list = document.getElementById('knowledgeList');
+    list.innerHTML = '';
+    for (var j = 0; j < data.items.length; j++) {
+      var item = data.items[j];
+      var div = document.createElement('div');
+      div.className = 'knowledge-row';
+      div.onclick = function() { location.href = 'knowledge-detail.html'; };
+      div.innerHTML = '<div class="knowledge-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>' +
+        '<div class="knowledge-row-info">' +
+        '<div class="knowledge-row-name">' + item.name + (item.important ? '<span class="knowledge-row-badge">重点</span>' : '') + '</div>' +
+        '<div class="knowledge-row-meta">' + (Math.floor(Math.random() * 20) + 1) + '人讲解</div>' +
+        '</div>' +
+        '<div class="knowledge-row-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>';
+      list.appendChild(div);
+    }
+  }
+
+  // 初始化显示第一章
+  switchChapter(1);
+
+  /* 时间 */
+  function updateTime() {
+    var n = new Date();
+    document.getElementById('statusTime').textContent =
+      String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0');
+  }
+  updateTime();
+  setInterval(updateTime, 30000);
+
+  /* 学科筛选 */
+  function selectSubject(el) {
+    var chips = document.querySelectorAll('.filter-chip[data-subject]');
+    for (var i = 0; i < chips.length; i++) chips[i].classList.remove('active');
+    el.classList.add('active');
+    
+    // 更新当前学科
+    currentSubject = el.dataset.subject;
+    
+    // 清空选中的AI形象（下次打开AI面板时会重新选择）
+    selectedAvatar = null;
+    selectedAvatarData = null;
+    
+    // 更新搜索栏AI按钮的默认头像
+    var defaultAvatar = getDefaultAvatarForSubject(currentSubject);
+    document.getElementById('aiSearchBtnAvatar').src = defaultAvatar;
+    
+    // TODO: 切换学科后刷新知识点和订阅内容
+  }
+
+  function getDefaultAvatarForSubject(subject) {
+    var data = AI_AVATARS[subject];
+    if (data && data.masters && data.masters.length > 0) {
+      var m = data.masters[0];
+      // 优先使用 dicebearSeed（基于真实肖像生成的卡通形象）
+      var seed = m.dicebearSeed || m.id;
+      return m.avatarStyle === 'avataaars'
+        ? 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + encodeURIComponent(seed)
+        : 'https://api.dicebear.com/7.x/personas/svg?seed=' + encodeURIComponent(seed);
+    }
+    return 'https://api.dicebear.com/7.x/personas/svg?seed=ai';
+  }
+
+  /* 年级/教材版本弹窗 */
+  var selectedGrade = '八年级';
+  var selectedVersion = '人教版';
+  var selectedBook = '上册';
+
+  function showGradeSheet() {
+    document.getElementById('gradeSheet').classList.add('show');
+  }
+  function hideGradeSheet() {
+    document.getElementById('gradeSheet').classList.remove('show');
+  }
+  document.getElementById('gradeSheet').addEventListener('click', function(e) {
+    if (e.target === this) hideGradeSheet();
+  });
+
+  function toggleSheetOption(el, type) {
+    var group = type === 'grade' ? '.sheet-options' : '.sheet-options';
+    var siblings = el.parentElement.querySelectorAll('.sheet-option');
+    for (var i = 0; i < siblings.length; i++) siblings[i].classList.remove('selected');
+    el.classList.add('selected');
+    if (type === 'grade') selectedGrade = el.dataset.grade;
+    if (type === 'version') selectedVersion = el.dataset.version;
+    if (type === 'book') selectedBook = el.dataset.book;
+  }
+
+  function confirmGrade() {
+    document.getElementById('gradeFilterLabel').textContent = selectedGrade + ' ' + selectedBook + ' · ' + selectedVersion;
+    hideGradeSheet();
+    // TODO: 确认后刷新知识点和订阅内容
+  }
+
+  /* AI 虚拟形象数据 - 按学科分类 */
+  var AI_AVATARS = {
+    math: {
+      masters: [
+        { id: 'newton', name: '牛顿', badge: '科学巨匠', title: '经典力学奠基人', desc: '发明微积分、发现万有引力定律、创立经典力学体系，与莱布尼茨并称微积分之父。', tags: ['微积分', '力学', '光学'], bgColor: '1e3d59', avatarStyle: 'avataaars', dicebearSeed: 'Gauss459' },
+        { id: 'gauss', name: '高斯', badge: '数学王子', title: '近代数学奠基人', desc: '提出了高斯分布、最小二乘法，在数论、几何、代数等领域均有重大贡献，被誉为"数学王子"。', tags: ['高斯分布', '数论', '几何'], bgColor: '6a0572', dicebearSeed: 'Carl_Friedrich_Gauss_mathematician_1777' },
+        { id: 'maxwell', name: '麦克斯韦', badge: '物理学大师', title: '电磁学之父', desc: '提出了著名的麦克斯韦方程组，统一了电与磁的理论，被誉为"物理学史上第二次大综合"。', tags: ['电磁学', '数学物理', '场论'], bgColor: '1a1a2e', dicebearSeed: 'James_Clerk_Maxwell_physicist_1831' },
+        { id: 'fourier', name: '傅里叶', badge: '数学家', title: '热传导理论奠基人', desc: '发明了傅里叶级数和傅里叶变换，将周期函数分解为三角级数，广泛应用于信号处理、图像压缩等领域。', tags: ['傅里叶变换', '信号处理', '级数'], bgColor: '2d3436', dicebearSeed: 'Joseph_Fourier_mathematician_1768' },
+        { id: 'euler', name: '欧拉', badge: '数学大师', title: '史上最多产的数学家', desc: '贡献了欧拉公式、欧拉恒等式，被誉为"数学界的莎士比亚"。"e^(iπ)+1=0"被公认为最美数学公式。', tags: ['欧拉公式', '数论', '图论'], bgColor: '0a3d62', dicebearSeed: 'Leonhard_Euler_mathematician_1707' }
+      ],
+      teachers: [
+        { id: 'zhang', name: '张明远', badge: '数学老师', title: '八年级数学教师', desc: '擅长代数教学，注重培养学生的逻辑思维能力，善于用生活实例讲解抽象概念。', tags: ['代数', '几何', '竞赛辅导'], bgColor: 'b6e3f4', avatarStyle: 'avataaars' },
+        { id: 'li', name: '李芳', badge: '数学老师', title: '八年级数学教师', desc: '专注于中考数学备考，擅长几何证明题的解题技巧，所教学生多次在数学竞赛中获奖。', tags: ['几何证明', '中考备考', '竞赛'], bgColor: 'c0aede', avatarStyle: 'avataaars' },
+        { id: 'wang', name: '王海燕', badge: '数学老师', title: '九年级数学教师', desc: '从事初中数学教学15年，擅长函数教学和数学思维训练，教学风格深入浅出。', tags: ['函数', '思维训练', '中考'], bgColor: 'ffd5dc', avatarStyle: 'avataaars' }
+      ],
+      subscribed: [
+        { id: 'sub_chen', name: '陈建华', badge: '物理老师', title: '八年级物理教师', desc: '订阅的物理老师，擅长力学和电学教学，实验演示生动有趣。', tags: ['力学', '电学', '实验'], bgColor: '74b9ff', avatarStyle: 'avataaars' },
+        { id: 'sub_liu', name: '刘美玲', badge: '英语老师', title: '八年级英语教师', desc: '订阅的英语老师，口语纯正，擅长英语演讲和写作指导。', tags: ['口语', '写作', '演讲'], bgColor: 'fd79a8', avatarStyle: 'avataaars' },
+        { id: 'sub_zhao', name: '赵雨萱', badge: '同班同学', title: '八年级3班', desc: '你订阅的同学，数学成绩优异，经常分享学习笔记和解题思路。', tags: ['笔记分享', '解题技巧'], bgColor: '00b894', avatarStyle: 'personas' },
+        { id: 'sub_zhou', name: '周志强', badge: '化学老师', title: '九年级化学教师', desc: '订阅的化学老师，擅长化学反应原理和实验安全教学。', tags: ['化学反应', '实验安全'], bgColor: 'e17055', avatarStyle: 'avataaars' }
+      ]
+    },
+    chinese: {
+      masters: [
+        { id: 'libai', name: '李白', badge: '诗仙', title: '唐代伟大诗人', desc: '中国历史上最杰出的浪漫主义诗人，诗风豪放飘逸，被誉为"诗仙"。代表作有《将进酒》《静夜思》等。', tags: ['浪漫主义', '唐诗', '诗歌鉴赏'], bgColor: '1e5f74', dicebearSeed: 'Li_Bai_poet_Tang_Dynasty_701' },
+        { id: 'dufu', name: '杜甫', badge: '诗圣', title: '唐代现实主义诗人', desc: '被尊为"诗圣"，诗作反映社会现实，诗风沉郁顿挫。代表作有《春望》《茅屋为秋风所破歌》等。', tags: ['现实主义', '唐诗', '社会关怀'], bgColor: '5c3d2e', dicebearSeed: 'Du_Fu_poet_Tang_Dynasty_712' },
+        { id: 'sushi', name: '苏轼', badge: '文学大家', title: '北宋文学家', desc: '词坛豪放派代表，诗、词、文、书、画均有极高成就。代表作有《念奴娇·赤壁怀古》《水调歌头》等。', tags: ['宋词', '豪放派', '散文'], bgColor: '8b5a2b', dicebearSeed: 'Su_Shi_poet_Song_Dynasty_1037' },
+        { id: 'luxun', name: '鲁迅', badge: '文学巨匠', title: '现代文学奠基人', desc: '中国现代文学的奠基人，白话文运动的先驱。代表作有《狂人日记》《阿Q正传》《朝花夕拾》等。', tags: ['白话文', '现代文学', '杂文'], bgColor: '2c3e50', dicebearSeed: 'Lu_Xun_writer_modern_China_1881' }
+      ],
+      teachers: [
+        { id: 'zhao', name: '赵文静', badge: '语文老师', title: '八年级语文教师', desc: '擅长古诗词教学和阅读理解训练，注重培养学生的文学素养和写作能力。', tags: ['古诗词', '阅读理解', '作文'], bgColor: 'f9c784', avatarStyle: 'avataaars' },
+        { id: 'chen', name: '陈思远', badge: '语文老师', title: '九年级语文教师', desc: '专注于中考语文备考，擅长文言文翻译技巧和现代文阅读方法。', tags: ['文言文', '中考备考', '阅读'], bgColor: 'f8b739', avatarStyle: 'avataaars' }
+      ],
+      subscribed: [
+        { id: 'sub_wu', name: '吴文静', badge: '历史老师', title: '八年级历史教师', desc: '订阅的历史老师，擅长中国古代史和近代史教学，讲课生动有趣。', tags: ['古代史', '近代史', '文化'], bgColor: 'fab1a0', avatarStyle: 'avataaars' },
+        { id: 'sub_zheng', name: '郑思琪', badge: '同班同学', title: '八年级3班', desc: '你订阅的同学，语文成绩优秀，经常分享作文素材和古诗词赏析。', tags: ['作文', '古诗词', '阅读'], bgColor: '00cec9', avatarStyle: 'personas' }
+      ]
+    },
+    english: {
+      masters: [
+        { id: 'shakespeare', name: '莎士比亚', badge: '文学巨匠', title: '英国文艺复兴时期剧作家', desc: '英语文学史上最伟大的剧作家和诗人，创作了《哈姆雷特》《罗密欧与朱丽叶》等经典作品。', tags: ['戏剧', '诗歌', '英语文学'], bgColor: '3d5a80', dicebearSeed: 'William_Shakespeare_playwright_1564' },
+        { id: 'dickens', name: '狄更斯', badge: '小说家', title: '维多利亚时代小说家', desc: '英国批判现实主义小说家，代表作有《双城记》《雾都孤儿》《大卫·科波菲尔》等。', tags: ['小说', '现实主义', '社会批判'], bgColor: '577590', dicebearSeed: 'Charles_Dickens_novelist_1812' },
+        { id: 'austen', name: '简·奥斯汀', badge: '小说家', title: '英国女作家', desc: '英国文学史上最受欢迎的女作家之一，代表作有《傲慢与偏见》《理智与情感》等。', tags: ['小说', '讽刺', '爱情'], bgColor: '90be6d', dicebearSeed: 'Jane_Austen_novelist_1775' },
+        { id: 'twain', name: '马克·吐温', badge: '幽默大师', title: '美国作家', desc: '美国幽默文学的代表人物，代表作有《汤姆·索亚历险记》《哈克贝利·费恩历险记》等。', tags: ['幽默', '讽刺', '小说'], bgColor: 'f9844a', dicebearSeed: 'Mark_Twain_writer_1835' }
+      ],
+      teachers: [
+        { id: 'emma', name: 'Emma', badge: '英语老师', title: '八年级英语教师', desc: 'Native English speaker，擅长口语训练和语法教学，课堂氛围轻松活泼。', tags: ['口语', '语法', '听力'], bgColor: '43aa8b', avatarStyle: 'avataaars' },
+        { id: 'michael', name: 'Michael', badge: '英语老师', title: '九年级英语教师', desc: '专注于中考英语和口语提升，善于用情景对话帮助学生记忆单词和句型。', tags: ['中考英语', '口语', '词汇'], bgColor: '4d908e', avatarStyle: 'avataaars' }
+      ],
+      subscribed: [
+        { id: 'sub_qian', name: '钱伟民', badge: '生物老师', title: '八年级生物教师', desc: '订阅的生物老师，擅长细胞生物学和遗传学教学，实验指导细致耐心。', tags: ['细胞', '遗传', '实验'], bgColor: '55efc4', avatarStyle: 'avataaars' },
+        { id: 'sub_feng', name: '冯子轩', badge: '同班同学', title: '八年级3班', desc: '你订阅的同学，英语成绩突出，经常分享英语学习方法和学习资源。', tags: ['学习方法', '资源分享'], bgColor: '81ecec', avatarStyle: 'personas' },
+        { id: 'sub_yang', name: '杨丽华', badge: '地理老师', title: '八年级地理教师', desc: '订阅的地理老师，擅长自然地理和人文地理教学，地图教学独具特色。', tags: ['自然地理', '人文地理', '地图'], bgColor: 'ffeaa7', avatarStyle: 'avataaars' }
+      ]
+    }
+  };
+
+  var currentSubject = 'math';
+  var selectedAvatar = null;
+  var selectedAvatarData = null;
+  /* =============================================
+     AI 搜问全屏弹窗
+     ============================================= */
+  function showAIChatPanel() {
+    var panel = document.getElementById('aiChatPanel');
+    if (!selectedAvatarData) {
+      var data = AI_AVATARS[currentSubject];
+      if (data && data.masters.length > 0) {
+        var first = data.masters[0];
+        selectedAvatar = first.id;
+        selectedAvatarData = first;
+      }
+    }
+    syncAIChatHeader();
+    renderAIChatContent();
+    panel.classList.add('show');
+  }
+
+  function hideAIChatPanel() {
+    document.getElementById('aiChatPanel').classList.remove('show');
+  }
+
+  function syncAIChatHeader() {
+    if (!selectedAvatarData) return;
+    // 优先使用 dicebearSeed（基于真实肖像生成的卡通形象）
+    var seed = selectedAvatarData.dicebearSeed || selectedAvatarData.id;
+    var avatarUrl = selectedAvatarData.avatarStyle === 'avataaars'
+      ? 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + encodeURIComponent(seed)
+      : 'https://api.dicebear.com/7.x/personas/svg?seed=' + encodeURIComponent(seed);
+    var heroEl = document.getElementById('aiChatHeroAvatar');
+    if (heroEl) heroEl.src = avatarUrl;
+    document.getElementById('aiGreetingName').textContent = selectedAvatarData.name;
+    // 同步按钮头像
+    var btnAvatar = document.getElementById('aiSearchBtnAvatar');
+    if (btnAvatar) btnAvatar.src = avatarUrl;
+  }
+
+  function renderAIChatContent() {
+    if (!selectedAvatarData) return;
+    var data = selectedAvatarData;
+    var subjectNames = { math: '数学', chinese: '语文', english: '英语' };
+    var subject = subjectNames[currentSubject] || '学科';
+    // 开场语(顶部显示)
+    var greetings = {
+      math: ['精通' + subject + '各个领域'],
+      chinese: ['带你领略文学之美'],
+      english: ['Your English learning companion']
+    };
+    var list = greetings[currentSubject] || greetings.math;
+    document.getElementById('aiGreetingSub').textContent = list[0] + '，也可以搜点东西~';
+    // 推荐问题
+    var recommends = {
+      math: [
+        '二次函数图像开口方向怎么判断？',
+        '勾股定理的证明方法有哪些？',
+        '一元二次方程怎么快速求根？',
+        '三角函数诱导公式怎么记？',
+        '平行四边形的性质与判定'
+      ],
+      chinese: [
+        '《背影》表达了怎样的父子情感？',
+        '如何赏析"明月几时有"的艺术手法？',
+        '文言文实词"之"的用法有哪些？',
+        '记叙文的六要素是什么？',
+        '比喻和拟人的区别是什么？'
+      ],
+      english: [
+        '现在完成时和一般过去时怎么区分？',
+        '如何快速记忆英语单词？',
+        '阅读理解有哪些答题技巧？',
+        '英语作文开头结尾怎么写更出彩？',
+        '定语从句和状语从句怎么区分？'
+      ]
+    };
+    var recList = recommends[currentSubject] || recommends.math;
+    var recEl = document.getElementById('aiRecommendList');
+    recEl.innerHTML = '';
+    for (var i = 0; i < recList.length; i++) {
+      var item = document.createElement('div');
+      item.className = 'ai-recommend-item';
+      item.textContent = recList[i];
+      item.onclick = function() { askRecommend(this); };
+      recEl.appendChild(item);
+    }
+  }
+
+  var isTyping = false;
+
+  function askRecommend(el) {
+    if (isTyping) return;
+    var question = el.textContent;
+    isTyping = true;
+
+    // 不隐藏欢迎区，让消息自然追加在其下方
+    var area = document.getElementById('aiMessagesArea');
+    area.style.display = 'flex';
+
+    // 添加用户消息
+    appendUserMessage(question);
+
+    // 打字指示器
+    var typingId = showTypingIndicator();
+
+    // 模拟AI回复
+    setTimeout(function() {
+      removeTypingIndicator(typingId);
+      appendAIMessage(getMockReply(question));
+      isTyping = false;
+      var middle = document.getElementById('aiChatMiddle');
+      middle.scrollTop = middle.scrollHeight;
+    }, 1500 + Math.random() * 1000);
+  }
+
+  function sendAIMessage() {
+    if (isTyping) return;
+    var input = document.getElementById('aiTextInput');
+    var text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    isTyping = true;
+
+    // 不隐藏欢迎区，让消息自然追加在其下方
+    var area = document.getElementById('aiMessagesArea');
+    area.style.display = 'flex';
+
+    // 添加用户消息
+    appendUserMessage(text);
+
+    // 显示打字指示器
+    var typingId = showTypingIndicator();
+
+    // 模拟AI延迟回复
+    setTimeout(function() {
+      removeTypingIndicator(typingId);
+      appendAIMessage(getMockReply(text));
+      isTyping = false;
+      // 滚动到底部
+      var middle = document.getElementById('aiChatMiddle');
+      middle.scrollTop = middle.scrollHeight;
+    }, 1500 + Math.random() * 1000);
+  }
+
+  function getUserAvatar() {
+    // 用户头像固定用本地占位
+    return '<img src="https://api.dicebear.com/7.x/avataaars/svg?seed=student123&backgroundColor=b6e3f4" width="30" height="30" style="border-radius:50%;object-fit:cover;background:#f0f4ff;" alt="">';
+  }
+
+  function getAIAvatar() {
+    if (!selectedAvatarData) return '<div class="ai-msg-avatar"></div>';
+    var url = selectedAvatarData.avatarStyle === 'avataaars'
+      ? 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + selectedAvatarData.id
+      : 'https://api.dicebear.com/7.x/personas/svg?seed=' + selectedAvatarData.id;
+    var name = selectedAvatarData.name;
+    return '<div class="ai-msg-avatar-block"><img src="' + url + '" alt="" style="border-radius:0;width:30px;height:30px;object-fit:cover;background:#f0f4ff;border:none;"><span class="ai-msg-avatar-name">' + name + '</span></div>';
+  }
+
+  function appendUserMessage(text) {
+    var area = document.getElementById('aiMessagesArea');
+    var time = formatTime(new Date());
+    var div = document.createElement('div');
+    div.className = 'ai-msg-user';
+    div.innerHTML = '<div class="ai-msg-row"><div class="ai-msg-bubble"><div class="ai-msg-text">' + escapeHtml(text) + '</div></div><div class="ai-msg-avatar">' + getUserAvatar() + '</div></div><div class="ai-msg-time">' + time + '</div>';
+    area.appendChild(div);
+    var middle = document.getElementById('aiChatMiddle');
+    middle.scrollTop = middle.scrollHeight;
+  }
+
+  function appendAIMessage(text) {
+    var area = document.getElementById('aiMessagesArea');
+    var div = document.createElement('div');
+    div.className = 'ai-msg-ai';
+    div.innerHTML = '<div class="ai-msg-avatar">' + getAIAvatar() + '</div>' +
+      '<div class="ai-msg-bubble"><div class="ai-msg-text">' + escapeHtml(text) + '</div></div>';
+    area.appendChild(div);
+  }
+
+  var typingCounter = 0;
+  function showTypingIndicator() {
+    var area = document.getElementById('aiMessagesArea');
+    var id = ++typingCounter;
+    var div = document.createElement('div');
+    div.className = 'ai-msg-ai';
+    div.id = 'aiTyping-' + id;
+    div.innerHTML = '<div class="ai-msg-avatar">' + getAIAvatar() + '</div>' +
+      '<div class="ai-typing-dots"><span></span><span></span><span></span></div>';
+    area.appendChild(div);
+    var middle = document.getElementById('aiChatMiddle');
+    middle.scrollTop = middle.scrollHeight;
+    return id;
+  }
+
+  function removeTypingIndicator(id) {
+    var el = document.getElementById('aiTyping-' + id);
+    if (el) el.remove();
+  }
+
+  function formatTime(date) {
+    var h = date.getHours().toString().padStart(2, '0');
+    var m = date.getMinutes().toString().padStart(2, '0');
+    return h + ':' + m;
+  }
+
+  function escapeHtml(text) {
+    return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // 模拟回复数据
+  var MOCK_REPLIES = {
+    '二次函数图像开口方向怎么判断': '二次函数 y=ax²+bx+c 的图像开口方向由系数 a 决定：\n\n• 当 a > 0 时，开口向上↑，顶点在最下方，函数有最小值\n• 当 a < 0 时，开口向下↓，顶点在最上方，函数有最大值\n\n记忆口诀：**a正上，a负下**。\n\n另外，|a| 越大，开口越小（图像越瘦）；|a| 越小，开口越大（图像越胖）。',
+    '勾股定理的证明方法有哪些': '勾股定理：a² + b² = c²（直角三角形两直角边的平方和等于斜边的平方）\n\n经典证明方法：\n\n1️⃣ **面积法（欧几里得）**：用四个全等直角三角形拼成大正方形，证两边面积相等\n\n2️⃣ **赵爽弦图**：中国数学家赵爽用出入相补原理证明\n\n3️⃣ **向量法**：利用向量点积的性质证明\n\n4️⃣ **拼图法**：把两个正方形剪开后重新拼成大正方形',
+    '一元二次方程怎么快速求根': '一元二次方程 ax²+bx+c=0 的求根公式：\n\n**x = (-b ± √(b²-4ac)) / 2a**\n\n快速判断：\n• Δ = b²-4ac > 0 → 两个不等实根\n• Δ = 0 → 两个相等实根（重根）\n• Δ < 0 → 无实根\n\n**十字相乘法**（更快！）：\n把常数项 c 分解成两个数，要求它们的和等于一次项系数 b。\n例如 x²+5x+6=0：6=2×3，2+3=5，所以 (x+2)(x+3)=0，x=-2 或 x=-3',
+    'default': null
+  };
+
+  function getMockReply(question) {
+    for (var key in MOCK_REPLIES) {
+      if (key !== 'default' && question.indexOf(key) !== -1) {
+        return MOCK_REPLIES[key];
+      }
+    }
+    var avatarName = selectedAvatarData ? selectedAvatarData.name : 'AI助手';
+    return avatarName + '收到你的问题啦！\n\n关于「' + question + '」这个问题，让我来为你详细解答：\n\n（这里将接入真实AI接口，返回专业答案~）\n\n你还有其他问题吗？我随时为你服务！';
+  }
+
+  function toggleVoiceInput() {
+    // 切换到文字模式
+    switchToTextMode();
+  }
+
+  function switchToTextMode() {
+    document.getElementById('aiVoiceMode').style.display = 'none';
+    document.getElementById('aiTextMode').style.display = 'flex';
+    setTimeout(function() { document.getElementById('aiTextInput').focus(); }, 100);
+  }
+
+  function switchToVoiceMode() {
+    document.getElementById('aiTextMode').style.display = 'none';
+    document.getElementById('aiVoiceMode').style.display = 'flex';
+  }
+
+  function startVoice() {
+    var btn = document.getElementById('aiVoicePill');
+    var label = document.getElementById('aiVoiceLabel');
+    btn.classList.add('recording');
+    if (label) label.textContent = '松开结束';
+    // TODO: 接入语音识别SDK
+  }
+
+  function stopVoice() {
+    var btn = document.getElementById('aiVoicePill');
+    var label = document.getElementById('aiVoiceLabel');
+    btn.classList.remove('recording');
+    if (label) label.textContent = '按住说话';
+    // TODO: 停止录音并识别
+  }
+
+  /* =============================================
+     AI Tab切换：新建对话 / 历史对话
+     ============================================= */
+  var AI_HISTORY_DATA = [
+    { id: 1, avatar: 'maxwell', name: '麦克斯韦', title: '关于二次函数图像性质的讨论', time: '今天 14:32' },
+    { id: 2, avatar: 'euler', name: '欧拉', title: '勾股定理的实际应用场景', time: '昨天 20:15' },
+    { id: 3, avatar: 'maxwell', name: '麦克斯韦', title: '一元二次方程求根公式推导', time: '3天前' },
+    { id: 4, avatar: 'gauss', name: '高斯', title: '三角函数诱导公式记忆技巧', time: '一周前' },
+    { id: 5, avatar: 'fourier', name: '傅里叶', title: '平行四边形性质与判定方法', time: '一周前' }
+  ];
+
+  var historyVisible = false;
+
+  function switchAITab(tabName) {
+    var tabNew = document.getElementById('aiTabNew');
+    var tabHistory = document.getElementById('aiTabHistory');
+    var middlePanel = document.getElementById('aiChatMiddle');
+    var historyPanel = document.getElementById('aiChatHistory');
+
+    if (tabName === 'history') {
+      // 切换历史显示/隐藏
+      historyVisible = !historyVisible;
+      if (historyVisible) {
+        tabHistory.classList.add('active');
+        middlePanel.style.display = 'none';
+        historyPanel.style.display = 'block';
+        renderAIHistoryList();
+      } else {
+        tabHistory.classList.remove('active');
+        middlePanel.style.display = 'flex';
+        historyPanel.style.display = 'none';
+      }
+    } else if (tabName === 'new') {
+      // 新建对话：保存当前对话到历史，然后恢复初始UI
+      historyVisible = false;
+      tabHistory.classList.remove('active');
+      tabNew.classList.remove('active');
+      if (typeof saveToHistory === 'function') saveToHistory();
+      historyPanel.style.display = 'none';
+      middlePanel.style.display = 'flex';
+      // 清空消息，恢复欢迎区
+      var area = document.getElementById('aiMessagesArea');
+      area.innerHTML = '';
+      area.style.display = 'none';
+      var welcome = document.getElementById('aiWelcomeSection');
+      if (welcome) welcome.style.display = 'block';
+    }
+  }
+
+  function saveToHistory() {
+    var msgs = document.getElementById('aiMessagesArea').children;
+    if (msgs.length === 0) return;
+    var firstUser = null;
+    for (var i = 0; i < msgs.length; i++) {
+      if (msgs[i].className === 'ai-msg-user') {
+        var t = msgs[i].querySelector('.ai-msg-text');
+        if (t) { firstUser = t.textContent; break; }
+      }
+    }
+    if (!firstUser) return;
+    var avatar = selectedAvatarData ? selectedAvatarData.id : 'maxwell';
+    var name = selectedAvatarData ? selectedAvatarData.name : 'AI助手';
+    var now = new Date();
+    var timeStr = (now.getMonth()+1) + '月' + now.getDate() + '日 ' + now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+    AI_HISTORY_DATA.unshift({
+      id: Date.now(),
+      avatar: avatar,
+      name: name,
+      title: firstUser.length > 20 ? firstUser.substring(0,20) + '…' : firstUser,
+      time: timeStr
+    });
+  }
+
+  function renderAIHistoryList() {
+    var container = document.getElementById('aiHistoryList');
+    container.innerHTML = '';
+    
+    for (var i = 0; i < AI_HISTORY_DATA.length; i++) {
+      var item = AI_HISTORY_DATA[i];
+      var avatarUrl = 'https://api.dicebear.com/7.x/personas/svg?seed=' + item.avatar + '&backgroundColor=1a1a2e';
+      
+      var div = document.createElement('div');
+      div.className = 'ai-history-item';
+      div.innerHTML = '<div class="ai-history-avatar"><img src="' + avatarUrl + '" alt=""></div>' +
+        '<div class="ai-history-left">' +
+        '<div class="ai-history-title">' + item.title + '</div>' +
+        '<div class="ai-history-time">' + item.name + '</div>' +
+        '</div>' +
+        '<div class="ai-history-right">' +
+        '<div class="ai-history-time">' + item.time + '</div>' +
+        '<button class="ai-history-delete" onclick="deleteAIHistory(' + item.id + ', event)">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/></svg>' +
+        '</button>' +
+        '</div>';
+      container.appendChild(div);
+    }
+  }
+
+  function deleteAIHistory(id, event) {
+    event.stopPropagation();
+    // 从数组中移除
+    for (var i = 0; i < AI_HISTORY_DATA.length; i++) {
+      if (AI_HISTORY_DATA[i].id === id) {
+        AI_HISTORY_DATA.splice(i, 1);
+        break;
+      }
+    }
+    renderAIHistoryList();
+  }
+
+  /* =============================================
+     AI 头像切换浮层
+     ============================================= */
+  function showAIAvatarPicker() {
+    renderPickerAvatars();
+    document.getElementById('aiAvatarPicker').classList.add('show');
+  }
+
+  function hideAIAvatarPicker() {
+    document.getElementById('aiAvatarPicker').classList.remove('show');
+  }
+
+  document.getElementById('aiAvatarPicker').addEventListener('click', function(e) {
+    if (e.target === this) hideAIAvatarPicker();
+  });
+
+  function renderPickerAvatars() {
+    // 固定显示数学学科的AI人物
+    var data = AI_AVATARS['math'];
+    if (!data) return;
+    document.getElementById('pickerMastersTitle').textContent = '数学大师';
+
+    // 渲染大师
+    var mastersRow = document.getElementById('pickerMastersRow');
+    mastersRow.innerHTML = '';
+    for (var i = 0; i < data.masters.length; i++) {
+      var m = data.masters[i];
+      var div = document.createElement('div');
+      div.className = 'ai-avatar-item' + (selectedAvatar === m.id ? ' selected' : '');
+      div.dataset.id = m.id;
+      div.onclick = function() { selectPickerAvatar(this); };
+      // 使用 dicebearSeed 生成基于真实肖像的卡通形象
+      var seed = m.dicebearSeed || m.id;
+      var avatarUrl = m.avatarStyle === 'avataaars'
+        ? 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + encodeURIComponent(seed) + '&backgroundColor=' + m.bgColor
+        : 'https://api.dicebear.com/7.x/personas/svg?seed=' + encodeURIComponent(seed) + '&backgroundColor=' + m.bgColor;
+      div.innerHTML = '<img class="ai-avatar-img" src="' + avatarUrl + '" alt="' + m.name + '">' +
+        '<span class="ai-avatar-name">' + m.name + '</span>';
+      mastersRow.appendChild(div);
+    }
+
+    // 渲染老师
+    var teachersRow = document.getElementById('pickerTeachersRow');
+    teachersRow.innerHTML = '';
+    for (var j = 0; j < data.teachers.length; j++) {
+      var t = data.teachers[j];
+      var div = document.createElement('div');
+      div.className = 'ai-avatar-item' + (selectedAvatar === t.id ? ' selected' : '');
+      div.dataset.id = t.id;
+      div.onclick = function() { selectPickerAvatar(this); };
+      var seed = t.dicebearSeed || t.id;
+      var avatarUrl = t.avatarStyle === 'avataaars'
+        ? 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + encodeURIComponent(seed) + '&backgroundColor=' + t.bgColor
+        : 'https://api.dicebear.com/7.x/personas/svg?seed=' + encodeURIComponent(seed) + '&backgroundColor=' + t.bgColor;
+      div.innerHTML = '<img class="ai-avatar-img" src="' + avatarUrl + '" alt="' + t.name + '">' +
+        '<span class="ai-avatar-name">' + t.name + '</span>';
+      teachersRow.appendChild(div);
+    }
+
+    // 渲染我的订阅人
+    var subscribedRow = document.getElementById('pickerSubscribedRow');
+    subscribedRow.innerHTML = '';
+    if (data.subscribed && data.subscribed.length > 0) {
+      for (var k = 0; k < data.subscribed.length; k++) {
+        var s = data.subscribed[k];
+        var div = document.createElement('div');
+        div.className = 'ai-avatar-item' + (selectedAvatar === s.id ? ' selected' : '');
+        div.dataset.id = s.id;
+        div.onclick = function() { selectPickerAvatar(this); };
+        var seed = s.dicebearSeed || s.id;
+        var avatarUrl = s.avatarStyle === 'avataaars'
+          ? 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + encodeURIComponent(seed) + '&backgroundColor=' + s.bgColor
+          : 'https://api.dicebear.com/7.x/personas/svg?seed=' + encodeURIComponent(seed) + '&backgroundColor=' + s.bgColor;
+        div.innerHTML = '<img class="ai-avatar-img" src="' + avatarUrl + '" alt="' + s.name + '">' +
+          '<span class="ai-avatar-name">' + s.name + '</span>';
+        subscribedRow.appendChild(div);
+      }
+    }
+
+    // 更新信息卡片
+    updatePickerInfoCard(selectedAvatarData);
+  }
+
+  function selectPickerAvatar(el) {
+    var items = document.querySelectorAll('#pickerMastersRow .ai-avatar-item, #pickerTeachersRow .ai-avatar-item, #pickerSubscribedRow .ai-avatar-item');
+    for (var i = 0; i < items.length; i++) items[i].classList.remove('selected');
+    el.classList.add('selected');
+    var id = el.dataset.id;
+    selectedAvatar = id;
+    selectedAvatarData = findAvatarById(id);
+    updatePickerInfoCard(selectedAvatarData);
+    // 同步弹窗顶部
+    syncAIChatHeader();
+    renderAIChatContent();
+  }
+
+  function findAvatarById(id) {
+    var data = AI_AVATARS[currentSubject];
+    if (!data) return null;
+    for (var i = 0; i < data.masters.length; i++) {
+      if (data.masters[i].id === id) return data.masters[i];
+    }
+    for (var j = 0; j < data.teachers.length; j++) {
+      if (data.teachers[j].id === id) return data.teachers[j];
+    }
+    if (data.subscribed) {
+      for (var k = 0; k < data.subscribed.length; k++) {
+        if (data.subscribed[k].id === id) return data.subscribed[k];
+      }
+    }
+    return null;
+  }
+
+  function updatePickerInfoCard(data) {
+    var card = document.getElementById('pickerInfoCard');
+    if (!data) { card.style.display = 'none'; return; }
+    card.style.display = 'flex';
+    var avatarUrl = data.avatarStyle === 'avataaars'
+      ? 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + data.id + '&backgroundColor=' + data.bgColor
+      : 'https://api.dicebear.com/7.x/personas/svg?seed=' + data.id + '&backgroundColor=' + data.bgColor;
+    document.getElementById('pickerInfoAvatar').src = avatarUrl;
+    document.getElementById('pickerInfoName').textContent = data.name;
+    document.getElementById('pickerInfoBadge').textContent = data.badge;
+    document.getElementById('pickerInfoTitle').textContent = data.title;
+    document.getElementById('pickerInfoDesc').textContent = data.desc;
+    var tagsEl = document.getElementById('pickerInfoTags');
+    tagsEl.innerHTML = '';
+    for (var i = 0; i < data.tags.length; i++) {
+      var tag = document.createElement('span');
+      tag.className = 'ai-info-tag';
+      tag.textContent = data.tags[i];
+      tagsEl.appendChild(tag);
+    }
+  }
+
+  /* =============================================
+     学科切换时同步AI按钮头像
+     ============================================= */
+  function updateAIButtonAvatar() {
+    var data = AI_AVATARS[currentSubject];
+    if (!data) return;
+    var first = data.masters[0];
+    selectedAvatar = first.id;
+    selectedAvatarData = first;
+    var avatarUrl = first.avatarStyle === 'avataaars'
+      ? 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + first.id + '&backgroundColor=' + first.bgColor
+      : 'https://api.dicebear.com/7.x/personas/svg?seed=' + first.id + '&backgroundColor=' + first.bgColor;
+    var btnAvatar = document.getElementById('aiSearchBtnAvatar');
+    if (btnAvatar) btnAvatar.src = avatarUrl;
+  }
+</script>
+
+<!-- =============================================
+     悬浮岛底部 Tab 栏
+     ============================================= -->
+<nav class="floating-tab-bar">
+
+  <!-- 教学 -->
+  <div class="tab-item active" id="tab-teach" onclick="switchTab('teach')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+    </svg>
+    <span class="tab-label">教学</span>
+  </div>
+
+  <!-- 班级 -->
+  <div class="tab-item inactive" id="tab-class" onclick="switchTab('class')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+    </svg>
+    <span class="tab-label">班级</span>
+  </div>
+
+  <!-- 任务（中间凸起按钮） -->
+  <div class="tab-item inactive center-tab" id="tab-task" onclick="switchTab('task')">
+    <div class="icon-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="3 8 5 10 9 6"/><line x1="13" y1="8" x2="21" y2="8"/>
+        <polyline points="3 16 5 18 9 14"/><line x1="13" y1="16" x2="19" y2="16"/>
+      </svg>
+    </div>
+    <span class="tab-label">任务</span>
+  </div>
+
+  <!-- 收藏 -->
+  <div class="tab-item inactive" id="tab-star" onclick="switchTab('star')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+    </svg>
+    <span class="tab-label">收藏</span>
+  </div>
+
+  <!-- 我的 -->
+  <div class="tab-item inactive" id="tab-me" onclick="switchTab('me')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+    </svg>
+    <span class="tab-label">我的</span>
+  </div>
+
+</nav>
+
+<script>
+// Tab 与页面映射
+const tabPages = {
+  'teach': 'teach.html',
+  'class': 'class.html',
+  'task': 'task.html',
+  'star': 'favorite.html',
+  'me': 'me.html'
+};
+
+function switchTab(name) {
+  window.location.href = tabPages[name];
+}
+
+// 页面加载时初始化AI搜问按钮头像为当前学科的默认头像（牛顿）
+document.addEventListener('DOMContentLoaded', function() {
+  var defaultAvatar = getDefaultAvatarForSubject(currentSubject);
+  var btnAvatar = document.getElementById('aiSearchBtnAvatar');
+  if (btnAvatar) btnAvatar.src = defaultAvatar;
+});
+</script>
+
+</body>
 </html>
