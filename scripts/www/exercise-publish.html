@@ -1,0 +1,2672 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>发布习题</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<style>
+  :root {
+    --bg: #F2F2F7;
+    --surface: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #6E6E73;
+    --text-muted: #AEAEB2;
+    --border: #E5E5EA;
+    --border-dark: #D1D1D6;
+    --divider: #F2F2F7;
+    --blue: #007AFF;
+    --blue-light: #E8F4FF;
+    --brand: #2dc89c;
+    --brand-light: #3ECCA4;
+    --hint-1: #2dc89c;
+    --hint-2: #2dc89c;
+    --hint-3: #FECA57;
+    --hint-4: #48C774;
+    --hint-5: #3273DC;
+    --purple: #764ba2;
+    --purple-light: #F3EEFF;
+    --red: #FF3B30;
+    --sp-1: 4px;   --sp-2: 8px;   --sp-3: 12px;  --sp-4: 16px;
+    --sp-5: 20px;  --sp-6: 24px;  --sp-8: 32px;  --sp-10: 40px;
+    --text-xs: 11px;  --text-sm: 12px;  --text-base: 14px;
+    --text-md: 15px;  --text-lg: 16px; --text-xl: 17px;
+    --text-2xl: 20px; --text-3xl: 24px;
+    --card-radius: 12px;
+    --btn-height: 50px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html { font-size: 14px; scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans SC', 'Helvetica Neue', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    max-width: 100%;
+    margin: 0 auto;
+    position: relative;
+    overflow-x: hidden;
+  }
+  .page-wrapper { width: 100%; }
+  .content { padding: var(--sp-4); padding-top: 108px; }
+
+  /* STATUS BAR */
+  .status-bar {
+    z-index: 10000;
+    position: fixed; left: 0; right: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    height: 44px;
+    display: flex; align-items: flex-end; justify-content: space-between;
+    padding: 0 24px 8px;
+  }
+  .status-time { font-size: var(--text-md); font-weight: 600; }
+  .status-icons { display: flex; align-items: center; gap: 5px; }
+  .status-icons svg { width: 17px; height: 17px; }
+
+  /* NAV BAR */
+  .nav-bar {
+    background: var(--surface);
+    height: 50px;
+    display: flex; align-items: center; padding: 0 12px;
+    border-bottom: 0.5px solid var(--border);
+    position: fixed; top: 44px; left: 0; right: 0; z-index: 100;
+  }
+  .nav-back {
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; border-radius: 8px; flex-shrink: 0;
+  }
+  .nav-back:active { background: var(--divider); }
+  .nav-back svg { width: 22px; height: 22px; }
+  .nav-title {
+    flex: 1; text-align: center;
+    font-size: var(--text-xl); font-weight: 600;
+    color: var(--text-primary); margin-right: 36px;
+  }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-size: var(--text-base); font-weight: 600; color: var(--text-secondary);
+    margin-bottom: var(--sp-3);
+    display: flex; align-items: center; gap: var(--sp-2);
+  }
+  .section-title svg { width: 16px; height: 16px; color: var(--brand); }
+
+  /* ========== 1. 题目模块 ========== */
+  .question-section {
+    background: var(--surface); border-radius: var(--card-radius);
+    padding: var(--sp-4); margin-bottom: var(--sp-3);
+  }
+
+  /* 题目内容区 */
+  .question-content-area {
+    border: 2px dashed var(--brand);
+    border-radius: 10px;
+    min-height: 120px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    cursor: pointer; padding: var(--sp-5);
+    transition: all 0.2s;
+    background: rgba(45,200,156,0.04);
+  }
+  .question-content-area:active { background: rgba(45,200,156,0.08); }
+  .question-content-icon {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(45,200,156,0.15);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: var(--sp-2);
+  }
+  .question-content-icon svg { width: 20px; height: 20px; color: var(--brand); }
+  .question-content-text { font-size: var(--text-base); font-weight: 600; color: var(--brand); margin-bottom: 2px; }
+  .question-content-sub { font-size: var(--text-sm); color: var(--text-muted); }
+
+  .question-preview {
+    display: none;
+    background: rgba(45,200,156,0.05);
+    border-radius: 10px;
+    padding: var(--sp-3);
+    border: 1.5px solid rgba(45,200,156,0.2);
+    min-height: 80px;
+  }
+  .question-preview.has-content { display: block; }
+  .question-preview-body {
+    font-size: var(--text-base); line-height: 1.8; color: var(--text-primary);
+    white-space: pre-wrap; word-break: break-word;
+  }
+  .question-preview-body img {
+    max-width: 100%; border-radius: 6px; margin: var(--sp-2) 0; display: block;
+  }
+  .question-preview-footer {
+    display: flex; align-items: center; justify-content: flex-end;
+    margin-top: var(--sp-3); padding-top: var(--sp-2);
+    border-top: 1px solid rgba(45,200,156,0.15);
+  }
+  .question-preview-edit {
+    display: flex; align-items: center; gap: 4px;
+    font-size: var(--text-sm); color: var(--brand); font-weight: 600; cursor: pointer;
+  }
+  .question-preview-edit svg { width: 14px; height: 14px; }
+
+  /* ========== 题目设置（新设计） ========== */
+  .question-settings {
+    margin-top: var(--sp-4);
+    padding-top: var(--sp-4);
+    border-top: 1px solid var(--divider);
+  }
+
+  /* 年级新设计：胶囊选择 */
+  .setting-group { margin-bottom: var(--sp-4); }
+  .setting-group:last-child { margin-bottom: 0; }
+  .setting-label {
+    font-size: var(--text-xs); font-weight: 700; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.5px;
+    margin-bottom: var(--sp-2);
+    display: flex; align-items: center; gap: 4px;
+  }
+  .setting-label svg { width: 12px; height: 12px; }
+
+  .grade-pills {
+    display: flex; gap: var(--sp-2); flex-wrap: wrap;
+  }
+  .grade-pill {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    font-size: var(--text-sm); font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .grade-pill:active { background: var(--divider); }
+  .grade-pill.active {
+    border-color: var(--brand);
+    background: rgba(45,200,156,0.12);
+    color: var(--brand);
+  }
+
+  /* 难度新设计：滑动选择 */
+  .difficulty-selector { display: flex; flex-direction: column; gap: var(--sp-3); }
+  .diff-header {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .diff-name {
+    font-size: var(--text-base); font-weight: 700;
+    color: var(--text-primary);
+    transition: color 0.2s;
+  }
+  .diff-count {
+    display: flex; align-items: center; gap: 3px;
+  }
+  .diff-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    transition: all 0.2s;
+  }
+  .diff-star-btn {
+    width: 18px; height: 18px; cursor: pointer;
+    transition: transform 0.1s;
+  }
+  .diff-star-btn:active { transform: scale(0.9); }
+  .diff-star-btn svg { width: 18px; height: 18px; }
+
+  .diff-track {
+    position: relative; height: 8px;
+    background: var(--border);
+    border-radius: 4px; cursor: pointer;
+  }
+  .diff-marks {
+    position: absolute; top: -6px; left: 0; right: 0; height: 20px;
+  }
+  .diff-mark {
+    position: absolute; top: 0;
+    width: 20px; height: 20px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; z-index: 5;
+  }
+  .diff-mark svg {
+    width: 16px; height: 16px;
+    transition: fill 0.2s, stroke 0.2s;
+  }
+  .diff-fill {
+    position: absolute; left: 0; top: 0; height: 100%;
+    background: var(--brand);
+    border-radius: 4px;
+    transition: width 0.2s, background 0.2s;
+  }
+  .diff-thumb {
+    position: absolute; top: 50%; transform: translate(-50%, -50%);
+    width: 22px; height: 22px; border-radius: 50%;
+    background: white;
+    border: 2.5px solid var(--brand);
+    box-shadow: 0 2px 6px rgba(45,200,156,0.3);
+    transition: left 0.2s, background 0.2s, border-color 0.2s;
+    cursor: grab;
+  }
+  .diff-thumb:active { cursor: grabbing; transform: translate(-50%, -50%) scale(1.15); }
+
+  /* 标签新设计：流式标签 + 添加按钮 */
+  .tags-wrap { display: flex; flex-direction: column; gap: var(--sp-1); }
+  .tags-list {
+    display: flex; flex-wrap: wrap; gap: var(--sp-2); min-height: 26px;
+    align-items: center;
+  }
+  .tag-chip {
+    display: flex; align-items: center; gap: 5px;
+    padding: 5px 12px; border-radius: 16px;
+    background: rgba(45,200,156,0.15); color: var(--brand);
+    font-size: var(--text-sm); font-weight: 600;
+    animation: tagPop 0.2s ease both;
+  }
+  @keyframes tagPop {
+    from { opacity: 0; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .tag-chip-remove {
+    display: flex; align-items: center; justify-content: center;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: rgba(45,200,156,0.3); cursor: pointer;
+    flex-shrink: 0;
+  }
+  .tag-chip-remove svg { width: 8px; height: 8px; color: var(--brand); }
+  .tag-suggestions {
+    display: flex; flex-wrap: wrap; gap: var(--sp-2);
+  }
+  .tag-suggestion {
+    padding: 4px 10px; border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--surface); font-size: var(--text-xs);
+    color: var(--text-secondary); cursor: pointer;
+    transition: all 0.15s;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .tag-suggestion:active { background: var(--divider); }
+  .tag-suggestion.used { display: none; }
+  .tag-ai-badge {
+    font-size: 10px; color: var(--purple);
+    background: var(--purple-light);
+    padding: 1px 4px; border-radius: 4px;
+    font-weight: 600;
+  }
+  .tag-add-btn {
+    display: flex; align-items: center; gap: 3px;
+    padding: 3px 8px; border-radius: 12px;
+    border: 1px dashed var(--border);
+    background: transparent; font-size: 11px;
+    color: var(--text-muted); cursor: pointer;
+    transition: all 0.15s; margin-top: 2px;
+  }
+  .tag-add-btn:active { background: var(--divider); }
+  .tag-add-btn svg { width: 10px; height: 10px; }
+  .tag-input-row {
+    display: flex; align-items: center; gap: var(--sp-2);
+    border: 1.5px solid var(--border); border-radius: 20px;
+    padding: 5px 12px; background: var(--surface);
+    transition: border-color 0.15s;
+  }
+  .tag-input-row.hidden { display: none; }
+  .tag-input-row:focus-within { border-color: var(--brand); }
+  .tag-input-row svg { width: 14px; height: 14px; color: var(--text-muted); flex-shrink: 0; }
+  .tag-input-row input {
+    border: none; outline: none; background: transparent;
+    font-size: var(--text-sm); font-family: inherit;
+    color: var(--text-primary); flex: 1; min-width: 60px;
+  }
+  .tag-input-row input::placeholder { color: var(--text-muted); }
+  .tag-input-confirm {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--brand); display: flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0;
+  }
+  .tag-input-confirm svg { width: 10px; height: 10px; color: white; }
+  .tag-input-confirm.hidden { display: none; }
+
+  /* ========== 2. 视频讲解模块 ========== */
+  .video-upload-section {
+    background: var(--surface); border-radius: var(--card-radius);
+    padding: var(--sp-4); margin-bottom: var(--sp-3);
+  }
+  .video-upload-area {
+    border: 2px dashed var(--brand);
+    border-radius: 10px;
+    aspect-ratio: 16/9;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    cursor: pointer; position: relative;
+    transition: all 0.2s;
+    background: rgba(45,200,156,0.04);
+    overflow: hidden;
+  }
+  .video-upload-area:active { background: rgba(45,200,156,0.08); }
+  .video-upload-icon {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: rgba(45,200,156,0.15);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: var(--sp-3);
+  }
+  .video-upload-icon svg { width: 26px; height: 26px; color: var(--brand); }
+  .video-upload-text { font-size: var(--text-base); font-weight: 600; color: var(--brand); margin-bottom: 4px; }
+  .video-upload-sub { font-size: var(--text-sm); color: var(--text-muted); }
+
+  .video-preview-wrap {
+    border-radius: 10px; overflow: hidden;
+    aspect-ratio: 16/9; position: relative;
+    background: #000; display: none;
+  }
+  .video-preview-wrap.has-video { display: block; }
+  .video-preview-wrap video {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+  }
+  .video-preview-delete {
+    position: absolute; top: 8px; right: 8px;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.55);
+    border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    z-index: 5;
+  }
+  .video-preview-delete:active { transform: scale(0.9); background: rgba(0,0,0,0.75); }
+  .video-preview-delete svg { width: 16px; height: 16px; color: white; }
+  .video-preview-overlay {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.2); cursor: pointer;
+  }
+  .video-preview-play {
+    width: 50px; height: 50px; border-radius: 50%;
+    background: rgba(255,255,255,0.9);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  }
+  .video-preview-play svg { width: 22px; height: 22px; margin-left: 3px; color: var(--brand); }
+
+  /* ========== 3. 图文讲解模块 ========== */
+  .image-text-upload-section {
+    background: var(--surface); border-radius: var(--card-radius);
+    padding: var(--sp-4); margin-bottom: var(--sp-3);
+  }
+  .image-text-upload-area {
+    border: 2px dashed var(--brand);
+    border-radius: 10px;
+    min-height: 120px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    cursor: pointer; padding: var(--sp-5);
+    transition: all 0.2s;
+    background: rgba(45,200,156,0.04);
+  }
+  .image-text-upload-area:active { background: rgba(45,200,156,0.08); }
+  .image-text-upload-icon {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(45,200,156,0.15);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: var(--sp-2);
+  }
+  .image-text-upload-icon svg { width: 20px; height: 20px; color: var(--brand); }
+  .image-text-upload-text { font-size: var(--text-base); font-weight: 600; color: var(--brand); margin-bottom: 2px; }
+  .image-text-upload-sub { font-size: var(--text-sm); color: var(--text-muted); }
+
+  .image-text-preview {
+    display: none;
+    background: rgba(45,200,156,0.05);
+    border-radius: 10px;
+    padding: var(--sp-3);
+    border: 1.5px solid rgba(45,200,156,0.2);
+    min-height: 80px;
+  }
+  .image-text-preview.has-content { display: block; }
+  .image-text-preview-body {
+    font-size: var(--text-base); line-height: 1.8; color: var(--text-primary);
+    white-space: pre-wrap; word-break: break-word;
+  }
+  .image-text-preview-body img {
+    max-width: 100%; border-radius: 6px; margin: var(--sp-2) 0; display: block;
+  }
+  .image-text-preview-footer {
+    display: flex; align-items: center; justify-content: flex-end;
+    margin-top: var(--sp-3); padding-top: var(--sp-2);
+    border-top: 1px solid rgba(45,200,156,0.15);
+  }
+  .image-text-preview-edit {
+    display: flex; align-items: center; gap: 4px;
+    font-size: var(--text-sm); color: var(--brand); font-weight: 600; cursor: pointer;
+  }
+  .image-text-preview-edit svg { width: 14px; height: 14px; }
+
+  /* ========== 4. 关联知识点模块 ========== */
+  .knowledge-card {
+    background: var(--surface);
+    border-radius: var(--card-radius);
+    padding: var(--sp-4);
+    margin-bottom: var(--sp-3);
+  }
+  .knowledge-empty {
+    border: 2px dashed var(--brand);
+    border-radius: 10px;
+    padding: var(--sp-5);
+    text-align: center;
+    cursor: pointer;
+    background: rgba(45,200,156,0.04);
+    transition: background 0.15s;
+  }
+  .knowledge-empty:active { background: rgba(45,200,156,0.08); }
+  .knowledge-empty-text { font-size: var(--text-base); font-weight: 600; color: var(--brand); margin-bottom: 4px; }
+  .knowledge-empty-sub { font-size: var(--text-sm); color: var(--text-muted); }
+  .knowledge-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--sp-3);
+    padding: var(--sp-3);
+    border-radius: 8px;
+    transition: background 0.15s;
+  }
+  .knowledge-item:active { background: var(--brand-light); }
+  .knowledge-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--brand);
+    color: white;
+    font-size: var(--text-xs); font-weight: 700;
+    flex-shrink: 0; margin-top: 2px;
+  }
+  .knowledge-content { flex: 1; min-width: 0; }
+  .knowledge-chapter {
+    font-size: var(--text-sm); color: var(--text-muted);
+    margin-bottom: 3px; line-height: 1.4;
+  }
+  .knowledge-section {
+    font-size: var(--text-base); color: #1A6B35;
+    font-weight: 600; line-height: 1.5;
+  }
+  .knowledge-delete {
+    width: 28px; height: 28px; border-radius: 6px;
+    background: transparent; border: none;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 2px;
+    transition: background 0.15s;
+  }
+  .knowledge-delete:active { background: rgba(255,59,48,0.15); }
+  .knowledge-delete svg { width: 16px; height: 16px; color: var(--red); }
+  .knowledge-divider {
+    height: 1px; background: var(--divider);
+    margin: var(--sp-2) 0;
+  }
+
+  /* ========== 5. 可见范围模块 ========== */
+  .visibility-section {
+    background: var(--surface); border-radius: var(--card-radius);
+    padding: var(--sp-4); margin-bottom: var(--sp-3);
+  }
+  .visibility-options { display: flex; flex-direction: column; gap: var(--sp-2); }
+  .visibility-option {
+    display: flex; align-items: center; gap: var(--sp-3);
+    padding: var(--sp-3); border-radius: 10px;
+    border: 1.5px solid var(--border);
+    cursor: pointer; transition: all 0.15s;
+    background: var(--surface);
+  }
+  .visibility-option:active { background: var(--divider); }
+  .visibility-option.selected {
+    border-color: var(--brand);
+    background: rgba(45,200,156,0.08);
+  }
+  .visibility-radio {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--border-dark);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: all 0.15s;
+    background: var(--surface);
+  }
+  .visibility-option.selected .visibility-radio {
+    border-color: var(--brand);
+    background: var(--brand);
+  }
+  .visibility-radio svg { width: 10px; height: 10px; color: white; opacity: 0; transition: opacity 0.15s; }
+  .visibility-option.selected .visibility-radio svg { opacity: 1; }
+  .visibility-info { flex: 1; }
+  .visibility-title { font-size: var(--text-md); font-weight: 600; color: var(--text-primary); }
+  .visibility-sub { font-size: var(--text-xs); color: var(--text-muted); margin-top: 2px; }
+
+  .class-list {
+    display: none;
+    margin-top: var(--sp-3);
+    padding-top: var(--sp-3);
+    border-top: 1px solid var(--divider);
+  }
+  .class-list.show { display: block; }
+  .class-list-title {
+    font-size: var(--text-sm); font-weight: 600; color: var(--text-secondary);
+    margin-bottom: var(--sp-2);
+  }
+  .class-items { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+  .class-chip {
+    display: flex; align-items: center; gap: 4px;
+    padding: 5px 12px; border-radius: 16px;
+    border: 1px solid var(--border);
+    background: var(--surface); font-size: var(--text-sm);
+    color: var(--text-secondary); cursor: pointer;
+    transition: all 0.15s;
+  }
+  .class-chip:active { background: var(--divider); }
+  .class-chip.selected {
+    background: var(--brand);
+    border-color: var(--brand);
+    color: white;
+  }
+
+  /* ========== 5. 发布按钮 ========== */
+  .submit-bar {
+    background: var(--surface);
+    border-top: 0.5px solid var(--border);
+    padding: var(--sp-3) var(--sp-4);
+    padding-bottom: max(var(--sp-3), env(safe-area-inset-bottom));
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.06);
+  }
+  .submit-btn {
+    width: 100%; height: var(--btn-height);
+    border-radius: var(--card-radius); border: none;
+    background: var(--brand);
+    color: white; font-size: var(--text-lg); font-weight: 700;
+    font-family: inherit; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: var(--sp-2);
+    transition: all 0.2s;
+    -webkit-user-select: none; user-select: none;
+  }
+  .submit-btn:active:not(.disabled) { background: #22a87a; transform: scale(0.98); }
+  .submit-btn.disabled {
+    background: var(--border); color: var(--text-muted); cursor: not-allowed;
+  }
+  .submit-btn svg { width: 20px; height: 20px; }
+
+  /* ========== 全屏图文编辑器（来自 explain.html） ========== */
+  .editor-overlay {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    z-index: 500;
+    display: none;
+    flex-direction: column;
+    animation: fadeInOverlay 0.25s ease both;
+  }
+  .editor-overlay.open { display: flex; }
+  @keyframes fadeInOverlay {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .editor-nav {
+    background: var(--surface);
+    height: 50px;
+    display: flex; align-items: center; padding: 0 12px;
+    border-bottom: 0.5px solid var(--border);
+    position: sticky; top: 0; z-index: 10;
+  }
+  .editor-drag-handle {
+    width: 40px; height: 5px;
+    border-radius: 3px;
+    background: var(--border-dark);
+    margin: 10px auto 0;
+    cursor: pointer; flex-shrink: 0;
+  }
+  .editor-close {
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; border-radius: 8px; flex-shrink: 0;
+  }
+  .editor-close:active { background: var(--divider); }
+  .editor-close svg { width: 22px; height: 22px; }
+  .editor-nav-title {
+    flex: 1; text-align: center;
+    font-size: var(--text-xl); font-weight: 600;
+    color: var(--text-primary); margin-right: 36px;
+  }
+  .editor-save-btn {
+    padding: 6px 16px; border-radius: 8px;
+    background: var(--brand); color: white;
+    font-size: var(--text-sm); font-weight: 700;
+    border: none; cursor: pointer;
+    transition: background 0.15s;
+  }
+  .editor-save-btn:active { background: #22a87a; }
+
+  .editor-toolbar {
+    background: var(--surface);
+    border-bottom: 0.5px solid var(--border);
+    padding: var(--sp-2) var(--sp-4);
+    display: flex; align-items: center; gap: var(--sp-1);
+    overflow-x: auto; flex-shrink: 0;
+    -webkit-overflow-scrolling: touch;
+  }
+  .editor-toolbar::-webkit-scrollbar { display: none; }
+  .editor-tool-btn {
+    width: 38px; height: 38px; border-radius: 8px;
+    border: none; background: transparent;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0;
+    transition: background 0.15s;
+    color: var(--text-secondary);
+  }
+  .editor-tool-btn:active { background: var(--divider); }
+  .editor-tool-btn.active { background: var(--blue-light); color: var(--blue); }
+  .editor-tool-btn svg { width: 20px; height: 20px; }
+  .editor-tool-divider { width: 1px; height: 24px; background: var(--border); margin: 0 var(--sp-1); flex-shrink: 0; }
+
+  /* 手写公式编辑器 */
+  .formula-hw-wrap {
+    flex: 1; position: relative; display: none;
+    flex-direction: column; background: white;
+  }
+  .formula-hw-wrap.show { display: flex; }
+  .formula-hw-canvas {
+    flex: 1; width: 100%; display: block;
+    touch-action: none; cursor: crosshair;
+  }
+  .formula-hw-preview-bar {
+    background: var(--surface);
+    border-top: 0.5px solid var(--border);
+    padding: var(--sp-3) var(--sp-4);
+    display: none; flex-direction: column; align-items: center; gap: var(--sp-2);
+  }
+  .formula-hw-preview-bar.show { display: flex; }
+  .formula-hw-result {
+    font-size: 20px; line-height: 1.6;
+    min-height: 36px; display: flex; align-items: center; justify-content: center;
+  }
+  .formula-hw-result-latex {
+    font-size: 12px; color: var(--text-muted);
+    font-family: 'Menlo', 'Monaco', monospace;
+    background: rgba(0,0,0,0.04); padding: 2px 8px; border-radius: 4px;
+    max-width: 100%; overflow-x: auto;
+  }
+  .formula-hw-result-actions { display: flex; gap: var(--sp-3); }
+  .formula-hw-result-btn {
+    padding: 5px 16px; border-radius: 6px; border: none;
+    font-size: var(--text-xs); font-weight: 600; cursor: pointer; white-space: nowrap;
+  }
+  .formula-hw-result-btn.confirm { background: var(--brand); color: white; }
+  .formula-hw-result-btn.confirm:active { background: #22a87a; }
+  .formula-hw-result-btn.retry { background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border); }
+  .formula-hw-result-btn.retry:active { background: #f0f0f0; }
+  .formula-hw-toolbar {
+    background: var(--surface);
+    border-top: 0.5px solid var(--border);
+    padding: var(--sp-2) var(--sp-4);
+    display: flex; align-items: center; gap: var(--sp-3);
+  }
+  .formula-hw-hint {
+    font-size: var(--text-xs); color: var(--text-muted);
+    flex: 1; text-align: center;
+  }
+  .formula-hw-clear {
+    padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--surface); font-size: var(--text-xs);
+    color: var(--text-muted); cursor: pointer; white-space: nowrap;
+  }
+  .formula-hw-recognize {
+    background: var(--brand); color: white;
+    border: none; border-radius: 6px;
+    padding: 5px 14px; font-size: var(--text-xs); font-weight: 600;
+    cursor: pointer; flex-shrink: 0; white-space: nowrap;
+  }
+  .formula-hw-recognize:active { background: #22a87a; }
+  .formula-hw-recognize.loading { opacity: 0.6; pointer-events: none; }
+  .formula-hw-settings-btn {
+    background: none; border: 1px solid var(--border); border-radius: 6px;
+    padding: 4px 8px; font-size: 14px; cursor: pointer; line-height: 1;
+  }
+  .formula-settings-panel {
+    background: var(--surface); border-top: 0.5px solid var(--border);
+    padding: var(--sp-3) var(--sp-4);
+  }
+  .formula-settings-title { font-size: var(--text-sm); font-weight: 600; margin-bottom: var(--sp-2); color: var(--text-primary); }
+  .formula-settings-row { display: flex; align-items: center; gap: var(--sp-2); margin-bottom: var(--sp-2); }
+  .formula-settings-row label { font-size: var(--text-xs); color: var(--text-muted); white-space: nowrap; min-width: 90px; }
+  .formula-settings-row input {
+    flex: 1; border: 1px solid var(--border); border-radius: 6px;
+    padding: 6px 10px; font-size: var(--text-xs); outline: none;
+    background: var(--bg);
+  }
+  .formula-settings-row input:focus { border-color: var(--brand); }
+  .formula-settings-hint { font-size: 11px; color: var(--text-muted); margin-bottom: var(--sp-2); }
+  .formula-settings-hint a { color: var(--brand); text-decoration: none; }
+  .formula-settings-hint a:hover { text-decoration: underline; }
+  .formula-settings-status { font-size: 11px; color: var(--brand); }
+
+  /* 拍照识别弹窗 */
+  .photo-ocr-wrap {
+    display: flex; flex-direction: column;
+    background: var(--surface);
+    border-radius: var(--card-radius) var(--card-radius) 0 0;
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+    max-height: 85vh;
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.12);
+  }
+  .photo-ocr-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: var(--sp-3) var(--sp-4);
+    border-bottom: 0.5px solid var(--border);
+  }
+  .photo-ocr-title { font-size: var(--text-lg); font-weight: 600; color: var(--text-primary); }
+  .photo-ocr-close {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--bg); border: none;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+  .photo-ocr-close svg { width: 16px; height: 16px; color: var(--text-secondary); }
+  .photo-ocr-body { flex: 1; padding: var(--sp-4); overflow-y: auto; }
+  .photo-ocr-upload {
+    border: 2px dashed var(--border);
+    border-radius: 12px; padding: var(--sp-6);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer; background: rgba(45,200,156,0.04);
+    transition: background 0.15s;
+  }
+  .photo-ocr-upload:active { background: rgba(45,200,156,0.08); }
+  .photo-ocr-upload-icon {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: rgba(45,200,156,0.15);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: var(--sp-3);
+  }
+  .photo-ocr-upload-icon svg { width: 26px; height: 26px; color: var(--brand); }
+  .photo-ocr-upload-text { font-size: var(--text-base); font-weight: 600; color: var(--brand); margin-bottom: 4px; }
+  .photo-ocr-upload-sub { font-size: var(--text-sm); color: var(--text-muted); }
+  .photo-ocr-preview { margin-bottom: var(--sp-3); }
+  .photo-ocr-preview img {
+    width: 100%; max-height: 200px; object-fit: contain;
+    border-radius: 8px; background: var(--bg);
+  }
+  .photo-ocr-reselect {
+    display: flex; align-items: center; gap: 4px;
+    padding: 6px 12px; border-radius: 16px;
+    border: 1px solid var(--border); background: var(--surface);
+    font-size: var(--text-xs); color: var(--text-secondary); cursor: pointer;
+    margin-top: var(--sp-2);
+  }
+  .photo-ocr-reselect svg { width: 14px; height: 14px; }
+  .photo-ocr-loading {
+    display: flex; align-items: center; justify-content: center; gap: var(--sp-2);
+    padding: var(--sp-4); color: var(--text-muted); font-size: var(--text-sm);
+  }
+  .photo-ocr-spinner {
+    width: 20px; height: 20px; border: 2px solid var(--border);
+    border-top-color: var(--brand); border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .photo-ocr-result { margin-top: var(--sp-3); }
+  .photo-ocr-result-label { font-size: var(--text-xs); color: var(--text-muted); margin-bottom: var(--sp-2); }
+  .photo-ocr-result-text {
+    background: var(--bg); border-radius: 8px; padding: var(--sp-3);
+    font-size: var(--text-md); line-height: 1.6; color: var(--text-primary);
+    min-height: 80px; max-height: 150px; overflow-y: auto;
+  }
+  .photo-ocr-result-actions { display: flex; gap: var(--sp-2); margin-top: var(--sp-3); }
+  .photo-ocr-result-btn {
+    flex: 1; padding: 10px 16px; border-radius: 20px; font-size: var(--text-sm);
+    font-weight: 600; cursor: pointer; border: none; transition: background 0.15s;
+  }
+  .photo-ocr-result-btn.edit { background: var(--bg); color: var(--text-secondary); border: 1px solid var(--border); }
+  .photo-ocr-result-btn.edit:active { background: var(--divider); }
+  .photo-ocr-result-btn.insert { background: var(--brand); color: white; }
+  .photo-ocr-result-btn.insert:active { background: var(--brand-light); }
+  .photo-ocr-result-btn.cancel { background: var(--bg); color: var(--text-secondary); border: 1px solid var(--border); }
+  .photo-ocr-edit-area { margin-top: var(--sp-3); }
+  .photo-ocr-edit-label { font-size: var(--text-xs); color: var(--text-muted); margin-bottom: var(--sp-2); }
+  .photo-ocr-textarea {
+    width: 100%; min-height: 120px; max-height: 200px;
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: var(--sp-3); font-size: var(--text-md); line-height: 1.6;
+    resize: vertical; outline: none; background: var(--bg);
+    font-family: inherit; color: var(--text-primary);
+  }
+  .photo-ocr-textarea:focus { border-color: var(--brand); }
+  .photo-ocr-edit-actions { display: flex; gap: var(--sp-2); margin-top: var(--sp-2); }
+  .photo-ocr-footer {
+    padding: var(--sp-3) var(--sp-4);
+    background: var(--bg); border-top: 0.5px solid var(--border);
+  }
+  .photo-ocr-tip { display: flex; align-items: center; gap: var(--sp-2); font-size: 11px; color: var(--text-muted); }
+  .photo-ocr-tip svg { flex-shrink: 0; }
+
+  .editor-content {
+    flex: 1; overflow-y: auto;
+    padding: var(--sp-4);
+    -webkit-overflow-scrolling: touch;
+  }
+  .editor-textarea {
+    width: 100%; min-height: 300px;
+    border: none; outline: none; resize: none;
+    font-size: var(--text-md); line-height: 1.9;
+    font-family: inherit; color: var(--text-primary);
+    background: transparent;
+  }
+  .editor-textarea::placeholder { color: var(--text-muted); }
+
+  #editorEditable img {
+    max-width: 100%; vertical-align: middle; border-radius: 6px; margin: 4px 2px;
+    cursor: pointer; transition: outline 0.15s;
+  }
+  #editorEditable img.selected {
+    outline: 2px solid var(--brand); outline-offset: 2px;
+  }
+  #editorEditable img[data-wb] {
+    cursor: pointer; border: 2px solid transparent; border-radius: 8px;
+    display: block; margin: 8px 0; transition: border-color 0.2s;
+  }
+  #editorEditable img[data-wb]:hover { border-color: var(--brand); }
+  #editorEditable img[data-wb].selected { border-color: var(--brand); }
+  /* 图片调整控制点 */
+  .img-resize-handle {
+    position: absolute; width: 10px; height: 10px;
+    background: var(--brand); border: 1px solid white;
+    border-radius: 2px; cursor: pointer; z-index: 100;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .img-resize-handle:hover { transform: scale(1.2); }
+  .img-resize-handle.nw { cursor: nw-resize; }
+  .img-resize-handle.ne { cursor: ne-resize; }
+  .img-resize-handle.sw { cursor: sw-resize; }
+  .img-resize-handle.se { cursor: se-resize; }
+
+  /* 白板 */
+  .whiteboard-wrap {
+    flex: 1; position: relative; display: none;
+    background: white; touch-action: none;
+  }
+  .whiteboard-wrap.show { display: flex; flex-direction: column; }
+  .whiteboard-canvas {
+    flex: 1; width: 100%; display: block;
+    touch-action: none;
+  }
+  .whiteboard-toolbar {
+    background: var(--surface);
+    border-top: 0.5px solid var(--border);
+    padding: var(--sp-2) var(--sp-3);
+    display: flex; align-items: center; gap: var(--sp-2);
+    flex-wrap: wrap;
+  }
+  .wb-tool-group { display: flex; align-items: center; gap: 2px; }
+  .wb-sep { width: 1px; height: 20px; background: var(--border); margin: 0 4px; flex-shrink:0; }
+  .wb-btn {
+    width: 32px; height: 32px; border-radius: 6px; border: none;
+    background: transparent; color: var(--text-secondary);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: background 0.15s, color 0.15s; flex-shrink: 0;
+  }
+  .wb-btn:hover { background: rgba(0,0,0,0.06); }
+  .wb-btn.active { background: rgba(45,200,156,0.15); color: var(--brand); }
+  .wb-btn:disabled { opacity: 0.3; cursor: default; }
+  .wb-btn svg { width: 18px; height: 18px; }
+  .whiteboard-color-picker { display: flex; gap: 4px; }
+  .whiteboard-color {
+    width: 22px; height: 22px; border-radius: 50%; border: 2px solid transparent;
+    cursor: pointer; transition: border-color 0.15s; flex-shrink: 0;
+  }
+  .whiteboard-color.active { border-color: var(--text-primary); }
+  .whiteboard-size-picker { display: flex; align-items: center; gap: 3px; }
+  .whiteboard-size-dot {
+    border-radius: 50%; background: var(--text-secondary); cursor: pointer;
+  }
+  .whiteboard-insert-btn {
+    background: var(--brand); color: white;
+    border: none; border-radius: 6px;
+    padding: 5px 12px; font-size: var(--text-xs); font-weight: 600;
+    cursor: pointer; flex-shrink: 0; white-space: nowrap;
+  }
+  .whiteboard-insert-btn:active { background: #22a87a; }
+  .whiteboard-clear {
+    padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--surface); font-size: var(--text-xs);
+    color: var(--text-muted); cursor: pointer;
+  }
+
+  /* ========== RESPONSIVE ========== */
+  @media (min-width: 600px) {
+    :root { --content-pad: 32px; --text-md: 16px; --text-base: 15px; --card-radius: 16px; }
+    .content { padding: 24px 32px; }
+    .question-section { padding: 24px; }
+    .submit-bar { padding: 20px 32px; }
+  }
+  @media (min-width: 768px) {
+    :root { --text-xl: 18px; --text-lg: 17px; --text-base: 15px; --card-radius: 20px; --btn-height: 54px; }
+    body { background: #E8E8EE; }
+    .page-wrapper { max-width: 680px; margin: 0 auto; background: var(--bg); min-height: 100vh; box-shadow: 0 0 40px rgba(0,0,0,0.06); }
+    .content { padding: 32px 48px; }
+    .question-section { padding: 28px; }
+    .video-upload-section, .image-text-upload-section, .visibility-section { padding: 24px; border-radius: 20px; }
+    .submit-bar { padding: 20px 48px; }
+  }
+  @media (min-width: 1024px) {
+    :root { --text-2xl: 22px; --text-xl: 19px; --text-lg: 17px; --text-md: 16px; --text-base: 15px; --card-radius: 24px; --btn-height: 56px; }
+    body { background: #D8D8E0; }
+    .page-wrapper { max-width: 760px; box-shadow: 0 0 60px rgba(0,0,0,0.08); }
+    .content { padding: 40px 60px; }
+    .question-section { padding: 32px; }
+    .submit-bar { padding: 22px 60px; }
+  }
+  @media (min-width: 1280px) {
+    :root { --card-radius: 28px; --btn-height: 58px; }
+    .page-wrapper { max-width: 860px; }
+    .content { padding: 48px 80px; }
+    .submit-bar { padding: 24px 80px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-wrapper">
+
+  <!-- STATUS BAR -->
+  <div class="status-bar">
+    <span class="status-time" id="statusTime">10:30</span>
+    <div class="status-icons">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+    </div>
+  </div>
+
+  <!-- NAV BAR -->
+  <div class="nav-bar">
+    <div class="nav-back" onclick="history.back()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 18L9 12L15 6"/>
+      </svg>
+    </div>
+    <span class="nav-title">发布习题</span>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- ========== 1. 题目模块 ========== -->
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+      题目
+    </div>
+    <div class="question-section">
+      <div id="questionUploadArea" class="question-content-area" onclick="openQuestionEditor()">
+        <div class="question-content-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+        </div>
+        <div class="question-content-text">编辑题目内容</div>
+        <div class="question-content-sub">点击此处输入题目文字和图片</div>
+      </div>
+      <div id="questionPreview" class="question-preview">
+        <div id="questionPreviewBody" class="question-preview-body"></div>
+        <div class="question-preview-footer">
+          <div class="question-preview-edit" onclick="openQuestionEditor()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            重新编辑
+          </div>
+        </div>
+      </div>
+
+      <!-- 题目设置（新设计） -->
+      <div class="question-settings">
+        <!-- 年级 -->
+        <div class="setting-group">
+          <div class="setting-label">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/></svg>
+            年级
+          </div>
+          <div class="grade-pills" id="gradePills">
+            <div class="grade-pill" data-grade="7" onclick="selectGrade(this)">初一</div>
+            <div class="grade-pill" data-grade="8" onclick="selectGrade(this)">初二</div>
+            <div class="grade-pill" data-grade="9" onclick="selectGrade(this)">初三</div>
+            <div class="grade-pill active" data-grade="10" onclick="selectGrade(this)">高一</div>
+            <div class="grade-pill" data-grade="11" onclick="selectGrade(this)">高二</div>
+            <div class="grade-pill" data-grade="12" onclick="selectGrade(this)">高三</div>
+          </div>
+        </div>
+
+        <!-- 难度 -->
+        <div class="setting-group">
+          <div class="setting-label">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+            难度
+          </div>
+          <div class="difficulty-selector" id="diffSelector">
+            <div class="diff-header">
+              <span class="diff-name" id="diffName">二级：运用</span>
+              <div class="diff-count" id="diffCount"></div>
+            </div>
+            <div class="diff-track" id="diffTrack">
+              <div class="diff-marks" id="diffMarks"></div>
+              <div class="diff-fill" id="diffFill"></div>
+              <div class="diff-thumb" id="diffThumb" style="left:40%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 标签 -->
+        <div class="setting-group">
+          <div class="setting-label">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58.55 0 1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.55-.23-1.06-.59-1.42z"/></svg>
+            标签
+          </div>
+          <div class="tags-wrap">
+            <div class="tags-list" id="tagsList">
+              <button class="tag-add-btn" id="tagAddBtn" onclick="showTagInput()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+                添加
+              </button>
+            </div>
+            <div class="tag-input-row hidden" id="tagInputRow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+              <input type="text" id="tagInput" placeholder="输入标签后回车确认"
+                maxlength="12" onkeydown="onTagInputKey(event)" oninput="onTagInputChange()">
+              <div class="tag-input-confirm hidden" id="tagConfirmBtn" onclick="confirmTagInput()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+            </div>
+            <div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:var(--sp-2);display:flex;align-items:center;gap:4px">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="var(--purple)" style="opacity:0.8"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+              AI推荐标签
+            </div>
+            <div class="tag-suggestions" id="tagSuggestions"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 2. 视频讲解 ========== -->
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+      视频讲解
+    </div>
+    <div class="video-upload-section">
+      <div id="videoUploadArea" class="video-upload-area" onclick="triggerVideoUpload()">
+        <div class="video-upload-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+          </svg>
+        </div>
+        <div class="video-upload-text">拍摄或上传视频</div>
+        <div class="video-upload-sub">点击此处录制讲解视频</div>
+      </div>
+      <div id="videoPreviewWrap" class="video-preview-wrap">
+        <video id="videoPreviewEl" controls playsinline></video>
+        <div class="video-preview-overlay" onclick="playPreview()">
+          <div class="video-preview-play">
+            <svg viewBox="0 0 24 24" fill="#2dc89c"><path d="M8 5v14l11-7L8 5z"/></svg>
+          </div>
+        </div>
+        <button class="video-preview-delete" onclick="deleteVideo(event)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <input type="file" id="videoFileInput" accept="video/*" style="display:none" onchange="onVideoFileSelected(event)">
+
+    <!-- ========== 3. 图文讲解 ========== -->
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+      图文讲解
+    </div>
+    <div class="image-text-upload-section">
+      <div id="imageTextUploadArea" class="image-text-upload-area" onclick="openEditor('explain')">
+        <div class="image-text-upload-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+        </div>
+        <div class="image-text-upload-text">编辑图文讲解</div>
+        <div class="image-text-upload-sub">点击此处编写解题步骤和说明</div>
+      </div>
+      <div id="imageTextPreview" class="image-text-preview">
+        <div id="imageTextPreviewBody" class="image-text-preview-body"></div>
+        <div class="image-text-preview-footer">
+          <div class="image-text-preview-edit" onclick="openEditor('explain')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            重新编辑
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 4. 关联知识点 ========== -->
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+      关联知识点
+    </div>
+    <div class="knowledge-card" id="knowledgeCard">
+      <div class="knowledge-empty" id="knowledgeEmpty" onclick="openKnowledgeSelector()">
+        <div class="knowledge-empty-text">选择知识点</div>
+        <div class="knowledge-empty-sub">点击此处从知识点库中选择关联知识点</div>
+      </div>
+      <div class="knowledge-list" id="knowledgeList" style="display:none"></div>
+    </div>
+
+    <!-- ========== 5. 可见范围 ========== -->
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+      可见范围
+    </div>
+    <div class="visibility-section">
+      <div class="visibility-options">
+        <div class="visibility-option selected" data-value="public" onclick="selectVisibility(this)">
+          <div class="visibility-radio">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="visibility-info">
+            <div class="visibility-title">公开</div>
+            <div class="visibility-sub">所有人可见</div>
+          </div>
+        </div>
+        <div class="visibility-option" data-value="school" onclick="selectVisibility(this)">
+          <div class="visibility-radio">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="visibility-info">
+            <div class="visibility-title">本校</div>
+            <div class="visibility-sub">仅本校师生可见</div>
+          </div>
+        </div>
+        <div class="visibility-option" data-value="class" onclick="selectVisibility(this)">
+          <div class="visibility-radio">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="visibility-info">
+            <div class="visibility-title">本班</div>
+            <div class="visibility-sub">仅本班同学可见</div>
+          </div>
+        </div>
+        <div class="visibility-option" data-value="classes" onclick="selectVisibility(this)">
+          <div class="visibility-radio">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="visibility-info">
+            <div class="visibility-title">指定班级</div>
+            <div class="visibility-sub">选择我所在的班级</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="class-list" id="classList">
+        <div class="class-list-title">选择班级</div>
+        <div class="class-items">
+          <div class="class-chip" onclick="toggleClass(this)">高一(1)班</div>
+          <div class="class-chip" onclick="toggleClass(this)">高一(2)班</div>
+          <div class="class-chip" onclick="toggleClass(this)">高一(3)班</div>
+          <div class="class-chip" onclick="toggleClass(this)">数学兴趣班</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.content -->
+
+  <!-- ========== 发布栏 ========== -->
+  <div class="submit-bar">
+    <button class="submit-btn disabled" id="submitBtn" onclick="handleSubmit()">
+      <svg viewBox="0 0 24 24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      发布习题
+    </button>
+  </div>
+
+</div><!-- /.page-wrapper -->
+
+<!-- ========== 全屏图文编辑器（完整版：白板+公式） ========== -->
+<div class="editor-overlay" id="editorOverlay">
+  <div class="editor-drag-handle" onclick="closeEditor(false)"></div>
+  <div class="editor-nav">
+    <div class="editor-close" onclick="closeEditor(false)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 6L6 18M6 6l12 12"/>
+      </svg>
+    </div>
+    <span class="editor-nav-title" id="editorNavTitle">编辑题目</span>
+    <button class="editor-save-btn" onclick="closeEditor(true)">保存</button>
+  </div>
+
+  <!-- 工具栏 -->
+  <div class="editor-toolbar">
+    <button class="editor-tool-btn" onclick="formatText('bold')" title="加粗">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.6 10.79c.97-.67 1.65-1.77 1.65-2.79 0-2.26-1.75-4-4-4H7v14h7.04c2.09 0 3.71-1.7 3.71-3.79 0-1.52-.86-2.82-2.15-3.42zM10 6.5h3c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-3v-3zm3.5 9H10v-3h3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z"/></svg>
+    </button>
+    <button class="editor-tool-btn" onclick="formatText('italic')" title="斜体">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 4v3h2.21l-3.42 8H6v3h8v-3h-2.21l3.42-8H18V4z"/></svg>
+    </button>
+    <div class="editor-tool-divider"></div>
+    <button class="editor-tool-btn" onclick="formatText('insertUnorderedList')" title="列表">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zm0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5zm0 12c-.83 0-1.5.68-1.5 1.5s.68 1.5 1.5 1.5 1.5-.68 1.5-1.5-.67-1.5-1.5-1.5zM7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7z"/></svg>
+    </button>
+    <button class="editor-tool-btn" onclick="formatText('insertOrderedList')" title="编号">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 17h2v.5H3v1h1v.5H2v1h3v-4H2v1zm1-9h1V4H2v1h1v3zm-1 3h1.8L2 13.1v.9h3v-1H3.2L5 10.9V10H2v1zm5-6v2h14V5H7zm0 14h14v-2H7v2zm0-6h14v-2H7v2z"/></svg>
+    </button>
+    <div class="editor-tool-divider"></div>
+    <label class="editor-tool-btn" title="插入图片" style="cursor:pointer">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+      <input type="file" accept="image/*" multiple style="display:none" id="editorImageInput" onchange="onEditorImageSelected(event)">
+    </label>
+    <button class="editor-tool-btn" id="whiteboardToolBtn" onclick="toggleWhiteboard()" title="白板画图">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+    </button>
+    <button class="editor-tool-btn" id="formulaToolBtn" onclick="toggleFormulaHW()" title="手写公式">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 19c-4 0-7-2.5-7-6 0-1.5.5-2.5 1.5-3.5C7.5 8.5 9 8 10 8c2 0 3.5 1 4 2.5"/>
+        <path d="M9 3l1 4"/><path d="M18 6l-2 3"/><path d="M16 15l1.5 3L20 13"/>
+      </svg>
+    </button>
+    <div class="editor-tool-divider"></div>
+    <button class="editor-tool-btn" onclick="openPhotoOCR()" title="拍照识别">
+      <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="3.2"/><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
+    </button>
+  </div>
+
+  <!-- 手写公式编辑器 -->
+  <div class="formula-hw-wrap" id="formulaHwWrap">
+    <canvas id="formulaHwCanvas" class="formula-hw-canvas"></canvas>
+    <div class="formula-hw-preview-bar" id="formulaHwPreviewBar">
+      <div class="formula-hw-result" id="formulaHwResult"></div>
+      <div class="formula-hw-result-latex" id="formulaHwLatex" style="display:none"></div>
+      <div class="formula-hw-result-actions">
+        <button class="formula-hw-result-btn retry" onclick="retryFormulaHW()">重新书写</button>
+        <button class="formula-hw-result-btn confirm" onclick="confirmFormulaHW()">插入</button>
+      </div>
+    </div>
+    <div class="formula-hw-toolbar">
+      <div class="formula-hw-hint">在上方区域手写公式</div>
+      <button class="formula-hw-clear" onclick="clearFormulaHW()">清空</button>
+      <button class="formula-hw-recognize" id="formulaHwRecogBtn" onclick="recognizeFormulaHW()">智能识别</button>
+      <button class="formula-hw-settings-btn" onclick="toggleFormulaSettings()" title="识别设置">⚙️</button>
+    </div>
+    <div class="formula-settings-panel" id="formulaSettingsPanel" style="display:none">
+      <div class="formula-settings-title">识别服务设置</div>
+      <div class="formula-settings-row">
+        <label>SimpleTex Token</label>
+        <input type="text" id="simpletexTokenInput" placeholder="输入 SimpleTex API Token"
+               oninput="saveSimpletexToken(this.value)">
+      </div>
+      <div class="formula-settings-hint">
+        <a href="https://simpletex.cn/user/login" target="_blank" rel="noopener">去 SimpleTex 注册</a> 获取免费 Token（每月1000次）
+      </div>
+      <div class="formula-settings-status" id="formulaSettingsStatus"></div>
+    </div>
+  </div>
+
+  <!-- 拍照识别弹窗 -->
+  <div class="photo-ocr-wrap" id="photoOcrWrap" style="display:none">
+    <div class="photo-ocr-header">
+      <span class="photo-ocr-title">拍照识别题目</span>
+      <button class="photo-ocr-close" onclick="closePhotoOCR()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="photo-ocr-body">
+      <div class="photo-ocr-upload" id="photoOcrUpload" onclick="triggerPhotoUpload()">
+        <div class="photo-ocr-upload-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="3.2"/><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
+        </div>
+        <div class="photo-ocr-upload-text">点击拍照或上传图片</div>
+        <div class="photo-ocr-upload-sub">一次仅识别一题</div>
+        <input type="file" accept="image/*" id="photoOcrInput" style="display:none" onchange="onPhotoSelected(event)">
+      </div>
+      <div class="photo-ocr-preview" id="photoOcrPreview" style="display:none">
+        <img id="photoOcrImage" alt="预览">
+        <button class="photo-ocr-reselect" onclick="reselectPhoto()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          重新选择
+        </button>
+      </div>
+      <div class="photo-ocr-loading" id="photoOcrLoading" style="display:none">
+        <div class="photo-ocr-spinner"></div>
+        <span>正在识别中...</span>
+      </div>
+      <div class="photo-ocr-result" id="photoOcrResult" style="display:none">
+        <div class="photo-ocr-result-label">识别结果</div>
+        <div class="photo-ocr-result-text" id="photoOcrText"></div>
+        <div class="photo-ocr-result-actions">
+          <button class="photo-ocr-result-btn edit" onclick="editOcrResult()">编辑修改</button>
+          <button class="photo-ocr-result-btn insert" onclick="insertOcrResult()">插入题目</button>
+        </div>
+      </div>
+      <div class="photo-ocr-edit-area" id="photoOcrEditArea" style="display:none">
+        <div class="photo-ocr-edit-label">编辑识别内容</div>
+        <textarea id="photoOcrTextarea" class="photo-ocr-textarea"></textarea>
+        <div class="photo-ocr-edit-actions">
+          <button class="photo-ocr-result-btn cancel" onclick="cancelEditOcr()">取消</button>
+          <button class="photo-ocr-result-btn insert" onclick="insertEditedOcr()">插入题目</button>
+        </div>
+      </div>
+    </div>
+    <div class="photo-ocr-footer">
+      <div class="photo-ocr-tip">
+        <svg viewBox="0 0 24 24" fill="var(--text-muted)" width="14" height="14"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+        <span>建议拍摄清晰的题目图片，避免倾斜或模糊</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 编辑内容区 -->
+  <div class="editor-content" id="editorContentArea">
+    <!-- 白板 -->
+    <div id="whiteboardWrap" class="whiteboard-wrap">
+      <canvas id="whiteboardCanvas" class="whiteboard-canvas"></canvas>
+      <div class="whiteboard-toolbar">
+        <div class="wb-tool-group">
+          <button class="wb-btn active" id="wbToolPen" onclick="setWbTool('pen')" title="画笔">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+          </button>
+          <button class="wb-btn" id="wbToolEraser" onclick="setWbTool('eraser')" title="橡皮擦">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H7L3 16c-.8-.8-.8-2 0-2.8L14.8 1.4c.8-.8 2-.8 2.8 0l5 5c.8.8.8 2 0 2.8L11 20"/><path d="M6 12l6 6"/></svg>
+          </button>
+          <button class="wb-btn" id="wbToolLine" onclick="setWbTool('line')" title="直线">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="19" x2="19" y2="5"/></svg>
+          </button>
+          <button class="wb-btn" id="wbToolRect" onclick="setWbTool('rect')" title="矩形">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+          </button>
+          <button class="wb-btn" id="wbToolCircle" onclick="setWbTool('circle')" title="圆形">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>
+          </button>
+        </div>
+        <div class="wb-sep"></div>
+        <div class="wb-tool-group">
+          <button class="wb-btn" id="wbUndo" onclick="wbUndo()" title="撤销" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+          </button>
+          <button class="wb-btn" id="wbRedo" onclick="wbRedo()" title="重做" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          </button>
+        </div>
+        <div class="wb-sep"></div>
+        <div class="whiteboard-color-picker" id="wbColorPicker"></div>
+        <div class="wb-sep"></div>
+        <div class="whiteboard-size-picker" id="wbSizePicker"></div>
+        <div style="flex:1"></div>
+        <button class="whiteboard-clear" onclick="clearWhiteboard()">清空</button>
+        <button class="whiteboard-insert-btn" onclick="insertWhiteboard()">插入</button>
+      </div>
+    </div>
+
+    <!-- 文字编辑区 -->
+    <div id="editorTextArea">
+      <div
+        id="editorEditable"
+        contenteditable="true"
+        class="editor-textarea"
+        data-placeholder="在此输入内容…"
+        style="outline:none;min-height:300px;display:block"
+      ></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ========== 全局状态 ========== */
+let hasQuestion = false;
+let hasVideo = false;
+let hasExplain = false;
+let questionContent = '';
+let explainContent = '';
+let currentEditor = 'question';
+let selectedVisibility = 'public';
+let selectedClasses = [];
+let currentGrade = '10';
+let currentDifficulty = 2;
+let tags = [];
+let _lastSavedRange = null;
+
+/* 白板状态 */
+let wbCtx = null;
+let whiteboardVisible = false;
+let wbIsDrawing = false;
+let wbLastX = 0, wbLastY = 0;
+let wbCurrentColor = '#1A1A1A';
+let wbCurrentSize = 3;
+let wbCurrentTool = 'pen';
+let wbEditingImg = null;
+let wbHistory = [];
+let wbHistoryIdx = -1;
+let wbShapeStart = null;
+let wbSnapshotBeforeShape = null;
+const WB_COLORS = ['#1A1A1A','#2dc89c','#FF4757','#FF9F43','#007AFF','#764ba2'];
+const WB_SIZES = [{s:2},{s:4},{s:8}];
+
+/* 公式编辑器状态 */
+let fhCtx = null;
+let formulaHWVisible = false;
+let fhIsDrawing = false;
+let fhLastX = 0, fhLastY = 0;
+let fhRecognizedLatex = '';
+
+/* ========== 时间更新 ========== */
+function updateTime() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  const el = document.getElementById('statusTime');
+  if (el) el.textContent = h + ':' + m;
+}
+setInterval(updateTime, 30000);
+updateTime();
+
+/* ========== 发布按钮状态 ========== */
+function updateSubmitState() {
+  const btn = document.getElementById('submitBtn');
+  if (hasQuestion) btn.classList.remove('disabled');
+  else btn.classList.add('disabled');
+}
+
+/* ========== 年级选择 ========== */
+function selectGrade(el) {
+  document.querySelectorAll('.grade-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  currentGrade = el.dataset.grade;
+}
+
+/* ========== 难度滑动选择 ========== */
+const DIFF_COLORS = ['', '#48C774', '#2dc89c', '#FECA57', '#FF9F43', '#FF4757'];
+const DIFF_NAMES = ['', '一级：基础', '二级：运用', '三级：巩固', '四级：进阶', '五级：挑战'];
+
+function initDifficulty() {
+  setDifficulty(currentDifficulty);
+  renderDiffMarks();
+  // 绑定拖拽
+  const thumb = document.getElementById('diffThumb');
+  const track = document.getElementById('diffTrack');
+  let dragging = false;
+
+  function getPosX(e) {
+    const rect = track.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const x = clientX - rect.left;
+    return Math.max(0, Math.min(x / rect.width, 1));
+  }
+
+  function onMove(e) {
+    if (!dragging) return;
+    e.preventDefault();
+    const pos = getPosX(e);
+    const level = Math.round(pos * 4) + 1;
+    setDifficulty(Math.min(5, Math.max(1, level)));
+  }
+
+  thumb.addEventListener('mousedown', () => { dragging = true; });
+  thumb.addEventListener('touchstart', () => { dragging = true; }, { passive: true });
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('touchmove', onMove, { passive: false });
+  document.addEventListener('mouseup', () => { dragging = false; });
+  document.addEventListener('touchend', () => { dragging = false; });
+
+  // 点击星星快速定位
+  document.querySelectorAll('.diff-star-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const lvl = parseInt(btn.dataset.level);
+      setDifficulty(lvl);
+    });
+  });
+}
+
+function renderDiffMarks() {
+  const marks = document.getElementById('diffMarks');
+  if (!marks) return;
+  marks.innerHTML = '';
+  for (let i = 1; i <= 5; i++) {
+    const mark = document.createElement('div');
+    mark.className = 'diff-mark';
+    mark.dataset.level = i;
+    // 第5个在最末尾(100%)，其他均匀分布在前4个位置
+    const posPct = i === 5 ? 100 : ((i - 1) / 4) * 100;
+    mark.style.left = posPct + '%';
+    mark.style.transform = 'translateX(-50%)';
+    mark.innerHTML = `<svg viewBox="0 0 24 24" fill="${i <= currentDifficulty ? DIFF_COLORS[i] : '#D1D1D6'}"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`;
+    mark.onclick = () => setDifficulty(i);
+    marks.appendChild(mark);
+  }
+}
+
+function setDifficulty(level) {
+  currentDifficulty = level;
+  const track = document.getElementById('diffTrack');
+  const fill = document.getElementById('diffFill');
+  const thumb = document.getElementById('diffThumb');
+  const nameEl = document.getElementById('diffName');
+  const countEl = document.getElementById('diffCount');
+  if (!track) return;
+
+  const pct = ((level - 1) / 4) * 100;
+  fill.style.width = pct + '%';
+  fill.style.background = DIFF_COLORS[level];
+  thumb.style.left = pct + '%';
+  thumb.style.borderColor = DIFF_COLORS[level];
+  nameEl.textContent = DIFF_NAMES[level];
+  nameEl.style.color = DIFF_COLORS[level];
+
+  // 更新轨道上的标记
+  renderDiffMarks();
+
+  // 星星指示
+  countEl.innerHTML = '';
+  for (let i = 1; i <= 5; i++) {
+    const star = document.createElement('div');
+    star.className = 'diff-star-btn' + (i <= level ? ' active' : '');
+    star.dataset.level = i;
+    star.innerHTML = `<svg viewBox="0 0 24 24" fill="${i <= level ? DIFF_COLORS[level] : '#D1D1D6'}"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`;
+    countEl.appendChild(star);
+  }
+  // 再次绑定点击事件
+  countEl.querySelectorAll('.diff-star-btn').forEach(btn => {
+    btn.onclick = () => setDifficulty(parseInt(btn.dataset.level));
+  });
+}
+
+function onDiffTrackClick(e) {
+  const track = document.getElementById('diffTrack');
+  const rect = track.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const pct = Math.max(0, Math.min(x / rect.width, 1));
+  const level = Math.round(pct * 4) + 1;
+  setDifficulty(Math.min(5, Math.max(1, level)));
+}
+
+/* ========== 标签管理 ========== */
+const TAG_SUGGESTIONS = [
+  '一元二次方程', '函数', '几何证明', '因式分解',
+  '不等式', '三角形', '圆', '概率统计',
+  '相似三角形', '二次函数', '勾股定理', '绝对值'
+];
+
+function initTags() {
+  renderTags();
+  renderTagSuggestions();
+}
+
+function renderTags() {
+  const list = document.getElementById('tagsList');
+  list.innerHTML = tags.map(tag => `
+    <div class="tag-chip">
+      ${tag}
+      <div class="tag-chip-remove" onclick="removeTag('${tag.replace(/'/g, "\\'")}', this.parentElement)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </div>
+    </div>
+  `).join('') + `
+    <button class="tag-add-btn" id="tagAddBtn" onclick="showTagInput()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      添加
+    </button>
+  `;
+  renderTagSuggestions();
+}
+
+function renderTagSuggestions() {
+  const container = document.getElementById('tagSuggestions');
+  container.innerHTML = TAG_SUGGESTIONS
+    .filter(s => !tags.includes(s))
+    .map(s => `<div class="tag-suggestion" onclick="addTag('${s.replace(/'/g, "\\'")}')" style="display:flex;align-items:center;gap:4px"><span style="font-size:10px;color:#764ba2;background:#F3EEFF;padding:1px 4px;border-radius:4px;font-weight:600">AI</span>${s}</div>`)
+    .join('');
+}
+
+function addTag(tag) {
+  if (tags.includes(tag) || tags.length >= 8) return;
+  tags.push(tag);
+  renderTags();
+}
+
+function removeTag(tag, el) {
+  tags = tags.filter(t => t !== tag);
+  el.remove();
+  renderTagSuggestions();
+}
+
+function showTagInput() {
+  document.getElementById('tagAddBtn').classList.add('hidden');
+  document.getElementById('tagInputRow').classList.remove('hidden');
+  document.getElementById('tagInput').focus();
+}
+
+function hideTagInput() {
+  document.getElementById('tagAddBtn').classList.remove('hidden');
+  document.getElementById('tagInputRow').classList.add('hidden');
+  document.getElementById('tagInput').value = '';
+  document.getElementById('tagConfirmBtn').classList.add('hidden');
+}
+
+function onTagInputKey(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    confirmTagInput();
+  }
+  if (e.key === 'Escape') {
+    hideTagInput();
+  }
+}
+
+function onTagInputChange() {
+  const input = document.getElementById('tagInput');
+  const btn = document.getElementById('tagConfirmBtn');
+  if (input.value.trim()) {
+    btn.classList.remove('hidden');
+  } else {
+    btn.classList.add('hidden');
+  }
+}
+
+function confirmTagInput() {
+  const input = document.getElementById('tagInput');
+  const value = input.value.trim();
+  if (value && !tags.includes(value) && tags.length < 8) {
+    tags.push(value);
+    renderTags();
+  }
+  hideTagInput();
+}
+
+/* ========== 图文编辑器 ========== */
+function openQuestionEditor() {
+  currentEditor = 'question';
+  document.getElementById('editorNavTitle').textContent = '编辑题目';
+  openEditorCommon(questionContent);
+}
+
+function openEditor(type) {
+  currentEditor = type;
+  document.getElementById('editorNavTitle').textContent = type === 'question' ? '编辑题目' : '编辑图文讲解';
+  openEditorCommon(type === 'question' ? questionContent : explainContent);
+}
+
+function openEditorCommon(content) {
+  document.getElementById('editorOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  const editable = document.getElementById('editorEditable');
+  editable.innerHTML = content || '';
+  
+  // 绑定图片点击调整大小
+  editable.querySelectorAll('img').forEach(img => {
+    img.onclick = function(event) { selectImageForResize(this, event); };if (img.hasAttribute('data-wb')) {
+      img.addEventListener('dblclick', function(event) { event.stopPropagation(); openWhiteboardWithImage(this); });}
+  });
+  initImageResize();
+
+  // 持续追踪光标
+  if (!editable._cursorTracked) {
+    const trackCursor = function() {
+      const sel = window.getSelection();
+      if (sel.rangeCount > 0) {
+        const r = sel.getRangeAt(0);
+        if (editable.contains(r.commonAncestorContainer)) {
+          _lastSavedRange = r.cloneRange();
+        }
+      }
+    };
+    editable.addEventListener('keyup', trackCursor);
+    editable.addEventListener('mouseup', trackCursor);
+    editable.addEventListener('input', trackCursor);
+    document.addEventListener('selectionchange', function() {
+      const sel = window.getSelection();
+      if (sel.rangeCount > 0) {
+        const r = sel.getRangeAt(0);
+        if (editable.contains(r.commonAncestorContainer)) {
+          _lastSavedRange = r.cloneRange();
+        }
+      }
+    });
+    editable._cursorTracked = true;
+  }
+
+  initWhiteboard();
+  setTimeout(() => editable.focus(), 300);
+}
+
+function closeEditor(save) {
+  if (save) {
+    const editable = document.getElementById('editorEditable');
+    const html = editable.innerHTML;
+    if (currentEditor === 'question') {
+      questionContent = html;
+      updateQuestionPreview(html);
+    } else {
+      explainContent = html;
+      updateExplainPreview(html);
+    }
+  }
+  wbEditingImg = null;
+  document.getElementById('editorOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function updateQuestionPreview(html) {
+  const preview = document.getElementById('questionPreview');
+  const uploadArea = document.getElementById('questionUploadArea');
+  const body = document.getElementById('questionPreviewBody');
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  const text = (tmp.textContent || tmp.innerText || '').trim();
+  if (text.length > 0 || html.includes('<img')) {
+    body.innerHTML = html;
+    preview.classList.add('has-content');
+    uploadArea.style.display = 'none';
+    hasQuestion = true;
+  } else {
+    preview.classList.remove('has-content');
+    uploadArea.style.display = 'flex';
+    hasQuestion = false;
+  }
+  updateSubmitState();
+}
+
+function updateExplainPreview(html) {
+  const preview = document.getElementById('imageTextPreview');
+  const uploadArea = document.getElementById('imageTextUploadArea');
+  const body = document.getElementById('imageTextPreviewBody');
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  const text = (tmp.textContent || tmp.innerText || '').trim();
+  if (text.length > 0 || html.includes('<img')) {
+    body.innerHTML = html;
+    preview.classList.add('has-content');
+    uploadArea.style.display = 'none';
+    hasExplain = true;
+  } else {
+    preview.classList.remove('has-content');
+    uploadArea.style.display = 'flex';
+    hasExplain = false;
+  }
+}
+
+/* ========== 视频上传 ========== */
+function triggerVideoUpload() {
+  document.getElementById('videoFileInput').click();
+}
+
+function onVideoFileSelected(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  const preview = document.getElementById('videoPreviewWrap');
+  const uploadArea = document.getElementById('videoUploadArea');
+  const videoEl = document.getElementById('videoPreviewEl');
+  videoEl.src = url;
+  preview.classList.add('has-video');
+  uploadArea.style.display = 'none';
+  hasVideo = true;
+  updateSubmitState();
+}
+
+function deleteVideo(e) {
+  e.stopPropagation();
+  document.getElementById('videoPreviewWrap').classList.remove('has-video');
+  document.getElementById('videoUploadArea').style.display = 'flex';
+  document.getElementById('videoPreviewEl').src = '';
+  document.getElementById('videoFileInput').value = '';
+  hasVideo = false;
+  updateSubmitState();
+}
+
+function playPreview() {
+  const v = document.getElementById('videoPreviewEl');
+  if (v.paused) { v.play(); document.querySelector('.video-preview-overlay').style.display = 'none'; }
+  else { v.pause(); document.querySelector('.video-preview-overlay').style.display = 'flex'; }
+}
+
+/* ========== 可见范围 ========== */
+function selectVisibility(el) {
+  document.querySelectorAll('.visibility-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedVisibility = el.dataset.value;
+  const classList = document.getElementById('classList');
+  classList.classList.toggle('show', selectedVisibility === 'classes');
+}
+
+function toggleClass(el) {
+  el.classList.toggle('selected');
+  const name = el.textContent;
+  if (el.classList.contains('selected')) {
+    if (!selectedClasses.includes(name)) selectedClasses.push(name);
+  } else {
+    selectedClasses = selectedClasses.filter(c => c !== name);
+  }
+}
+
+/* ========== 编辑器文字处理 ========== */
+function formatText(command) {
+  document.execCommand(command, false, null);
+  document.getElementById('editorEditable').focus();
+}
+
+function onEditorImageSelected(e) {
+  Array.from(e.target.files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      const img = document.createElement('img');
+      img.src = ev.target.result;
+      img.style.cssText = 'max-width:100%;vertical-align:middle;margin:4px 2px;border-radius:6px;';
+      img.onclick = function(event) { selectImageForResize(this, event); };insertNodeAtCursor(img);
+    };
+    reader.readAsDataURL(file);
+  });
+  e.target.value = '';
+}
+
+function insertNodeAtCursor(node) {
+  const editable = document.getElementById('editorEditable');
+  const sel = window.getSelection();
+  let useRange = null;
+  if (sel.rangeCount > 0) {
+    const r = sel.getRangeAt(0);
+    if (editable.contains(r.commonAncestorContainer)) useRange = r;
+  }
+  if (!useRange && _lastSavedRange && editable.contains(_lastSavedRange.commonAncestorContainer)) {
+    editable.focus();
+    sel.removeAllRanges();
+    sel.addRange(_lastSavedRange);
+    useRange = sel.getRangeAt(0);
+  }
+  if (useRange) {
+    useRange.deleteContents();
+    useRange.insertNode(node);
+    useRange.collapse(false);
+    _lastSavedRange = useRange.cloneRange();
+    if (document.activeElement !== editable) editable.focus();
+    return;
+  }
+  editable.appendChild(node);
+  const newRange = document.createRange();
+  newRange.setStartAfter(node);
+  newRange.collapse(true);
+  _lastSavedRange = newRange;
+  if (document.activeElement !== editable) editable.focus();
+}
+
+/* ========== 图片调整大小 ========== */
+let selectedImg = null;
+let resizeHandles = [];
+let resizing = false;
+let resizeHandle = null;
+let resizeStartX = 0, resizeStartY = 0, resizeStartW = 0, resizeStartH = 0;
+
+function selectImageForResize(img, event) {
+  event.stopPropagation();
+  deselectImage();
+  selectedImg = img;
+  img.classList.add('selected');
+  createResizeHandles(img);
+}
+
+function createResizeHandles(img) {
+  const editable = document.getElementById('editorEditable');
+  editable.style.position = 'relative';
+  const positions = ['nw', 'ne', 'sw', 'se'];
+  positions.forEach(pos => {
+    const handle = document.createElement('div');
+    handle.className = 'img-resize-handle ' + pos;
+    handle.dataset.pos = pos;
+    handle.addEventListener('mousedown', startResize);
+    handle.addEventListener('touchstart', startResize, { passive: false });
+    editable.appendChild(handle);
+    resizeHandles.push(handle);
+  });
+  updateHandlePositions();
+}
+
+function updateHandlePositions() {
+  if (!selectedImg) return;
+  const rect = selectedImg.getBoundingClientRect();
+  const editableRect = document.getElementById('editorEditable').getBoundingClientRect();
+  const offsetX = rect.left - editableRect.left;
+  const offsetY = rect.top - editableRect.top;
+  const handles = { nw: { x: offsetX - 5, y: offsetY - 5 }, ne: { x: offsetX + rect.width - 5, y: offsetY - 5 }, sw: { x: offsetX - 5, y: offsetY + rect.height - 5 }, se: { x: offsetX + rect.width - 5, y: offsetY + rect.height - 5 } };resizeHandles.forEach(h => {
+    const pos = h.dataset.pos;h.style.left = handles[pos].x + 'px';h.style.top = handles[pos].y + 'px';
+  });
+}
+
+function startResize(e) {
+  e.preventDefault(); e.stopPropagation();
+  resizing = true; resizeHandle = e.target.dataset.pos;
+  resizeStartX = e.touches ? e.touches[0].clientX : e.clientX;
+  resizeStartY = e.touches ? e.touches[0].clientY : e.clientY;
+  resizeStartW = selectedImg.offsetWidth; resizeStartH = selectedImg.offsetHeight;
+  document.addEventListener('mousemove', doResize);
+  document.addEventListener('touchmove', doResize, { passive: false });
+  document.addEventListener('mouseup', endResize);
+  document.addEventListener('touchend', endResize);
+}
+
+function doResize(e) {
+  if (!resizing) return; e.preventDefault();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  const dx = clientX - resizeStartX; const dy = clientY - resizeStartY;
+  let newW = resizeStartW, newH = resizeStartH;
+  if (resizeHandle.includes('e')) newW = Math.max(50, resizeStartW + dx);
+  if (resizeHandle.includes('w')) newW = Math.max(50, resizeStartW - dx);
+  if (resizeHandle.includes('s')) newH = Math.max(50, resizeStartH + dy);
+  if (resizeHandle.includes('n')) newH = Math.max(50, resizeStartH - dy);
+  selectedImg.style.width = newW + 'px';
+  selectedImg.style.height = 'auto';
+  updateHandlePositions();
+}
+
+function endResize() {
+  resizing = false;
+  document.removeEventListener('mousemove', doResize);
+  document.removeEventListener('touchmove', doResize);
+  document.removeEventListener('mouseup', endResize);
+  document.removeEventListener('touchend', endResize);
+}
+
+function deselectImage() {
+  if (selectedImg) selectedImg.classList.remove('selected');
+  selectedImg = null;
+  resizeHandles.forEach(h => h.remove());
+  resizeHandles = [];
+}
+
+function initImageResize() {
+  const editable = document.getElementById('editorEditable');
+  editable.addEventListener('click', function(e) {
+    if (e.target.tagName !== 'IMG') deselectImage();
+  });}
+
+/* ========== 白板 ========== */
+function initWhiteboard() {
+  const canvas = document.getElementById('whiteboardCanvas');
+  if (!canvas) return;
+  wbCtx = canvas.getContext('2d');
+  wbCtx.lineCap = 'round';
+  wbCtx.lineJoin = 'round';
+
+  const colorPicker = document.getElementById('wbColorPicker');
+  colorPicker.innerHTML = WB_COLORS.map(c => `
+    <div class="whiteboard-color ${c === wbCurrentColor ? 'active' : ''}"
+      style="background:${c}" onclick="setWbColor('${c}', this)"></div>
+  `).join('');
+
+  const sizePicker = document.getElementById('wbSizePicker');
+  sizePicker.innerHTML = WB_SIZES.map(sz => `
+    <div class="whiteboard-size-dot" style="width:${sz.s+4}px;height:${sz.s+4}px;opacity:${sz.s === wbCurrentSize ? '1' : '0.4'}"
+      onclick="setWbSize(${sz.s}, this)"></div>
+  `).join('');
+
+  wbHistory = [];
+  wbHistoryIdx = -1;
+}
+
+function toggleWhiteboard() {
+  const wrap = document.getElementById('whiteboardWrap');
+  const textArea = document.getElementById('editorTextArea');
+  const btn = document.getElementById('whiteboardToolBtn');
+  whiteboardVisible = !whiteboardVisible;
+  if (whiteboardVisible && formulaHWVisible) toggleFormulaHW();
+  if (!whiteboardVisible) {
+    wrap.classList.remove('show');
+    textArea.style.display = 'block';
+    btn.classList.remove('active');
+  } else {
+    wrap.classList.add('show');
+    textArea.style.display = 'none';
+    btn.classList.add('active');
+    requestAnimationFrame(() => {
+      const canvas = document.getElementById('whiteboardCanvas');
+      const w = canvas.parentElement.offsetWidth;
+      const h = Math.max(canvas.parentElement.offsetHeight, 300);
+      canvas.width = w;
+      canvas.height = h;
+      wbCtx = canvas.getContext('2d');
+      wbCtx.lineCap = 'round';
+      wbCtx.lineJoin = 'round';
+      wbCtx.strokeStyle = wbCurrentColor;
+      wbCtx.lineWidth = wbCurrentSize;
+      canvas.style.cursor = wbCurrentTool === 'eraser' ? 'cell' : 'crosshair';
+      wbSaveSnapshot();
+    });
+  }
+}
+
+function setWbColor(color, el) {
+  wbCurrentColor = color;
+  document.querySelectorAll('.whiteboard-color').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function setWbSize(size, el) {
+  wbCurrentSize = size;
+  document.querySelectorAll('.whiteboard-size-dot').forEach(s => s.style.opacity = '0.4');
+  el.style.opacity = '1';
+}
+
+function clearWhiteboard() {
+  const canvas = document.getElementById('whiteboardCanvas');
+  if (!canvas || !wbCtx) return;
+  wbCtx.clearRect(0, 0, canvas.width, canvas.height);
+  wbSaveSnapshot();
+}
+
+function wbSaveSnapshot() {
+  const canvas = document.getElementById('whiteboardCanvas');
+  if (!canvas) return;
+  wbHistory = wbHistory.slice(0, wbHistoryIdx + 1);
+  wbHistory.push(canvas.toDataURL());
+  if (wbHistory.length > 50) wbHistory.shift();
+  wbHistoryIdx = wbHistory.length - 1;
+  wbUpdateUndoRedo();
+}
+
+function wbUndo() {
+  if (wbHistoryIdx <= 0) return;
+  wbHistoryIdx--;
+  wbRestoreSnapshot(wbHistory[wbHistoryIdx]);
+  wbUpdateUndoRedo();
+}
+
+function wbRedo() {
+  if (wbHistoryIdx >= wbHistory.length - 1) return;
+  wbHistoryIdx++;
+  wbRestoreSnapshot(wbHistory[wbHistoryIdx]);
+  wbUpdateUndoRedo();
+}
+
+function wbRestoreSnapshot(dataURL) {
+  const canvas = document.getElementById('whiteboardCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const img = new Image();
+  img.onload = function() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  };
+  img.src = dataURL;
+}
+
+function wbUpdateUndoRedo() {
+  const u = document.getElementById('wbUndo');
+  const r = document.getElementById('wbRedo');
+  if (u) u.disabled = wbHistoryIdx <= 0;
+  if (r) r.disabled = wbHistoryIdx >= wbHistory.length - 1;
+}
+
+function setWbTool(tool) {
+  wbCurrentTool = tool;
+  document.querySelectorAll('#whiteboardWrap .wb-btn').forEach(b => b.classList.remove('active'));
+  const map = { pen:'wbToolPen', eraser:'wbToolEraser', line:'wbToolLine', rect:'wbToolRect', circle:'wbToolCircle' };
+  const el = document.getElementById(map[tool]);
+  if (el) el.classList.add('active');
+  const canvas = document.getElementById('whiteboardCanvas');
+  if (canvas) canvas.style.cursor = tool === 'eraser' ? 'cell' : 'crosshair';
+}
+
+function insertWhiteboard() {
+  const canvas = document.getElementById('whiteboardCanvas');
+  if (!canvas || !wbCtx) return;
+  const dataURL = canvas.toDataURL('image/png');
+  const editable = document.getElementById('editorEditable');
+
+  if (whiteboardVisible) toggleWhiteboard();
+
+  if (wbEditingImg && editable.contains(wbEditingImg)) {
+    wbEditingImg.src = dataURL;
+    wbEditingImg = null;
+    editable.focus();
+    return;
+  }
+  wbEditingImg = null;
+
+  const img = document.createElement('img');
+  img.src = dataURL;
+  img.setAttribute('data-wb', 'true');
+  img.addEventListener('click', function(event) { selectImageForResize(this, event); });
+  img.addEventListener('dblclick', function(event) { event.stopPropagation(); openWhiteboardWithImage(this); });
+  insertNodeAtCursor(img);
+  editable.focus();
+}
+
+function openWhiteboardWithImage(imgEl) {
+  wbEditingImg = imgEl;
+  if (!whiteboardVisible) toggleWhiteboard();
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      const canvas = document.getElementById('whiteboardCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      img.onload = function() {
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        wbSaveSnapshot();
+      };
+      img.src = imgEl.src;
+    });
+  });
+}
+
+function wbStartDraw(x, y) {
+  wbIsDrawing = true;
+  wbLastX = x;
+  wbLastY = y;
+  if (wbCurrentTool === 'pen') {
+    wbCtx.globalCompositeOperation = 'source-over';
+    wbCtx.strokeStyle = wbCurrentColor;
+    wbCtx.lineWidth = wbCurrentSize;
+    wbCtx.beginPath();
+    wbCtx.moveTo(x, y);
+  } else if (wbCurrentTool === 'eraser') {
+    wbCtx.globalCompositeOperation = 'destination-out';
+    wbCtx.lineWidth = wbCurrentSize * 4;
+    wbCtx.beginPath();
+    wbCtx.moveTo(x, y);
+  } else {
+    wbShapeStart = { x, y };
+    const canvas = document.getElementById('whiteboardCanvas');
+    wbSnapshotBeforeShape = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
+  }
+}
+
+function wbMoveDraw(x, y) {
+  if (!wbIsDrawing) return;
+  if (wbCurrentTool === 'pen' || wbCurrentTool === 'eraser') {
+    wbCtx.lineTo(x, y);
+    wbCtx.stroke();
+    wbLastX = x;
+    wbLastY = y;
+  } else if (wbSnapshotBeforeShape && wbShapeStart) {
+    const canvas = document.getElementById('whiteboardCanvas');
+    const ctx = canvas.getContext('2d');
+    ctx.putImageData(wbSnapshotBeforeShape, 0, 0);
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.strokeStyle = wbCurrentColor;
+    ctx.lineWidth = wbCurrentSize;
+    ctx.beginPath();
+    if (wbCurrentTool === 'line') {
+      ctx.moveTo(wbShapeStart.x, wbShapeStart.y);
+      ctx.lineTo(x, y);
+    } else if (wbCurrentTool === 'rect') {
+      ctx.rect(wbShapeStart.x, wbShapeStart.y, x - wbShapeStart.x, y - wbShapeStart.y);
+    } else if (wbCurrentTool === 'circle') {
+      const rx = Math.abs(x - wbShapeStart.x) / 2;
+      const ry = Math.abs(y - wbShapeStart.y) / 2;
+      const cx = (wbShapeStart.x + x) / 2;
+      const cy = (wbShapeStart.y + y) / 2;
+      ctx.ellipse(cx, cy, Math.max(rx, 0.1), Math.max(ry, 0.1), 0, 0, Math.PI * 2);
+    }
+    ctx.stroke();
+  }
+}
+
+function wbEndDraw() {
+  if (!wbIsDrawing) return;
+  wbIsDrawing = false;
+  wbCtx.globalCompositeOperation = 'source-over';
+  wbShapeStart = null;
+  wbSnapshotBeforeShape = null;
+  wbSaveSnapshot();
+}
+
+function getTouchPos(e) {
+  const canvas = document.getElementById('whiteboardCanvas');
+  const rect = canvas.getBoundingClientRect();
+  const touch = e.touches[0];
+  return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+}
+
+/* ========== 公式编辑器 ========== */
+function toggleFormulaHW() {
+  const wrap = document.getElementById('formulaHwWrap');
+  const textArea = document.getElementById('editorTextArea');
+  const btn = document.getElementById('formulaToolBtn');
+  formulaHWVisible = !formulaHWVisible;
+  if (formulaHWVisible && whiteboardVisible) toggleWhiteboard();
+  if (!formulaHWVisible) {
+    wrap.classList.remove('show');
+    textArea.style.display = 'block';
+    btn.classList.remove('active');
+  } else {
+    wrap.classList.add('show');
+    textArea.style.display = 'none';
+    btn.classList.add('active');
+    document.getElementById('formulaHwPreviewBar').classList.remove('show');
+    fhRecognizedLatex = '';
+    requestAnimationFrame(() => initFormulaHWCanvas());
+  }
+}
+
+function initFormulaHWCanvas() {
+  const canvas = document.getElementById('formulaHwCanvas');
+  if (!canvas) return;
+  const w = canvas.parentElement.offsetWidth;
+  const h = Math.max(canvas.parentElement.offsetHeight, 200);
+  canvas.width = w;
+  canvas.height = h;
+  fhCtx = canvas.getContext('2d');
+  fhCtx.lineCap = 'round';
+  fhCtx.lineJoin = 'round';
+  fhCtx.strokeStyle = '#1A1A1A';
+  fhCtx.lineWidth = 3;
+}
+
+function clearFormulaHW() {
+  const canvas = document.getElementById('formulaHwCanvas');
+  if (!canvas || !fhCtx) return;
+  fhCtx.clearRect(0, 0, canvas.width, canvas.height);
+  document.getElementById('formulaHwPreviewBar').classList.remove('show');
+  fhRecognizedLatex = '';
+}
+
+function recognizeFormulaHW() {
+  const canvas = document.getElementById('formulaHwCanvas');
+  if (!canvas) return;
+  const dataURL = canvas.toDataURL('image/png');
+  const img = new Image();
+  img.onload = function() {
+    const tmp = document.createElement('canvas');
+    tmp.width = canvas.width;
+    tmp.height = canvas.height;
+    const ctx2 = tmp.getContext('2d');
+    ctx2.drawImage(img, 0, 0);
+    const pixels = ctx2.getImageData(0, 0, tmp.width, tmp.height).data;
+    let hasContent = false;
+    for (let i = 3; i < pixels.length; i += 4) {
+      if (pixels[i] > 10) { hasContent = true; break; }
+    }
+    if (!hasContent) return;
+
+    const btn = document.getElementById('formulaHwRecogBtn');
+    btn.textContent = '识别中…';
+    btn.classList.add('loading');
+
+    doFormulaRecognition(canvas).finally(() => {
+      btn.textContent = '智能识别';
+      btn.classList.remove('loading');
+    });
+  };
+  img.src = dataURL;
+}
+
+async function doFormulaRecognition(canvas) {
+  const dataURL = canvas.toDataURL('image/png');
+  const previewBar = document.getElementById('formulaHwPreviewBar');
+  const resultDiv = document.getElementById('formulaHwResult');
+  const latexDiv = document.getElementById('formulaHwLatex');
+
+  const simpletexToken = localStorage.getItem('simpletex_token') || '';
+  if (simpletexToken) {
+    try {
+      const blob = await (await fetch(dataURL)).blob();
+      const fd = new FormData();
+      fd.append('file', blob, 'formula.png');
+      fd.append('rec_mode', 'formula');
+      const resp = await fetch('https://server.simpletex.cn/api/latex_ocr', {
+        method: 'POST',
+        headers: { 'token': simpletexToken },
+        body: fd
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        if (data.status && data.res && data.res.latex) {
+          let latex = data.res.latex.trim().replace(/^\$+|\$+$/g, '');
+          if (latex) {
+            fhRecognizedLatex = latex;
+            showFormulaHWResult(latex);
+            return;
+          }
+        }
+      }
+    } catch(e) { console.warn('SimpleTex API 失败:', e); }
+  }
+
+  try {
+    const resp = await fetch('http://127.0.0.1:9876/predict', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: dataURL }),
+      signal: AbortSignal.timeout(8000)
+    });
+    if (resp.ok) {
+      const data = await resp.json();
+      const latex = (data.latex || data.result || '').trim();
+      if (latex) {
+        fhRecognizedLatex = latex;
+        showFormulaHWResult(latex);
+        return;
+      }
+    }
+  } catch(e) { /* 本地服务未运行 */ }
+
+  fhRecognizedLatex = '';
+  resultDiv.innerHTML = '<span style="font-size:13px;color:var(--text-muted)">暂未识别到公式，将以手写图片形式插入</span><br><span style="font-size:11px;color:var(--text-muted);opacity:0.7">提示：可在设置中配置 SimpleTex API Token 开启智能识别</span>';
+  latexDiv.style.display = 'none';
+  previewBar.classList.add('show');
+}
+
+function showFormulaHWResult(latex) {
+  const previewBar = document.getElementById('formulaHwPreviewBar');
+  const resultDiv = document.getElementById('formulaHwResult');
+  const latexDiv = document.getElementById('formulaHwLatex');
+  try {
+    resultDiv.innerHTML = '';
+    katex.render(latex, resultDiv, { throwOnError: false, displayMode: true });
+  } catch(e) {
+    resultDiv.innerHTML = '<span style="color:#FF4757;font-size:13px">渲染失败</span>';
+  }
+  latexDiv.textContent = latex;
+  latexDiv.style.display = 'block';
+  previewBar.classList.add('show');
+}
+
+function retryFormulaHW() { clearFormulaHW(); }
+
+function confirmFormulaHW() {
+  const editable = document.getElementById('editorEditable');
+  if (fhRecognizedLatex) {
+    try {
+      const span = document.createElement('span');
+      span.style.cssText = 'display:inline-block;margin:4px 0;vertical-align:middle;';
+      span.setAttribute('data-formula', fhRecognizedLatex);
+      katex.render(fhRecognizedLatex, span, { throwOnError: false, displayMode: false });
+      insertNodeAtCursor(span);
+    } catch(e) { insertFormulaAsImage(); }
+  } else {
+    insertFormulaAsImage();
+  }
+  if (formulaHWVisible) toggleFormulaHW();
+  editable.focus();
+}
+
+function insertFormulaAsImage() {
+  const canvas = document.getElementById('formulaHwCanvas');
+  if (!canvas) return;
+  const img = document.createElement('img');
+  img.src = canvas.toDataURL('image/png');
+  img.style.cssText = 'max-width:100%;vertical-align:middle;margin:4px 2px;border-radius:4px;';
+  insertNodeAtCursor(img);
+}
+
+function toggleFormulaSettings() {
+  const panel = document.getElementById('formulaSettingsPanel');
+  if (!panel) return;
+  const visible = panel.style.display !== 'none';
+  panel.style.display = visible ? 'none' : 'block';
+  if (!visible) {
+    const input = document.getElementById('simpletexTokenInput');
+    if (input) input.value = localStorage.getItem('simpletex_token') || '';
+    const status = document.getElementById('formulaSettingsStatus');
+    const token = localStorage.getItem('simpletex_token');
+    if (status) status.textContent = token ? '✅ 已配置 Token，将优先使用 SimpleTex 识别' : '⚠️ 未配置 Token，将降级为图片插入';
+  }
+}
+
+function saveSimpletexToken(value) {
+  const token = value.trim();
+  const status = document.getElementById('formulaSettingsStatus');
+  if (token) {
+    localStorage.setItem('simpletex_token', token);
+    if (status) status.textContent = '✅ 已保存 Token';
+  } else {
+    localStorage.removeItem('simpletex_token');
+    if (status) status.textContent = '⚠️ 未配置 Token，将降级为图片插入';
+  }
+}
+
+/* ========== 拍照识别 ========== */
+let photoOcrVisible = false;
+let photoOcrResult = '';
+
+function openPhotoOCR() {
+  photoOcrVisible = true;
+  document.getElementById('photoOcrWrap').style.display = 'flex';
+  resetPhotoOcrState();
+}
+
+function closePhotoOCR() {
+  photoOcrVisible = false;
+  document.getElementById('photoOcrWrap').style.display = 'none';
+}
+
+function resetPhotoOcrState() {
+  document.getElementById('photoOcrUpload').style.display = 'flex';
+  document.getElementById('photoOcrPreview').style.display = 'none';
+  document.getElementById('photoOcrLoading').style.display = 'none';
+  document.getElementById('photoOcrResult').style.display = 'none';
+  document.getElementById('photoOcrEditArea').style.display = 'none';
+  photoOcrResult = '';
+}
+
+function triggerPhotoUpload() {
+  document.getElementById('photoOcrInput').click();
+}
+
+function onPhotoSelected(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = document.getElementById('photoOcrImage');
+    img.src = e.target.result;
+    img.onload = () => {
+      document.getElementById('photoOcrUpload').style.display = 'none';
+      document.getElementById('photoOcrPreview').style.display = 'block';
+      recognizePhoto(img);
+    };};
+  reader.readAsDataURL(file);
+}
+
+function reselectPhoto() {
+  resetPhotoOcrState();
+  document.getElementById('photoOcrInput').value = '';
+}
+
+async function recognizePhoto(img) {
+  document.getElementById('photoOcrLoading').style.display = 'flex';
+  
+  // 模拟OCR识别 - 实际应调用OCR API
+  try {
+    // 这里可以接入真实的OCR服务
+    // 例如: 百度OCR、腾讯OCR、Mathpix等
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    // 模拟识别结果
+    const mockResult = `已知二次函数 $y = ax^2 + bx + c$ 的图像经过点 $A(1, 3)$ 和 $B(-1, 1)$。
+
+(1) 求该二次函数的解析式；
+
+(2) 求该函数图像的顶点坐标。`;
+    
+    photoOcrResult = mockResult;
+    showPhotoOcrResult(mockResult);
+  } catch(e) {
+    alert('识别失败，请重试');
+    resetPhotoOcrState();
+  }
+}
+
+function showPhotoOcrResult(text) {
+  document.getElementById('photoOcrLoading').style.display = 'none';
+  document.getElementById('photoOcrResult').style.display = 'block';
+  document.getElementById('photoOcrText').textContent = text;
+}
+
+function editOcrResult() {
+  document.getElementById('photoOcrResult').style.display = 'none';
+  document.getElementById('photoOcrEditArea').style.display = 'block';
+  document.getElementById('photoOcrTextarea').value = photoOcrResult;
+}
+
+function cancelEditOcr() {
+  document.getElementById('photoOcrEditArea').style.display = 'none';
+  document.getElementById('photoOcrResult').style.display = 'block';
+}
+
+function insertOcrResult() {
+  if (!photoOcrResult) return;
+  const editable = document.getElementById('editorEditable');
+  if (!editable) return;
+  editable.focus();
+  editable.innerHTML += `<div style="white-space:pre-wrap;line-height:1.6">${photoOcrResult}</div><br>`;
+  closePhotoOCR();
+  updateQuestionPreview();
+}
+
+function insertEditedOcr() {
+  const text = document.getElementById('photoOcrTextarea').value.trim();
+  if (!text) return;
+  photoOcrResult = text;
+  insertOcrResult();
+}
+
+/* ========== 关联知识点 ========== */
+let knowledgePoints = [];
+
+function openKnowledgeSelector() {
+  // TODO: 打开知识点选择页面/弹窗
+  // 这里模拟添加一些知识点
+  const mockData = [
+    { chapter: '二、函数的应用', section: '2.1 二次函数的图像与性质' },
+    { chapter: '二、函数的应用', section: '2.2 二次函数解析式的求法' },
+    { chapter: '三、方程与不等式', section: '3.4 一元二次方程的根与系数关系' }
+  ];
+  knowledgePoints = mockData;
+  renderKnowledgePoints();
+}
+
+function renderKnowledgePoints() {
+  const empty = document.getElementById('knowledgeEmpty');
+  const list = document.getElementById('knowledgeList');
+  if (knowledgePoints.length === 0) {
+    empty.style.display = 'block';
+    list.style.display = 'none';
+    return;
+  }
+  empty.style.display = 'none';
+  list.style.display = 'block';
+  list.innerHTML = knowledgePoints.map((kp, i) => `
+    <div class="knowledge-item">
+      <span class="knowledge-num">${i + 1}</span>
+      <div class="knowledge-content">
+        <div class="knowledge-chapter">${kp.chapter}</div>
+        <div class="knowledge-section">${kp.section}</div>
+      </div>
+      <button class="knowledge-delete" onclick="removeKnowledgePoint(${i})" title="删除">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    ${i < knowledgePoints.length - 1 ? '<div class="knowledge-divider"></div>' : ''}
+  `).join('') + `
+    <div style="margin-top:var(--sp-2);display:flex;justify-content:flex-end" >
+      <button onclick="openKnowledgeSelector()" style="padding:4px 10px;border-radius:14px;background:rgba(45,200,156,0.08);border:1px solid rgba(45,200,156,0.3);color:var(--brand);font-size:11px;display:flex;align-items:center;gap:3px;cursor:pointer" >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="10" height="10"><path d="M12 5v14M5 12h14"/></svg>
+        继续添加
+      </button>
+    </div>
+  `;
+}
+
+function removeKnowledgePoint(index) {
+  knowledgePoints.splice(index, 1);
+  renderKnowledgePoints();
+}
+
+/* ========== 发布 ========== */
+function handleSubmit() {
+  const btn = document.getElementById('submitBtn');
+  if (btn.classList.contains('disabled')) return;
+  btn.textContent = '发布中…';
+  btn.disabled = true;
+  setTimeout(() => {
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> 发布成功！';
+    btn.style.background = '#48C774';
+    setTimeout(() => {
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg> 发布习题';
+      btn.style.background = '';
+      btn.disabled = false;
+      btn.classList.add('disabled');
+    }, 2500);
+  }, 1200);
+}
+
+/* ========== DOMReady 事件绑定 ========== */
+document.addEventListener('DOMContentLoaded', () => {
+  initDifficulty();
+  initTags();
+
+  // 白板 canvas 事件
+  const wbCanvas = document.getElementById('whiteboardCanvas');
+  if (wbCanvas) {
+    wbCanvas.addEventListener('mousedown', e => {
+      const rect = wbCanvas.getBoundingClientRect();
+      wbStartDraw(e.clientX - rect.left, e.clientY - rect.top);
+    });
+    wbCanvas.addEventListener('mousemove', e => {
+      const rect = wbCanvas.getBoundingClientRect();
+      wbMoveDraw(e.clientX - rect.left, e.clientY - rect.top);
+    });
+    wbCanvas.addEventListener('mouseup', () => wbEndDraw());
+    wbCanvas.addEventListener('mouseleave', () => wbEndDraw());
+    wbCanvas.addEventListener('touchstart', e => {
+      e.preventDefault();
+      const pos = getTouchPos(e);
+      wbStartDraw(pos.x, pos.y);
+    }, { passive: false });
+    wbCanvas.addEventListener('touchmove', e => {
+      e.preventDefault();
+      const pos = getTouchPos(e);
+      wbMoveDraw(pos.x, pos.y);
+    }, { passive: false });
+    wbCanvas.addEventListener('touchend', () => wbEndDraw());
+  }
+
+  // 公式 canvas 事件
+  const fhCanvas = document.getElementById('formulaHwCanvas');
+  if (fhCanvas) {
+    const draw = (x, y) => {
+      if (!fhCtx || !fhIsDrawing) return;
+      fhCtx.beginPath();
+      fhCtx.moveTo(fhLastX, fhLastY);
+      fhCtx.lineTo(x, y);
+      fhCtx.stroke();
+      fhLastX = x; fhLastY = y;
+    };
+    fhCanvas.addEventListener('mousedown', e => {
+      fhIsDrawing = true;
+      const rect = fhCanvas.getBoundingClientRect();
+      fhLastX = e.clientX - rect.left;
+      fhLastY = e.clientY - rect.top;
+    });
+    fhCanvas.addEventListener('mousemove', e => {
+      if (!fhIsDrawing) return;
+      const rect = fhCanvas.getBoundingClientRect();
+      draw(e.clientX - rect.left, e.clientY - rect.top);
+    });
+    fhCanvas.addEventListener('mouseup', () => fhIsDrawing = false);
+    fhCanvas.addEventListener('mouseleave', () => fhIsDrawing = false);
+    fhCanvas.addEventListener('touchstart', e => {
+      e.preventDefault();
+      fhIsDrawing = true;
+      const rect = fhCanvas.getBoundingClientRect();
+      const touch = e.touches[0];
+      fhLastX = touch.clientX - rect.left;
+      fhLastY = touch.clientY - rect.top;
+    }, { passive: false });
+    fhCanvas.addEventListener('touchmove', e => {
+      e.preventDefault();
+      if (!fhIsDrawing) return;
+      const rect = fhCanvas.getBoundingClientRect();
+      const touch = e.touches[0];
+      draw(touch.clientX - rect.left, touch.clientY - rect.top);
+    }, { passive: false });
+    fhCanvas.addEventListener('touchend', () => fhIsDrawing = false);
+  }
+});
+</script>
+
+</body>
+</html>
