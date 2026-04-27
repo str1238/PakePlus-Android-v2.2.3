@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>我的作业</title>
+  <style>
+    :root {
+      --brand: #2dc89c;
+      --brand-dark: #20b090;
+      --brand-light: rgba(45,200,156,0.15);
+      --text-primary: #1A1A1A;
+      --text-secondary: #6E6E73;
+      --text-muted: #AEAEB2;
+      --border: rgba(255,255,255,0.3);
+      --surface: rgba(255,255,255,0.95);
+      --surface-card: rgba(255,255,255,0.92);
+      --bg: #2dc89c;
+      --sp-1: 4px;   --sp-2: 8px;   --sp-3: 12px;  --sp-4: 16px;
+      --sp-5: 20px;  --sp-6: 24px;  --sp-8: 32px;
+      --text-xs: 11px;  --text-sm: 12px;  --text-base: 14px;
+      --text-md: 15px;  --text-lg: 16px;  --text-xl: 17px;
+      --text-2xl: 20px; --text-3xl: 24px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      font-size: var(--text-base);
+      -webkit-text-size-adjust: 100%;
+      -webkit-tap-highlight-color: transparent;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    a { color: inherit; text-decoration: none; }
+
+    /* Status Bar */
+    .status-bar {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .status-time { font-size: 15px; font-weight: 600; color: white; letter-spacing: -0.3px; }
+    .status-icons { position: absolute; right: var(--sp-4); display: flex; gap: var(--sp-2); }
+    .status-icons svg { width: 16px; height: 16px; fill: white; }
+
+    /* Content — no white container */
+    .content {
+      padding: var(--sp-2) var(--sp-4) 120px;
+    }
+
+    /* Section */
+    .task-section { margin-bottom: var(--sp-6); }
+    .section-title {
+      font-size: var(--text-lg);
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: var(--sp-3);
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+    }
+    .section-count {
+      font-size: var(--text-sm);
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+    .section-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--brand);
+      flex-shrink: 0;
+    }
+
+    /* Task Card */
+    .task-card {
+      background: var(--surface-card);
+      border-radius: 14px;
+      padding: var(--sp-3) var(--sp-4);
+      margin-bottom: var(--sp-3);
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      border: 1px solid rgba(0,0,0,0.04);
+    }
+    .task-card:active { transform: scale(0.98); box-shadow: none; }
+    .task-card:last-child { margin-bottom: 0; }
+    .task-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .task-icon-text { font-size: 18px; font-weight: 700; color: white; letter-spacing: 1px; }
+    .task-icon.orange { background: linear-gradient(135deg, #FF9500, #FF6B00); }
+    .task-icon.blue { background: linear-gradient(135deg, #007AFF, #0056CC); }
+    .task-icon.purple { background: linear-gradient(135deg, #AF52DE, #8B3FBF); }
+    .task-icon.teal { background: linear-gradient(135deg, #30D158, #20A84A); }
+    .task-icon.red { background: linear-gradient(135deg, #FF453A, #D92D20); }
+    .task-info { flex: 1; min-width: 0; }
+    .task-school {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+    .task-name {
+      font-size: var(--text-base);
+      font-weight: 600;
+      color: var(--text-primary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .task-meta {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 3px;
+    }
+    .task-tag {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+    }
+    .task-tag.orange { background: rgba(255,149,0,0.12); color: #FF9500; }
+    .task-tag.blue { background: rgba(0,122,255,0.12); color: #007AFF; }
+    .task-tag.purple { background: rgba(175,82,222,0.12); color: #AF52DE; }
+    .task-tag.teal { background: rgba(48,209,88,0.12); color: #30D158; }
+    .task-tag.red { background: rgba(255,69,58,0.12); color: #FF453A; }
+    .task-date {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      flex-shrink: 0;
+      text-align: center;
+    }
+    .task-arrow {
+      width: 18px;
+      height: 18px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: var(--sp-8) 0;
+    }
+    .empty-icon {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto var(--sp-3);
+      background: var(--brand-light);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .empty-icon svg { width: 28px; height: 28px; color: var(--brand); }
+    .empty-title { font-size: var(--text-base); font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+    .empty-desc { font-size: var(--text-sm); color: var(--text-muted); }
+
+    /* Bottom close button area */
+    .bottom-area {
+      position: sticky;
+      bottom: 0;
+      padding: var(--sp-3) var(--sp-4) calc(var(--sp-4) + env(safe-area-inset-bottom));
+      display: flex;
+      justify-content: center;
+      background: transparent;
+    }
+    .close-btn {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.10);
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      border: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .close-btn:active { transform: scale(0.93); box-shadow: none; }
+    .close-btn svg { width: 20px; height: 20px; color: var(--brand); }
+  </style>
+</head>
+<body>
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <div class="status-time">9:41</div>
+    <div class="status-icons">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- 待完成作业 -->
+    <div class="task-section">
+      <div class="section-title">
+        <div class="section-dot"></div>
+        待完成作业
+        <span class="section-count" id="pendingCount"></span>
+      </div>
+      <div id="pendingList"></div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Close Button -->
+  <div class="bottom-area">
+    <button class="close-btn" onclick="closeTask()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+
+<script>
+  // 科目 → 单字缩写
+  const subjectChar = { '数学':'数', '语文':'语', '英语':'英', '物理':'物', '化学':'化', '历史':'历', '地理':'地', '生物':'生', '政治':'政' };
+
+  // Mock: 学生待完成作业
+  const pendingHomework = [
+    { school: '北京市第一中学', class: '八年级(1)班', subject: '数学', name: '二次函数单元练习', date: '2026-04-22', questions: 15, tag: 'orange' },
+    { school: '北京市第一中学', class: '八年级(1)班', subject: '语文', name: '背影 课后练习', date: '2026-04-23', questions: 8, tag: 'red' },
+    { school: '北京市第一中学', class: '八年级(1)班', subject: '英语', name: 'Unit4 单词听写', date: '2026-04-23', questions: 20, tag: 'blue' },
+    { school: '北京市第一中学', class: '八年级(1)班', subject: '物理', name: '凸透镜成像规律练习', date: '2026-04-24', questions: 12, tag: 'purple' },
+    { school: '北京市第一中学', class: '八年级(1)班', subject: '数学', name: '二次函数综合测试', date: '2026-04-25', questions: 20, tag: 'orange' },
+    { school: '北京市第一中学', class: '八年级(1)班', subject: '历史', name: '第5-6课复习题', date: '2026-04-26', questions: 10, tag: 'teal' },
+  ];
+
+  function formatDate(dateStr) {
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const d = new Date(dateStr);
+    d.setHours(0,0,0,0);
+    const diff = Math.round((today - d) / 86400000);
+    if (diff === 0) return '今天';
+    if (diff === 1) return '昨天';
+    return dateStr.slice(5);
+  }
+
+  function renderPending() {
+    const list = document.getElementById('pendingList');
+    const count = document.getElementById('pendingCount');
+    if (pendingHomework.length === 0) {
+      count.textContent = '（0）';
+      list.innerHTML = emptyHTML('太棒了！', '本周作业已全部完成');
+      return;
+    }
+    count.textContent = '（' + pendingHomework.length + '）';
+    list.innerHTML = pendingHomework.map((h, i) => cardHTML(h, i)).join('');
+  }
+
+  function cardHTML(h, i) {
+    const ch = subjectChar[h.subject] || h.subject.charAt(0);
+    return '<div class="task-card" onclick="goToHomework(' + i + ')">' +
+      '<div class="task-icon ' + h.tag + '">' +
+        '<span class="task-icon-text">' + ch + '</span>' +
+      '</div>' +
+      '<div class="task-info">' +
+        '<div class="task-school">' + h.school + ' · ' + h.class + '</div>' +
+        '<div class="task-name">' + h.name + '</div>' +
+        '<div class="task-meta">' +
+          '<span class="task-tag ' + h.tag + '">' + h.subject + '</span>' +
+          '<span style="font-size:10px;color:var(--text-muted);">共 ' + h.questions + ' 题</span>' +
+        '</div>' +
+      '</div>' +
+      '<div style="display:flex;align-items:center;gap:8px;align-self:stretch;justify-content:flex-end;">' +
+        '<div class="task-date">' + formatDate(h.date) + '</div>' +
+        '<svg class="task-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>' +
+      '</div>' +
+    '</div>';
+  }
+
+  function emptyHTML(title, desc) {
+    return '<div class="empty-state">' +
+      '<div class="empty-icon">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg>' +
+      '</div>' +
+      '<div class="empty-title">' + title + '</div>' +
+      '<div class="empty-desc">' + desc + '</div>' +
+    '</div>';
+  }
+
+  function goToHomework(id) { window.location.href = 'homework.html?id=' + id; }
+
+  function closeTask() { history.back(); }
+
+  renderPending();
+</script>
+
+<script>
+</script>
+</body>
+</html>
